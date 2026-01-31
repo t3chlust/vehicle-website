@@ -1436,139 +1436,88 @@
 
                                     <script>
                                         (function () {
-                                            var manufacturers = [
-                                                {
-                                                    name: "ТИНГЕР",
-                                                    city: "Череповец",
-                                                    logo: "https://res.cloudinary.com/duystfz2v/image/upload/v1768922599/%D0%BB%D0%BE%D0%B3%D0%BE_%D1%82%D0%B8%D0%BD%D0%B3%D0%B5%D1%80_axempn.jpg",
-                                                    vk: "https://vk.com/predel.prochnosti",
-                                                    youtube: "https://www.youtube.com/@predel_prochnosti",
-                                                    website: "https://tinger.ru/"
-                                                },
-                                                {
-                                                    name: "BIGBO",
-                                                    city: "Кострома",
-                                                    logo: "https://res.cloudinary.com/duystfz2v/image/upload/v1716980833/g32wmeeyhbz8rqvlb2cu.png",
-                                                    vk: "https://vk.com/vezdehodbigbo",
-                                                    youtube: "https://www.youtube.com/@bigbo44",
-                                                    website: "https://bigbo.ru/"
-                                                },
-                                                {
-                                                    name: "Лесник",
-                                                    city: "Вологда",
-                                                    logo: "https://res.cloudinary.com/duystfz2v/image/upload/v1716980834/mewy0bxfmmyjizg45jry.png",
-                                                    vk: "https://vk.com/vezdehod_lesnik",
-                                                    youtube: "https://www.youtube.com/@user-sm9mg9bf9d",
-                                                    website: "https://vezdehod-lesnik.ru/"
-                                                },
-                                                {
-                                                    name: "TINGER",
-                                                    city: "Череповец",
-                                                    logo: "https://res.cloudinary.com/duystfz2v/image/upload/v1716980833/nfrgrmrqxxf1dmeeyqtv.png",
-                                                    vk: "https://vk.com/tinger",
-                                                    youtube: "https://www.youtube.com/@tinger",
-                                                    website: "https://tinger.ru/"
-                                                },
-                                                {
-                                                    name: "SHERP",
-                                                    city: "Санкт-Петербург",
-                                                    logo: "https://res.cloudinary.com/duystfz2v/image/upload/v1716980833/oiypsx2xb5v6n0hbxdj4.svg",
-                                                    vk: "https://vk.com/sherp_global",
-                                                    youtube: "https://www.youtube.com/@SHERP",
-                                                    website: "https.com/sherp.global"
-                                                },
-                                                {
-                                                    name: "SEVER",
-                                                    city: "Красноярск",
-                                                    logo: "https://res.cloudinary.com/duystfz2v/image/upload/v1716980834/r2acxvyqumpqyy40h7tx.png",
-                                                    vk: "https://vk.com/sever.vezdehody",
-                                                    youtube: "https://www.youtube.com/@sever-vezdehody",
-                                                    website: "https.com/sever-trucks.ru"
-                                                },
-                                                {
-                                                    name: "СОКОЛ",
-                                                    city: "Новосибирск",
-                                                    logo: "https://res.cloudinary.com/duystfz2v/image/upload/v1716980833/s7l14z3ndqowcqyqg1tq.png",
-                                                    vk: "https://vk.com/vezdehody_sokol",
-                                                    youtube: "https://www.youtube.com/@sokolvezdehod",
-                                                    website: "https.com/vezdehod-sokol.ru"
-                                                },
-                                                {
-                                                    name: "ШАТУН",
-                                                    city: "Нижний Новгород",
-                                                    logo: "https://res.cloudinary.com/duystfz2v/image/upload/v1716980834/j7n20rxq8s10txld1hxn.png",
-                                                    vk: "https://vk.com/vezdehodshatun",
-                                                    youtube: "https://www.youtube.com/@vezdehodshatun",
-                                                    website: "https.com/vezdehod-shatun.ru"
-                                                },
-                                            ];
 
-                                            var ICON_VK = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/VK_Compact_Logo_%282021-present%29.svg/1024px-VK_Compact_Logo_%282021-present%29.svg.png';
-                                            var ICON_YT = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png';
-                                            var ICON_WEB = 'https://cdn-icons-png.flaticon.com/512/1006/1006771.png';
+                                            const SHEET_CSV_URL =
+                                                'https://docs.google.com/spreadsheets/d/1xU4C49DHBBlz0FdfGbc-kAZBBJlBVdgGxcYL68QKhUc/export?format=csv&gid=736473411';
 
-                                            function renderManufacturers() {
-                                                var grid = document.getElementById('manufacturer-grid');
+                                            const ICON_VK = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/VK_Compact_Logo_%282021-present%29.svg/1024px-VK_Compact_Logo_%282021-present%29.svg.png';
+                                            const ICON_YT = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png';
+                                            const ICON_WEB = 'https://cdn-icons-png.flaticon.com/512/1006/1006771.png';
+
+                                            function parseCSV(text) {
+                                                const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+                                                lines.shift(); // убираем заголовки
+
+                                                return lines.map(line => {
+                                                    const v = line.split(',');
+                                                    return {
+                                                        name: v[1] || '',
+                                                        city: v[2] || '',
+                                                        logo: v[3] || '',
+                                                        vk: v[4] || '',
+                                                        youtube: v[5] || '',
+                                                        website: v[6] || ''
+                                                    };
+                                                });
+                                            }
+
+                                            function renderManufacturers(manufacturers) {
+                                                const grid = document.getElementById('manufacturer-grid');
                                                 if (!grid) return;
                                                 grid.innerHTML = '';
 
-                                                manufacturers.forEach(function (m) {
-                                                    var card = document.createElement('div');
+                                                manufacturers.forEach(m => {
+                                                    const card = document.createElement('div');
                                                     card.className = 'manufacturer-card';
 
-                                                    var logoWrap = document.createElement('div');
+                                                    const logoWrap = document.createElement('div');
                                                     logoWrap.className = 'manufacturer-logo-container';
-                                                    var img = document.createElement('img');
+
+                                                    const img = document.createElement('img');
                                                     img.className = 'manufacturer-logo';
                                                     img.src = m.logo || '';
                                                     img.alt = m.name || '';
                                                     logoWrap.appendChild(img);
 
-                                                    var name = document.createElement('div');
+                                                    const name = document.createElement('div');
                                                     name.className = 'manufacturer-name';
                                                     name.textContent = m.name || '';
 
-                                                    var city = document.createElement('div');
+                                                    const city = document.createElement('div');
                                                     city.className = 'manufacturer-city';
                                                     city.textContent = m.city || '';
 
-                                                    var socials = document.createElement('div');
+                                                    const socials = document.createElement('div');
                                                     socials.className = 'manufacturer-socials';
 
                                                     if (m.vk) {
-                                                        var aVk = document.createElement('a');
-                                                        aVk.href = m.vk;
-                                                        aVk.target = '_blank';
-                                                        aVk.title = 'VK';
-                                                        var iVk = document.createElement('img');
-                                                        iVk.src = ICON_VK;
-                                                        iVk.alt = 'VK';
-                                                        aVk.appendChild(iVk);
-                                                        socials.appendChild(aVk);
+                                                        const a = document.createElement('a');
+                                                        a.href = m.vk;
+                                                        a.target = '_blank';
+                                                        const i = document.createElement('img');
+                                                        i.src = ICON_VK;
+                                                        a.appendChild(i);
+                                                        socials.appendChild(a);
                                                     }
 
                                                     if (m.youtube) {
-                                                        var aYt = document.createElement('a');
-                                                        aYt.href = m.youtube;
-                                                        aYt.target = '_blank';
-                                                        aYt.title = 'YouTube';
-                                                        var iYt = document.createElement('img');
-                                                        iYt.src = ICON_YT;
-                                                        iYt.alt = 'YT';
-                                                        aYt.appendChild(iYt);
-                                                        socials.appendChild(aYt);
+                                                        const a = document.createElement('a');
+                                                        a.href = m.youtube;
+                                                        a.target = '_blank';
+                                                        const i = document.createElement('img');
+                                                        i.src = ICON_YT;
+                                                        a.appendChild(i);
+                                                        socials.appendChild(a);
                                                     }
 
                                                     if (m.website) {
-                                                        var aWeb = document.createElement('a');
-                                                        aWeb.href = m.website;
-                                                        aWeb.target = '_blank';
-                                                        aWeb.title = 'Сайт';
-                                                        var iWeb = document.createElement('img');
-                                                        iWeb.src = ICON_WEB;
-                                                        iWeb.alt = 'Web';
-                                                        aWeb.appendChild(iWeb);
-                                                        socials.appendChild(aWeb);
+                                                        const a = document.createElement('a');
+                                                        a.href = m.website;
+                                                        a.target = '_blank';
+                                                        const i = document.createElement('img');
+                                                        i.src = ICON_WEB;
+                                                        a.appendChild(i);
+                                                        socials.appendChild(a);
                                                     }
 
                                                     card.appendChild(logoWrap);
@@ -1580,13 +1529,19 @@
                                                 });
                                             }
 
-                                            // Run immediately (grid exists earlier in DOM)
-                                            renderManufacturers();
-                                            // Expose for debug if needed
-                                            window.manufacturers = manufacturers;
-                                            window.renderManufacturers = renderManufacturers;
+                                            fetch(SHEET_CSV_URL)
+                                                .then(r => r.text())
+                                                .then(csv => {
+                                                    const manufacturers = parseCSV(csv);
+                                                    renderManufacturers(manufacturers);
+                                                    window.manufacturers = manufacturers;
+                                                })
+                                                .catch(err => console.error('Ошибка загрузки таблицы:', err));
+
                                         })();
                                     </script>
+
+
                                 </div>
                             </div>
                             <div id="tab-content-admin" class="tab-content">
