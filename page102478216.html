@@ -49,7 +49,77 @@
                 <div class="t-container_100 ">
                     <div class="t-width t-width_100 "> <!-- nominify begin -->
                         <script>
+                            function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
+                            function closeModalDirect() { document.getElementById('modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
+                            function openAuthModal() {
+                                document.getElementById('auth-step-1').classList.remove('hidden');
+                                document.getElementById('auth-step-2').classList.add('hidden');
 
+                                document.getElementById('auth-code').value = '';
+                                document.getElementById('auth-phone').value = '+7';
+
+                                document.getElementById('auth-modal').classList.add('active');
+                            }
+                            function closeAuthModal() { document.getElementById('auth-modal').classList.remove('active') }
+                            function verifySmsCode() {
+                                const code = safeVal('auth-code')?.trim();
+
+                                if (!code) {
+                                    alert("Введите код");
+                                    return;
+                                }
+
+                                showLoader("Проверка...");
+
+                                const correctCode = "1";
+
+                                setTimeout(() => {
+                                    hideLoader();
+
+                                    if (code === correctCode) {
+                                        currentUserName = "Админ";
+                                        localStorage.setItem('vezdehod_username', currentUserName);
+
+                                        currentUser = {
+                                            phoneNumber: "+79829817369",
+                                            uid: "hardcoded-admin-001"
+                                        };
+
+                                        closeAuthModal();
+
+                                        updateAuthUI(currentUser);
+                                    } else {
+                                        alert("Неверный код");
+                                    }
+                                }, 800);
+                            }
+                            function doLogout() { auth.signOut(); localStorage.removeItem('vezdehod_username'); currentUserName = ""; isAdmin = false; }
+
+                            function sendSmsCode() {
+                                const phoneInput = safeVal('auth-phone');
+
+                                if (!phoneInput) {
+                                    alert("Введите номер телефона");
+                                    return;
+                                }
+
+                                let formattedPhone = phoneInput.trim();
+
+                                if (formattedPhone.startsWith('8')) {
+                                    formattedPhone = '+7' + formattedPhone.substring(1);
+                                }
+
+                                if (!formattedPhone.startsWith('+')) {
+                                    formattedPhone = '+' + formattedPhone;
+                                }
+
+                                showLoader("Отправка SMS...");
+
+                                hideLoader();
+
+                                document.getElementById('auth-step-1').classList.add('hidden');
+                                document.getElementById('auth-step-2').classList.remove('hidden');
+                            }
                             function getPriceVal(v) {
                                 if (!v) return 0;
                                 let n = String(v).replace(/[^0-9]/g, '');
@@ -714,19 +784,26 @@
 
                             .modal-close {
                                 position: absolute;
-                                top: 15px;
-                                right: 20px;
-                                font-size: 30px;
+                                top: 12px;
+                                right: 16px;
+                                font-size: 28px;
+                                font-weight: bold;
+                                color: #333;
                                 cursor: pointer;
-                                background: rgba(255, 255, 255, 0.9);
-                                width: 40px;
-                                height: 40px;
-                                border-radius: 50%;
+                                line-height: 1;
+                                width: 32px;
+                                height: 32px;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
-                                z-index: 20;
-                                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                                border-radius: 50%;
+                                background: rgba(255, 255, 255, 0.7);
+                                transition: background 0.2s;
+                                z-index: 10;
+                            }
+
+                            .modal-close:hover {
+                                background: rgba(240, 240, 240, 0.9);
                             }
 
                             .modal-content {
@@ -957,6 +1034,7 @@
                             }
 
                             .auth-window {
+                                position: relative;
                                 background: #fff;
                                 border-radius: 20px;
                                 padding: 30px;
@@ -1059,7 +1137,7 @@
                             }
 
                             .tab-link.active {
-                                color: #222;
+                                color: #333;
                                 border-bottom: 3px solid #ab47bc;
                                 /* Purple accent */
                             }
@@ -1121,7 +1199,7 @@
                             }
 
                             .manufacturer-name {
-                                font-size: 18px;
+                                font-size: 20px;
                                 font-weight: 800;
                                 margin-bottom: 5px;
                                 color: #000;
@@ -1130,7 +1208,7 @@
                             }
 
                             .manufacturer-city {
-                                font-size: 14px;
+                                font-size: 19px;
                                 font-weight: 600;
                                 color: #000;
                                 margin-bottom: 20px;
@@ -1690,9 +1768,11 @@
                                     onclick="closeAuthModal()" style="background:#eee;">Отмена</button>
                             </div>
                             <div id="auth-step-2" class="hidden">
-                                <div style="font-size:20px;font-weight:700;margin-bottom:15px;">Введите код</div> <input
-                                    class="form-input" id="auth-code" type="number" placeholder="Код из SMS" /> <button
-                                    class="btn btn-black btn-full" onclick="verifySmsCode()">Подтвердить</button>
+                                <div class="modal-close" onclick="closeAuthModal()">×</div>
+
+                                <div style="font-size:20px;font-weight:700;margin-bottom:15px;">Введите код</div>
+                                <input class="form-input" id="auth-code" type="number" placeholder="Код из SMS" />
+                                <button class="btn btn-black btn-full" onclick="verifySmsCode()">Подтвердить</button>
                             </div>
                         </div>
                     </div>
@@ -1755,15 +1835,10 @@
                         <div class="spinner"></div>
                         <p style="margin-top:15px;" id="loader-text">Загрузка...</p>
                     </div>
-                    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-                    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
                     <script>
                         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUI4vRlqW88m7jcx5sPQYg6PMDv0nVQ3U4ollXorvzPB1MaiNMkUEn7kQjN8UcPnVy/exec";
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
-                        const firebaseConfig = { apiKey: "AIzaSyAYrqpPe-FZTewQSBRYgSV9IaTzGoRZj9s", authDomain: "site-kupitvezdehod.firebaseapp.com", projectId: "site-kupitvezdehod", storageBucket: "site-kupitvezdehod.firebasestorage.app", messagingSenderId: "428658642822", appId: "1:428658642822:web:d5e2f3aa15c3c2806aa607" };
-                        firebase.initializeApp(firebaseConfig);
-                        const auth = firebase.auth(); auth.languageCode = 'ru';
                         let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], currentAd = null, isEditMode = false, isAdmin = false;
                         let currentPhotoIndex = 0; let currentPhotos = [];
 
@@ -1824,7 +1899,7 @@
                         }
                         function safeVal(id) { const e = document.getElementById(id); return e ? e.value : "" }
                         function setVal(i, v) { const e = document.getElementById(i); if (e) e.value = v }
-                        document.addEventListener('DOMContentLoaded', () => { loadAds(); const n = localStorage.getItem('vezdehod_username'); if (n) currentUserName = n; auth.onAuthStateChanged(u => { currentUser = u; updateAuthUI(u); }); const ptrIndicator = document.getElementById('ptr-indicator'); ptrIndicator.style.opacity = '0'; });
+                        document.addEventListener('DOMContentLoaded', () => { loadAds(); });
                         let startY = 0; let ptrDist = 0; const ptrThreshold = 80;
                         const ptrIndicator = document.getElementById('ptr-indicator');
                         const wrapper = document.getElementById('main-wrapper');
