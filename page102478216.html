@@ -1195,17 +1195,19 @@
                                 margin-bottom: 15px;
                                 overflow: hidden;
 
-                                /* убираем padding и центрирование через flex */
-                                padding: 0;
-                                display: block;
-                                /* или position: relative */
+                                /* важно */
+                                position: relative;
+                                display: flex;
+                                /* ← меняем на flex */
+                                align-items: center;
+                                justify-content: center;
                             }
 
                             .manufacturer-logo {
                                 width: 100%;
                                 height: 100%;
                                 object-fit: cover;
-                                /* ← изменили с contain на cover */
+                                /* или contain — смотрите ниже */
                                 object-position: center;
                                 display: block;
                             }
@@ -1598,7 +1600,7 @@
                                                         a.appendChild(i);
                                                         socials.appendChild(a);
                                                     }
-                                                    
+
                                                     // VK
                                                     if (m.vk) {
                                                         const a = document.createElement('a');
