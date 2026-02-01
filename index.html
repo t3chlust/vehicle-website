@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      background-color: #F7F9F8;
+      font-family: Arial, sans-serif;
+    }
+    .search-container {
+      position: relative;
+      /* ИЗМЕНЕНО: Установлен отступ 40px сверху и снизу, auto - для центрирования по горизонтали */
+      margin: 25px auto; 
+      text-align: center;
+      width: 340px;
+    }
+    #searchInput {
+      background-color: #F7F9F8;
+      padding: 10px 40px 10px 10px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23888" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.414 1.414l3.85 3.85a1 1 0 0 0 1.414-1.414l-3.85-3.85zM6.5 12a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    #manufacturerList {
+      display: none;
+      text-align: left;
+      width: 340px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .manufacturer {
+      display: block;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      background-color: #fff;
+    }
+    .manufacturer:hover {
+      background-color: #f0f0f0;
+    }
+    .hidden {
+      display: none;
+    }
+    .manufacturer-card.highlight {
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5) !important;
+      border: 2px solid #007bff !important;
+      background-color: rgba(255, 255, 0, 0.3) !important;
+    }
+    .t396__artboard .t-col-4, .t396__elem-tn, .tn-elem {
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Поиск производителей..." onkeyup="searchManufacturers()">
+  </div>
+  <div id="manufacturerList">
+    <!-- Список производителей -->
+    <div class="manufacturer" data-target="TINGER">ТИНГЕР</div>
+    <div class="manufacturer" data-target="TUNDRA">ТУНДРА</div>
+    <!-- и так далее... -->
+     <div class="manufacturer" data-target="ХАКЕР">ХАКЕР</div>
+    <div class="manufacturer" data-target="ДОЗЕР">ДОЗЕР</div>
+    <div class="manufacturer" data-target="РБ МОТОРС">РБ МОТОРС</div>
+    <div class="manufacturer" data-target="КАПРАЛ">КАПРАЛ</div>
+ <div class="manufacturer" data-target="МАМОНТ">МАМОНТ</div>
+    <div class="manufacturer" data-target="ПОМОРЕЦ">ПОМОРЕЦ</div>
+    <div class="manufacturer" data-target="РОМБ 4х4">РОМБ 4х4</div>
+    <div class="manufacturer" data-target="TRACKER">ТРЭКЕР</div>
+    <div class="manufacturer" data-target="ИЗГТ">ИЗГТ</div>
+    <div class="manufacturer" data-target="РУСАК">РУСАК</div>
+    <div class="manufacturer" data-target="БАРС">БАРС</div>
+    <div class="manufacturer" data-target="БИВНЕХОД">БИВНЕХОД</div>  
+    <div class="manufacturer" data-target="ВЕЗДЕЗОД 29">ВЕЗДЕЗОД 29</div>
+    <div class="manufacturer" data-target="ПРО 29">ПРО 29</div>
+    <div class="manufacturer" data-target="МАРС">МАРС</div>
+    <div class="manufacturer" data-target="ХАН">ХАН</div>
+    <div class="manufacturer" data-target="АВРОРА">АВРОРА</div>
+    <div class="manufacturer" data-target="ARCH">АРЧ</div>
+    <div class="manufacturer" data-target="АТЛАНТ">АТЛАНТ</div>
+ <div class="manufacturer" data-target="БЕР">БЕР</div>
+    <div class="manufacturer" data-target="ВЕДУН">ВЕДУН</div>
+    <div class="manufacturer" data-target="ВЕПРЬ">ВЕПРЬ 4х4</div>
+    <div class="manufacturer" data-target="ГАЗАН">ГАЗАН</div>
+    <div class="manufacturer" data-target="ГЕФЕСТ">ГЕФЕСТ</div>
+    <div class="manufacturer" data-target="ДОБЫТЧИК">ДОБЫТЧИК</div>
+    <div class="manufacturer" data-target="ЕГЕРЬ">ЕГЕРЬ</div>
+    <div class="manufacturer" data-target="ЛЕШИЙ">ЛЕШИЙ</div>  
+     <div class="manufacturer" data-target="г. Вологда">г. Вологда</div>
+    <div class="manufacturer" data-target="г. Владимир">г. Владимир</div>
+    <div class="manufacturer" data-target="г. Витебск">г. Витебск</div>
+    <div class="manufacturer" data-target="г. Вельск">г. Вельск</div>
+    <div class="manufacturer" data-target="г. Богородск">г. Богородск</div>
+    <div class="manufacturer" data-target="г. Берёзовский">г. Берёзовский</div>
+    <div class="manufacturer" data-target="г. Архангельск">г. Архангельск</div> 
+    <div class="manufacturer" data-target="ЛИТЛ">ЛИТЛ</div>
+    <div class="manufacturer" data-target="МЕДВЕДЬ PRO">МЕДВЕДЬ ПРО</div>
+    <div class="manufacturer" data-target="ОХОТНИК">ОХОТНИК</div>
+    <div class="manufacturer" data-target="ПАНФИЛОВЕЦ">ПАНФИЛОВЕЦ</div>
+    <div class="manufacturer" data-target="СЕВЕРЯК">СЕВЕРЯК</div>
+    <div class="manufacturer" data-target="ТДН">ТДН</div>
+    <div class="manufacturer" data-target="ТЕРМИТ">ТЕРМИТ</div>  
+     <div class="manufacturer" data-target="ТЕХНИК">ТЕХНИК</div>
+    <div class="manufacturer" data-target="ТЕХНОВОЛК">ТЕХНОВОЛК</div>
+    <div class="manufacturer" data-target="ТОР-35">ТОР 35</div>
+    <div class="manufacturer" data-target="ТРИМ">ТРИМ</div>
+    <div class="manufacturer" data-target="ТРИУМФ">ТРИУМФ</div>
+    <div class="manufacturer" data-target="ЧЕРЕПАХА">ЧЕРЕПАХА</div>
+    <div class="manufacturer" data-target="ШАТУН 35">ШАТУН 35</div> 
+        <div class="manufacturer" data-target="ШЕРИФ">ШЕРИФ</div>  
+     <div class="manufacturer" data-target="г. Всеволжск">г. Всеволжск</div>
+    <div class="manufacturer" data-target="СЕКАЧ">СЕКАЧ</div>
+    <div class="manufacturer" data-target="г. Жуков">г. Жуков</div>
+    <div class="manufacturer" data-target="БРО">БРО</div>
+    <div class="manufacturer" data-target="г. Заволжье">г. Заволжье</div>
+    <div class="manufacturer" data-target="СТМ">СТМ</div>
+    <div class="manufacturer" data-target="г. Иркутск">г. Иркутск</div> 
+    <div class="manufacturer" data-target="БАЙКАЛ 4х4">БАЙКАЛ 4х4</div>  
+     <div class="manufacturer" data-target="ВЕТЕР">ВЕТЕР</div>
+    <div class="manufacturer" data-target="ЗЭТ">ЗЭТ</div>
+    <div class="manufacturer" data-target="ИРКУТ">ИРКУТ</div>
+    <div class="manufacturer" data-target="СОБОЛЬ">СОБОЛЬ</div>
+    <div class="manufacturer" data-target="ШТОРМ">ШТОРМ</div>
+    <div class="manufacturer" data-target="г. Калуга">г. Калуга</div>
+    <div class="manufacturer" data-target="КАЛУЖАНИН">КАЛУЖАНИН</div> 
+    <div class="manufacturer" data-target="г. Киров">г. Киров</div>  
+     <div class="manufacturer" data-target="Завод Вездеход">Завод Вездеход</div>
+    <div class="manufacturer" data-target="КАРАКАТ 43"></div>
+    <div class="manufacturer" data-target="р. Коми">р. Коми</div>
+    <div class="manufacturer" data-target="БООТУР">БООТУР</div>
+    <div class="manufacturer" data-target="ГРЯЗЕМЕС 11">ГРЯЗЕМЕС 11</div>
+    <div class="manufacturer" data-target="ЗЫРЯНИН">ЗЫРЯНИН</div>
+    <div class="manufacturer" data-target="г. Коноша">г. Коноша</div> 
+    <div class="manufacturer" data-target="БИЗОН">БИЗОН</div>  
+     <div class="manufacturer" data-target="г. Кострома">г. Кострома</div>
+    <div class="manufacturer" data-target="BIG BO">БИГ БО</div>
+    <div class="manufacturer" data-target="ВЕЗДЕХОД 44">ВЕЗДЕХОД 44</div>
+    <div class="manufacturer" data-target="г. Котлас">г. Котлас</div>
+    <div class="manufacturer" data-target="ХОМА">ХОМА</div>
+    <div class="manufacturer" data-target="г. Красноярск">г. Красноярск</div>
+    <div class="manufacturer" data-target="БОРУС">БОРУС</div> 
+    <div class="manufacturer" data-target="ВАРЯГ">ВАРЯГ</div>
+    <div class="manufacturer" data-target="VISUVA">ВИЗУВА</div> 
+    <div class="manufacturer" data-target="МАКС">МАКС</div>
+    <div class="manufacturer" data-target="СЕВЕР">СЕВЕР</div> 
+    <div class="manufacturer" data-target="г. Курган">Курган</div>
+    <div class="manufacturer" data-target="БУРЛАК">БУРЛАК</div> 
+    <div class="manufacturer" data-target="ЛАЙКА">ЛАЙКА</div>
+    <div class="manufacturer" data-target="ФЕНИКС">ФЕНИКС</div> 
+    <div class="manufacturer" data-target="г. Липецк">г. Липецк</div>
+    <div class="manufacturer" data-target="АВИОН">АВИОН</div> 
+    <div class="manufacturer" data-target="ДЕМОН">ДЕМОН</div> 
+    <div class="manufacturer" data-target="г. Минск">г. Минск</div>
+    <div class="manufacturer" data-target="ЛИТВИНА">ЛИТВИНА</div> 
+    <div class="manufacturer" data-target="г. Москва">г. Москва</div>
+    <div class="manufacturer" data-target="ДОЗОР">ДОЗОР</div> 
+    <div class="manufacturer" data-target="КАРАВАН">КАРАВАН</div>
+    <div class="manufacturer" data-target="PatrolTrack">ПАТРОЛ-ТРЭК</div> 
+    <div class="manufacturer" data-target="TERRANICA">ТЕРРАНИКА</div>
+    <div class="manufacturer" data-target="ТРЭКОЛ">ТРЭКОЛ</div> 
+    <div class="manufacturer" data-target="УРСА">УРСА</div>
+    <div class="manufacturer" data-target="ФИНИСТ">ФИНИСТ</div> 
+    <div class="manufacturer" data-target="ШАМАН">ШАМАН</div>
+    <div class="manufacturer" data-target="г. Нижнеудинск">г. Нижнеудинск</div> 
+    <div class="manufacturer" data-target="ЗВЕРЬ">ЗВЕРЬ</div>
+    <div class="manufacturer" data-target="г. Нижний Новгород">г. Нижний Новгород</div> 
+    <div class="manufacturer" data-target="ЕГЕРЬ">ЕГЕРЬ</div>
+    <div class="manufacturer" data-target="ENWIX">ЭНВИКС</div> 
+    <div class="manufacturer" data-target="НИЖЕГОРОДЕЦ">НИЖЕГОРОДЕЦ</div>
+    <div class="manufacturer" data-target="T-REX">Т-РЭКС</div> 
+    <div class="manufacturer" data-target="УРАН">УРАН</div>
+    <div class="manufacturer" data-target="г. Нижний Тагил">г. Нижний Тагил</div> 
+    <div class="manufacturer" data-target="КОНОН">КОНОН</div>
+    <div class="manufacturer" data-target="г. Новосибирск">г. Новосибирск</div> 
+    <div class="manufacturer" data-target="АЗИМУТ">АЗИМУТ</div>
+    <div class="manufacturer" data-target="VENOM">ВЕНОМ</div> 
+    <div class="manufacturer" data-target="КАРАКАН">КАРАКАН</div>
+    <div class="manufacturer" data-target="ПЛАСТУН">ПЛАСТУН</div> 
+    <div class="manufacturer" data-target="СОКОЛ">СОКОЛ</div>
+    <div class="manufacturer" data-target="ТАЙПАН">ТАЙПАН</div> 
+    <div class="manufacturer" data-target="ЯРС">ЯРС</div>
+    <div class="manufacturer" data-target="г. Омск">г. Омск</div> 
+    <div class="manufacturer" data-target="Болотный Проходимец">Болотный Проходимец</div>
+    <div class="manufacturer" data-target="ТИТАН">ТИТАН</div> 
+    <div class="manufacturer" data-target="г. Пермь">г. Пермь</div>
+    <div class="manufacturer" data-target="Тактик">Тактик</div> 
+    <div class="manufacturer" data-target="г. Псков">г. Псков</div>
+    <div class="manufacturer" data-target="г. Рыбинск">г. Рыбинск</div> 
+    <div class="manufacturer" data-target="ВЕПС">ВЕПС</div>
+    <div class="manufacturer" data-target="РУСОХОД">РУСОХОД</div> 
+    <div class="manufacturer" data-target="г. Санкт-Петербург">г. Санкт-Петербург</div>
+    <div class="manufacturer" data-target="АРХАНТ">АРХАНТ</div> 
+    <div class="manufacturer" data-target="ГИРТЕК">ГИРТЕК</div>
+    <div class="manufacturer" data-target="ЗИС-СПБ">ЗИС-СПБ</div> 
+    <div class="manufacturer" data-target="RDC">РДЦ</div> 
+    <div class="manufacturer" data-target="САМУРАЙ">САМУРАЙ</div>
+    <div class="manufacturer" data-target="ТАЙФУН">ТАЙФУН</div> 
+    <div class="manufacturer" data-target="ЛОМОЛЕС">ЛОМОЛЕС</div> 
+    <div class="manufacturer" data-target="BV 206 ЛОСЬ">БВ 206 ЛОСЬ</div>
+    <div class="manufacturer" data-target="г. Северодвинск">г. Северодвинск</div> 
+    <div class="manufacturer" data-target="СЕВЕР">СЕВЕР</div> 
+    <div class="manufacturer" data-target="СЕВЕРОДВИНСК"></div>
+    <div class="manufacturer" data-target="г. Смоленск">г. Смоленск</div> 
+    <div class="manufacturer" data-target="ДОБРЫНЯ">ДОБРЫНЯ</div> 
+    <div class="manufacturer" data-target="г. Сургут">г. Сургут</div>
+    <div class="manufacturer" data-target="ОСТЯК">ОСТЯК</div> 
+    <div class="manufacturer" data-target="ТРОМ">ТРОМ</div> 
+    <div class="manufacturer" data-target="г. Сыктывкар">г. Сыктывкар</div>
+    <div class="manufacturer" data-target="БАТЫРЬ">БАТЫРЬ</div> 
+    <div class="manufacturer" data-target="ГАЛА">ГАЛА</div> 
+    <div class="manufacturer" data-target="г. Тобольск">г. Тобольск</div>
+    <div class="manufacturer" data-target="МОЛОХ">МОЛОХ</div> 
+    <div class="manufacturer" data-target="ХИЩНИК">ХИЩНИК</div> 
+    <div class="manufacturer" data-target="г. Томск">г. Томск</div>
+    <div class="manufacturer" data-target="БИРЮК">БИРЮК</div> 
+    <div class="manufacturer" data-target="VNE DOROG">ВНЕ ДОРОГ</div> 
+    <div class="manufacturer" data-target="ФАНТОМ">ФАНТОМ</div>
+    <div class="manufacturer" data-target="г. Тюмень">г. Тюмень</div> 
+    <div class="manufacturer" data-target="АРКТИКА">АРКТИКА</div> 
+    <div class="manufacturer" data-target="БЕРКУТ">БЕРКУТ</div>
+    <div class="manufacturer" data-target="КОСАЧ">КОСАЧ</div> 
+    <div class="manufacturer" data-target="КРЕЧЕТ">КРЕЧЕТ</div> 
+    <div class="manufacturer" data-target="МЕДВЕДЬ ТЮМЕНЬ">МЕДВЕДЬ ТЮМЕНЬ</div> 
+    <div class="manufacturer" data-target="РОСОМАХА">РОСОМАХА</div>
+    <div class="manufacturer" data-target="СКБ МОТОРС">СКБ МОТОРС</div> 
+    <div class="manufacturer" data-target="ТУНГУС 72">ТУНГУС-72</div> 
+    <div class="manufacturer" data-target="г. Уват">г. Уват</div>
+    <div class="manufacturer" data-target="ТАЙГА 72">ТАЙГА-72</div> 
+    <div class="manufacturer" data-target="г. Уфа">г. Уфа</div> 
+    <div class="manufacturer" data-target="г. Череповец">г. Череповец</div> 
+    <div class="manufacturer" data-target="КРОШ">КРОШ</div>
+    <div class="manufacturer" data-target="ПЕЛЕЦ">ПЕЛЕЦ</div> 
+    <div class="manufacturer" data-target="ЯР">Прицепы Яр</div>
+    <div class="manufacturer" data-target="ЯР">Яр</div>
+    <div class="manufacturer" data-target="ЯР">Прицеп</div>
+  </div>
+
+  <script>
+    // Весь JavaScript остаётся без изменений
+    function searchManufacturers() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const manufacturers = document.getElementsByClassName('manufacturer');
+      const list = document.getElementById('manufacturerList');
+
+      if (list) {
+        if (input === '') {
+          list.style.display = 'none';
+        } else {
+          list.style.display = 'block';
+        }
+      }
+
+      for (let i = 0; i < manufacturers.length; i++) {
+        const name = manufacturers[i].textContent.toLowerCase();
+        if (name.includes(input)) {
+          manufacturers[i].classList.remove('hidden');
+        } else {
+          manufacturers[i].classList.add('hidden');
+        }
+      }
+    }
+
+    function scrollToCard(targetName) {
+      console.log('Ищем карточку для:', targetName);
+
+      document.querySelectorAll('.manufacturer-card.highlight, .t-col.highlight, .tn-elem.highlight').forEach(el => el.classList.remove('highlight'));
+
+      const selectors = [
+        'div.t-col',
+        'div.t396__elem',
+        'div.tn-elem',
+        'div[class*="col"]',
+        'div'
+      ];
+
+      let foundElement = null;
+      let bestMatch = 0;
+
+      for (let selector of selectors) {
+        const elements = document.querySelectorAll(selector);
+        for (let element of elements) {
+          const text = element.textContent || element.innerText || '';
+          const lowerText = text.toLowerCase();
+
+          if (lowerText.includes(targetName.toLowerCase()) || text.includes(targetName)) {
+            const matchScore = (text.startsWith(targetName) ? 3 : (lowerText.includes(targetName.toLowerCase()) ? 2 : 1));
+            if (matchScore > bestMatch) {
+              bestMatch = matchScore;
+              foundElement = element;
+            }
+          }
+        }
+        if (foundElement && bestMatch >= 2) break;
+      }
+
+      if (foundElement) {
+
+        foundElement.classList.add('highlight');
+        foundElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        setTimeout(() => {
+          foundElement.classList.remove('highlight');
+        }, 2000);
+
+        const list = document.getElementById('manufacturerList');
+        if (list) list.style.display = 'none';
+        document.getElementById('searchInput').value = '';
+
+      } else {
+        console.error('Карточка для "' + targetName + '" не найдена.');
+        alert('Карточка для "' + targetName + '" не найдена.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const manufacturers = document.getElementsByClassName('manufacturer');
+      for (let i = 0; i < manufacturers.length; i++) {
+        manufacturers[i].addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetName = manufacturers[i].getAttribute('data-target');
+          scrollToCard(targetName);
+        });
+      }
+    });
+
+    if (document.readyState !== 'loading') {
+      setTimeout(() => {
+        const manufacturers = document.getElementsByClassName('manufacturer');
+        for (let i = 0; i < manufacturers.length; i++) {
+          manufacturers[i].addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetName = manufacturers[i].getAttribute('data-target');
+            scrollToCard(targetName);
+          });
+        }
+      }, 500);
+    }
+  </script>
+</body>
+</html>

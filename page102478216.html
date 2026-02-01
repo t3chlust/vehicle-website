@@ -1522,14 +1522,19 @@
                                     </div>
                                 </div>
                                 <div id="tab-content-manufacturers" class="tab-content">
+                                    <div style="margin-bottom: 25px; max-width: 500px;">
+                                        <input type="text" id="manufacturer-search" class="form-input filter-input"
+                                            placeholder="Поиск производителя" autocomplete="off"
+                                            list="manufacturer-suggestions" />
+                                        <datalist id="manufacturer-suggestions"></datalist>
+                                    </div>
                                     <div class="manufacturer-grid" id="manufacturer-grid">
                                         <!-- Manufacturer cards will be rendered here from the JS `manufacturers` array -->
                                     </div>
 
                                     <script>
                                         (function () {
-                                            const SHEET_CSV_URL =
-                                                'https://docs.google.com/spreadsheets/d/1xU4C49DHBBlz0FdfGbc-kAZBBJlBVdgGxcYL68QKhUc/export?format=csv&gid=736473411';
+                                            const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1xU4C49DHBBlz0FdfGbc-kAZBBJlBVdgGxcYL68QKhUc/export?format=csv&gid=736473411';
 
                                             const ICON_VK = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/VK_Compact_Logo_%282021-present%29.svg/1024px-VK_Compact_Logo_%282021-present%29.svg.png';
                                             const ICON_YT = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png';
@@ -1537,35 +1542,55 @@
                                             const ICON_TG = 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg';
                                             const ICON_RUTUBE = 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Rutube_icon.svg';
 
+                                            let manufacturers = [];
+                                            let synonymToOfficial = new Map();   // "тингер" → "TINGER", "трекер" → "TRACKER" и т.д.
+
                                             function parseCSV(text) {
-                                                const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+                                                const lines = text.split('\n').map(l => l.trim()).filter(l => l);
                                                 lines.shift(); // убираем заголовки
 
                                                 return lines.map(line => {
-                                                    const v = line.split(',');
-                                                    // Пропускаем № → начинаем с индекса 1
-                                                    return {
-                                                        name: v[1] || '',
-                                                        city: v[2] || '',
-                                                        logo: v[3] || '',
-                                                        vk: v[4] || '',
-                                                        youtube: v[5] || '',
-                                                        website: v[6] || '',
-                                                        rutube: v[7] || '',
-                                                        telegram: v[8] || ''
-                                                    };
+                                                    const cols = line.split(',');
+                                                    const name = (cols[1] || '').trim();
+                                                    const city = (cols[2] || '').trim();
+                                                    const logo = (cols[3] || '').trim();
+                                                    const vk = (cols[4] || '').trim();
+                                                    const youtube = (cols[5] || '').trim();
+                                                    const website = (cols[6] || '').trim();
+                                                    const rutube = (cols[7] || '').trim();
+                                                    const telegram = (cols[8] || '').trim();
+                                                    const aliases = (cols[9] || '').trim();
+
+                                                    const entry = { name, city, logo, vk, youtube, website, rutube, telegram };
+
+                                                    // Заполняем карту синоним → официальное название
+                                                    if (name) {
+                                                        const lowerName = name.toLowerCase();
+                                                        synonymToOfficial.set(lowerName, name);  // само название тоже можно искать
+                                                    }
+
+                                                    if (aliases) {
+                                                        aliases.split(',').forEach(s => {
+                                                            const clean = s.trim().toLowerCase();
+                                                            if (clean) {
+                                                                synonymToOfficial.set(clean, name);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    return entry;
                                                 });
                                             }
 
-                                            function renderManufacturers(manufacturers) {
+                                            function renderManufacturers(list) {
                                                 const grid = document.getElementById('manufacturer-grid');
                                                 if (!grid) return;
-
                                                 grid.innerHTML = '';
 
-                                                manufacturers.forEach(m => {
+                                                list.forEach(m => {
                                                     const card = document.createElement('div');
                                                     card.className = 'manufacturer-card';
+                                                    card.id = `manuf-${m.name.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
 
                                                     // Логотип
                                                     const logoWrap = document.createElement('div');
@@ -1573,96 +1598,141 @@
                                                     const img = document.createElement('img');
                                                     img.className = 'manufacturer-logo';
                                                     img.src = m.logo || '';
-                                                    img.alt = m.name || '';
+                                                    img.alt = m.name;
+                                                    img.onerror = () => img.src = 'https://placehold.co/200x200?text=нет+лого';
                                                     logoWrap.appendChild(img);
 
                                                     // Название
-                                                    const name = document.createElement('div');
-                                                    name.className = 'manufacturer-name';
-                                                    name.textContent = m.name || '';
+                                                    const nameEl = document.createElement('div');
+                                                    nameEl.className = 'manufacturer-name';
+                                                    nameEl.textContent = m.name;
 
                                                     // Город
-                                                    const city = document.createElement('div');
-                                                    city.className = 'manufacturer-city';
-                                                    city.textContent = m.city || '';
+                                                    const cityEl = document.createElement('div');
+                                                    cityEl.className = 'manufacturer-city';
+                                                    cityEl.textContent = m.city || '—';
 
                                                     // Соцсети
                                                     const socials = document.createElement('div');
                                                     socials.className = 'manufacturer-socials';
 
-                                                    // Сайт
-                                                    if (m.website) {
+                                                    const add = (url, icon) => {
+                                                        if (!url) return;
                                                         const a = document.createElement('a');
-                                                        a.href = m.website;
-                                                        a.target = '_blank';
+                                                        a.href = url; a.target = '_blank';
                                                         const i = document.createElement('img');
-                                                        i.src = ICON_WEB;
+                                                        i.src = icon;
                                                         a.appendChild(i);
                                                         socials.appendChild(a);
-                                                    }
+                                                    };
 
-                                                    // VK
-                                                    if (m.vk) {
-                                                        const a = document.createElement('a');
-                                                        a.href = m.vk;
-                                                        a.target = '_blank';
-                                                        const i = document.createElement('img');
-                                                        i.src = ICON_VK;
-                                                        a.appendChild(i);
-                                                        socials.appendChild(a);
-                                                    }
+                                                    add(m.website, ICON_WEB);
+                                                    add(m.vk, ICON_VK);
+                                                    add(m.youtube, ICON_YT);
+                                                    add(m.rutube, ICON_RUTUBE);
+                                                    add(m.telegram, ICON_TG);
 
-                                                    // YouTube
-                                                    if (m.youtube) {
-                                                        const a = document.createElement('a');
-                                                        a.href = m.youtube;
-                                                        a.target = '_blank';
-                                                        const i = document.createElement('img');
-                                                        i.src = ICON_YT;
-                                                        a.appendChild(i);
-                                                        socials.appendChild(a);
-                                                    }
-
-
-                                                    // Rutube
-                                                    if (m.rutube) {
-                                                        const a = document.createElement('a');
-                                                        a.href = m.rutube;
-                                                        a.target = '_blank';
-                                                        const i = document.createElement('img');
-                                                        i.src = ICON_RUTUBE;
-                                                        a.appendChild(i);
-                                                        socials.appendChild(a);
-                                                    }
-
-                                                    // Telegram
-                                                    if (m.telegram) {
-                                                        const a = document.createElement('a');
-                                                        a.href = m.telegram;
-                                                        a.target = '_blank';
-                                                        const i = document.createElement('img');
-                                                        i.src = ICON_TG;
-                                                        a.appendChild(i);
-                                                        socials.appendChild(a);
-                                                    }
-
-                                                    card.appendChild(logoWrap);
-                                                    card.appendChild(name);
-                                                    card.appendChild(city);
-                                                    card.appendChild(socials);
-
+                                                    card.append(logoWrap, nameEl, cityEl, socials);
                                                     grid.appendChild(card);
                                                 });
                                             }
+                                            function fillDatalist() {
+                                                const datalist = document.getElementById('manufacturer-suggestions');
+                                                if (!datalist) return;
+                                                datalist.innerHTML = '';
 
+                                                const officialSet = new Set();
+                                                synonymToOfficial.forEach(official => officialSet.add(official));
+
+                                                [...officialSet].sort().forEach(name => {
+                                                    const opt = document.createElement('option');
+                                                    opt.value = name;
+                                                    datalist.appendChild(opt);
+                                                });
+                                            }
+
+                                            function findAndScroll() {
+                                                const input = document.getElementById('manufacturer-search');
+                                                if (!input) return;
+
+                                                const val = input.value.trim();
+                                                if (!val) return;
+
+                                                const lower = val.toLowerCase();
+                                                const officialName = synonymToOfficial.get(lower);
+
+                                                if (officialName) {
+                                                    // ← Вот это главное изменение
+                                                    input.value = officialName;  // подставляем официальное название в поле
+
+                                                    const id = `manuf-${officialName.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
+                                                    const card = document.getElementById(id);
+
+                                                    if (card) {
+                                                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                        // Подсветка карточки
+                                                        card.style.transition = 'background 1.2s';
+                                                        card.style.background = '#fff0e6';
+                                                        setTimeout(() => { card.style.background = ''; }, 1600);
+                                                    } else {
+                                                        console.warn('Карточка не найдена по id:', id);
+                                                    }
+                                                }
+                                            }
+                                            // Загрузка
                                             fetch(SHEET_CSV_URL)
                                                 .then(r => r.text())
                                                 .then(csv => {
-                                                    const manufacturers = parseCSV(csv);
+                                                    manufacturers = parseCSV(csv);
                                                     renderManufacturers(manufacturers);
-                                                    window.manufacturers = manufacturers; // если нужно где-то ещё использовать
+                                                    fillDatalist();
+
+                                                    const input = document.getElementById('manufacturer-search');
+                                                    if (input) {
+                                                        // Срабатывает при выборе из списка или нажатии Enter
+                                                        input.addEventListener('change', findAndScroll);
+                                                        input.addEventListener('keypress', e => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                findAndScroll();
+                                                            }
+                                                        });
+
+                                                        input.addEventListener('input', function () {
+                                                            const typed = this.value.trim().toLowerCase();
+                                                            const datalist = document.getElementById('manufacturer-suggestions');
+                                                            if (!datalist) return;
+
+                                                            datalist.innerHTML = '';
+
+                                                            if (!typed) {
+                                                                fillDatalist();           // если поле пустое — показываем все
+                                                                return;
+                                                            }
+
+                                                            // Собираем все подходящие официальные названия
+                                                            const suggestions = new Set();
+
+                                                            // Проходим по всем синонимам и названиям
+                                                            synonymToOfficial.forEach((official, key) => {
+                                                                // key — это или синоним, или само название в нижнем регистре
+                                                                if (key.startsWith(typed)) {
+                                                                    suggestions.add(official);
+                                                                }
+                                                            });
+
+                                                            // Сортируем и добавляем в datalist
+                                                            [...suggestions]
+                                                                .sort()
+                                                                .forEach(name => {
+                                                                    const option = document.createElement('option');
+                                                                    option.value = name;
+                                                                    datalist.appendChild(option);
+                                                                });
+                                                        });
+                                                    }
                                                 })
-                                                .catch(err => console.error('Ошибка загрузки таблицы:', err));
+                                                .catch(err => console.error('Ошибка загрузки производителей:', err));
                                         })();
                                     </script>
                                 </div>
