@@ -63,37 +63,47 @@
                             function closeAuthModal() { document.getElementById('auth-modal').classList.remove('active') }
                             function verifySmsCode() {
                                 const code = safeVal('auth-code')?.trim();
-
                                 if (!code) {
                                     alert("Введите код");
                                     return;
                                 }
-
                                 showLoader("Проверка...");
-
                                 const correctCode = "1";
-
                                 setTimeout(() => {
                                     hideLoader();
-
                                     if (code === correctCode) {
-                                        currentUserName = "Админ";
-                                        localStorage.setItem('vezdehod_username', currentUserName);
+                                        const phone = safeVal('auth-phone').trim();
+
+                                        // Запоминаем, что пользователь авторизован
+                                        localStorage.setItem('vezdehod_auth_phone', phone);
+                                        localStorage.setItem('vezdehod_username', "Админ"); // или имя, если будет
 
                                         currentUser = {
-                                            phoneNumber: "+79829817369",
+                                            phoneNumber: phone,
                                             uid: "hardcoded-admin-001"
                                         };
+                                        currentUserName = "Админ";
 
                                         closeAuthModal();
-
                                         updateAuthUI(currentUser);
                                     } else {
                                         alert("Неверный код");
                                     }
                                 }, 800);
                             }
-                            function doLogout() { auth.signOut(); localStorage.removeItem('vezdehod_username'); currentUserName = ""; isAdmin = false; }
+                            function doLogout() {
+                                localStorage.removeItem('vezdehod_auth_phone');
+                                localStorage.removeItem('vezdehod_username');
+
+                                currentUser = null;
+                                currentUserName = "";
+                                isAdmin = false;
+
+                                updateAuthUI(null);
+
+                                // Можно сразу переключить на вкладку объявлений
+                                showTab(null, 'ads');
+                            }
 
                             function sendSmsCode() {
                                 const phoneInput = safeVal('auth-phone');
@@ -1182,20 +1192,22 @@
                                 aspect-ratio: 1 / 1;
                                 background: #fff;
                                 border-radius: 12px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
                                 margin-bottom: 15px;
                                 overflow: hidden;
-                                padding: 20px;
+
+                                /* убираем padding и центрирование через flex */
+                                padding: 0;
+                                display: block;
+                                /* или position: relative */
                             }
 
                             .manufacturer-logo {
-                                max-width: 100%;
-                                max-height: 100%;
-                                object-fit: contain;
-                                border: none;
-                                margin-bottom: 0;
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                                /* ← изменили с contain на cover */
+                                object-position: center;
+                                display: block;
                             }
 
                             .manufacturer-name {
@@ -1629,133 +1641,139 @@
                                 <p id="moderation-placeholder" style="text-align:center; color: #888; padding: 50px 0;">
                                     Нет объявлений на модерации.</p>
                             </div>
-                        </div> <!-- FORM VIEW -->
-                        <div id="view-form" class="hidden fade-in">
-                            <h3 id="form-title" style="margin-top:0">Новое объявление</h3>
-                            <form id="main-form"> <input type="hidden" id="edit-row-index" />
-                                <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px;">
-                                    <div class="form-section-title" style="margin-top:0">Ваши контакты</div>
-                                    <div style="display:grid; grid-template-columns: 1fr; gap:10px;"> <input
-                                            class="form-input" id="inp-name" placeholder="Ваше имя" /> <input
-                                            class="form-input" id="inp-phone" placeholder="Телефон" disabled readonly />
+
+                            <div id="view-form" class="hidden fade-in">
+                                <h3 id="form-title" style="margin-top:0">Новое объявление</h3>
+                                <form id="main-form"> <input type="hidden" id="edit-row-index" />
+                                    <div
+                                        style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px;">
+                                        <div class="form-section-title" style="margin-top:0">Ваши контакты</div>
+                                        <div style="display:grid; grid-template-columns: 1fr; gap:10px;"> <input
+                                                class="form-input" id="inp-name" placeholder="Ваше имя" /> <input
+                                                class="form-input" id="inp-phone" placeholder="Телефон" disabled
+                                                readonly />
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-section-title">Информация о продавце</div> <select class="form-select"
-                                    id="inp-seller-type" onchange="checkTenderVisibility()">
-                                    <option value="" disabled selected>Кто вы?</option>
-                                    <option value="factory">Производитель</option>
-                                    <option value="dealer">Дилер</option>
-                                    <option value="private">Владелец</option>
-                                </select>
-                                <div id="div-tender" class="hidden"
-                                    style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e1bee7;">
-                                    <label
-                                        style="font-weight:bold; color:#ab47bc; font-size:14px; display:block; margin-bottom:10px;">Состоит
-                                        в реестре МинПромТорга?</label><select class="form-select" id="inp-tender"
-                                        style="margin-bottom:0">
-                                        <option value="no">Нет</option>
-                                        <option value="yes">Да</option>
+                                    <div class="form-section-title">Информация о продавце</div> <select
+                                        class="form-select" id="inp-seller-type" onchange="checkTenderVisibility()">
+                                        <option value="" disabled selected>Кто вы?</option>
+                                        <option value="factory">Производитель</option>
+                                        <option value="dealer">Дилер</option>
+                                        <option value="private">Владелец</option>
                                     </select>
-                                </div>
-                                <div class="form-section-title">Где находится техника</div> <input class="form-input"
-                                    id="inp-city" placeholder="Город" />
-                                <div class="form-section-title">Основное</div> <select class="form-select"
-                                    id="inp-tech-type" onchange="checkTechTypeVisibility()">
-                                    <option value="vezdehod" selected>Вездеход</option>
-                                    <option value="moto">Мото-техника</option>
-                                    <option value="trailer">Прицеп</option>
-                                </select> <select class="form-select" id="inp-construction">
-                                    <option value="">Конструкция вездехода</option>
-                                    <option value="Цельнорамный">Цельнорамный</option>
-                                    <option value="Переломный">Переломный</option>
-                                    <option value="Бортоповоротный">Бортоповоротный</option>
-                                </select> <input class="form-input" id="inp-title" placeholder="Марка и модель" />
-                                <input type="text" class="form-input" id="inp-price" placeholder="Цена (₽)"
-                                    list="price-list" oninput="formatPriceInput(this)" />
-                                <div class="form-section-title">Состояние</div> <select class="form-select"
-                                    id="inp-condition" onchange="checkConditionVisibility()">
-                                    <option value="" disabled selected>Выберите состояние</option>
-                                    <option value="new">Новый</option>
-                                    <option value="used">Б/У</option>
-                                </select>
-                                <div id="div-mileage" class="hidden">
-                                    <div class="form-section-title">Пробег</div><input type="number" class="form-input"
-                                        id="inp-mileage" placeholder="Моточасы" />
-                                </div>
-                                <div class="form-section-title" id="specs-title">Характеристики</div>
-                                <div id="div-capacity" class="hidden"><input type="number" class="form-input"
-                                        id="inp-capacity" placeholder="Грузоподъемность (кг)" /></div>
-                                <div id="div-main-specs"
-                                    style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"> <input
-                                        class="form-input" id="inp-engine" placeholder="Модель двигателя" /><input
-                                        class="form-input" id="inp-power" type="number" placeholder="Мощность (л.с.)" />
-                                    <select class="form-select" id="inp-trans">
-                                        <option value="">Трансмиссия</option>
-                                        <option value="АКПП">АКПП</option>
-                                        <option value="МКПП">МКПП</option>
-                                        <option value="Вариатор">Вариатор</option>
-                                    </select> <select class="form-select" id="inp-fuel">
-                                        <option value="">Топливо</option>
-                                        <option value="Бензин">Бензин</option>
-                                        <option value="Дизель">Дизель</option>
-                                        <option value="Электро">Электро</option>
-                                        <option value="Газ">Газ</option>
-                                    </select> <select class="form-select" id="inp-wheel-f">
-                                        <option value="">Тип шасси</option>
-                                        <option value="Колёсный">Колёсный</option>
-                                        <option value="Гусеничный">Гусеничный</option>
-                                    </select> <select class="form-select" id="inp-amphibious">
-                                        <option value="no">Плавающий?</option>
-                                        <option value="yes">Да</option>
-                                        <option value="no">Нет</option>
+                                    <div id="div-tender" class="hidden"
+                                        style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e1bee7;">
+                                        <label
+                                            style="font-weight:bold; color:#ab47bc; font-size:14px; display:block; margin-bottom:10px;">Состоит
+                                            в реестре МинПромТорга?</label><select class="form-select" id="inp-tender"
+                                            style="margin-bottom:0">
+                                            <option value="no">Нет</option>
+                                            <option value="yes">Да</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-section-title">Где находится техника</div> <input
+                                        class="form-input" id="inp-city" placeholder="Город" />
+                                    <div class="form-section-title">Основное</div> <select class="form-select"
+                                        id="inp-tech-type" onchange="checkTechTypeVisibility()">
+                                        <option value="vezdehod" selected>Вездеход</option>
+                                        <option value="moto">Мото-техника</option>
+                                        <option value="trailer">Прицеп</option>
+                                    </select> <select class="form-select" id="inp-construction">
+                                        <option value="">Конструкция вездехода</option>
+                                        <option value="Цельнорамный">Цельнорамный</option>
+                                        <option value="Переломный">Переломный</option>
+                                        <option value="Бортоповоротный">Бортоповоротный</option>
+                                    </select> <input class="form-input" id="inp-title" placeholder="Марка и модель" />
+                                    <input type="text" class="form-input" id="inp-price" placeholder="Цена (₽)"
+                                        list="price-list" oninput="formatPriceInput(this)" />
+                                    <div class="form-section-title">Состояние</div> <select class="form-select"
+                                        id="inp-condition" onchange="checkConditionVisibility()">
+                                        <option value="" disabled selected>Выберите состояние</option>
+                                        <option value="new">Новый</option>
+                                        <option value="used">Б/У</option>
                                     </select>
-                                </div>
-                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                                    <select class="form-select" id="inp-color">
-                                        <option value="">Цвет</option>
-                                        <option value="Синий">Синий</option>
-                                        <option value="Красный">Красный</option>
-                                        <option value="Желтый">Желтый</option>
-                                        <option value="Коричневый">Коричневый</option>
-                                        <option value="Черный">Черный</option>
-                                        <option value="Серый">Серый</option>
-                                        <option value="Зеленый">Зеленый</option>
-                                        <option value="Оранжевый">Оранжевый</option>
-                                        <option value="Фиолетовый">Фиолетовый</option>
-                                        <option value="Белый">Белый</option>
-                                        <option value="Хаки">Хаки</option>
-                                        <option value="Золотой">Золотой</option>
-                                        <option value="Серебристый">Серебристый</option>
-                                    </select> <select class="form-select" id="inp-docs">
-                                        <option value="">Документы</option>
-                                        <option value="ЭПСМ">ЭПСМ (ПСМ)</option>
-                                        <option value="СпортИнвентарь">Спорт.инвентарь</option>
-                                        <option value="Нет">Без документов</option>
-                                    </select>
-                                </div>
-                                <div id="div-wheels">
-                                    <div class="form-section-title">Размер шин</div>
-                                    <div class="tires-group"><input class="tires-input" id="tire-d" placeholder="D (мм)"
-                                            type="number"><span style="font-weight:bold; color:#aaa;">x</span><input
-                                            class="tires-input" id="tire-w" placeholder="W (мм)" type="number"></div>
-                                </div>
-                                <div class="form-section-title">Описание</div> <textarea class="form-input"
-                                    id="inp-desc" rows="4" placeholder="Доп. информация..."></textarea>
-                                <div
-                                    style="border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
-                                    <label style="cursor:pointer; display:block;"><span
-                                            style="font-weight:bold; color:#0066cc;">Добавить фото</span><input
-                                            type="file" id="inp-photos" multiple accept="image/*" style="display:none"
-                                            onchange="showFilePreview(this)" /></label>
-                                    <div id="preview-container"></div>
-                                    <div id="file-count" style="margin-top:10px; font-weight:bold;"></div>
-                                </div>
-                                <div style="display:flex; gap:10px;"><button type="button" class="btn btn-red"
-                                        onclick="showList()">Отмена</button><button type="submit"
-                                        class="btn btn-black btn-full" id="submit-btn"
-                                        style="margin-top:0">Опубликовать</button></div>
-                            </form>
-                        </div>
+                                    <div id="div-mileage" class="hidden">
+                                        <div class="form-section-title">Пробег</div><input type="number"
+                                            class="form-input" id="inp-mileage" placeholder="Моточасы" />
+                                    </div>
+                                    <div class="form-section-title" id="specs-title">Характеристики</div>
+                                    <div id="div-capacity" class="hidden"><input type="number" class="form-input"
+                                            id="inp-capacity" placeholder="Грузоподъемность (кг)" /></div>
+                                    <div id="div-main-specs"
+                                        style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"> <input
+                                            class="form-input" id="inp-engine" placeholder="Модель двигателя" /><input
+                                            class="form-input" id="inp-power" type="number"
+                                            placeholder="Мощность (л.с.)" />
+                                        <select class="form-select" id="inp-trans">
+                                            <option value="">Трансмиссия</option>
+                                            <option value="АКПП">АКПП</option>
+                                            <option value="МКПП">МКПП</option>
+                                            <option value="Вариатор">Вариатор</option>
+                                        </select> <select class="form-select" id="inp-fuel">
+                                            <option value="">Топливо</option>
+                                            <option value="Бензин">Бензин</option>
+                                            <option value="Дизель">Дизель</option>
+                                            <option value="Электро">Электро</option>
+                                            <option value="Газ">Газ</option>
+                                        </select> <select class="form-select" id="inp-wheel-f">
+                                            <option value="">Тип шасси</option>
+                                            <option value="Колёсный">Колёсный</option>
+                                            <option value="Гусеничный">Гусеничный</option>
+                                        </select> <select class="form-select" id="inp-amphibious">
+                                            <option value="no">Плавающий?</option>
+                                            <option value="yes">Да</option>
+                                            <option value="no">Нет</option>
+                                        </select>
+                                    </div>
+                                    <div
+                                        style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                                        <select class="form-select" id="inp-color">
+                                            <option value="">Цвет</option>
+                                            <option value="Синий">Синий</option>
+                                            <option value="Красный">Красный</option>
+                                            <option value="Желтый">Желтый</option>
+                                            <option value="Коричневый">Коричневый</option>
+                                            <option value="Черный">Черный</option>
+                                            <option value="Серый">Серый</option>
+                                            <option value="Зеленый">Зеленый</option>
+                                            <option value="Оранжевый">Оранжевый</option>
+                                            <option value="Фиолетовый">Фиолетовый</option>
+                                            <option value="Белый">Белый</option>
+                                            <option value="Хаки">Хаки</option>
+                                            <option value="Золотой">Золотой</option>
+                                            <option value="Серебристый">Серебристый</option>
+                                        </select> <select class="form-select" id="inp-docs">
+                                            <option value="">Документы</option>
+                                            <option value="ЭПСМ">ЭПСМ (ПСМ)</option>
+                                            <option value="СпортИнвентарь">Спорт.инвентарь</option>
+                                            <option value="Нет">Без документов</option>
+                                        </select>
+                                    </div>
+                                    <div id="div-wheels">
+                                        <div class="form-section-title">Размер шин</div>
+                                        <div class="tires-group"><input class="tires-input" id="tire-d"
+                                                placeholder="D (мм)" type="number"><span
+                                                style="font-weight:bold; color:#aaa;">x</span><input class="tires-input"
+                                                id="tire-w" placeholder="W (мм)" type="number"></div>
+                                    </div>
+                                    <div class="form-section-title">Описание</div> <textarea class="form-input"
+                                        id="inp-desc" rows="4" placeholder="Доп. информация..."></textarea>
+                                    <div
+                                        style="border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
+                                        <label style="cursor:pointer; display:block;"><span
+                                                style="font-weight:bold; color:#0066cc;">Добавить фото</span><input
+                                                type="file" id="inp-photos" multiple accept="image/*"
+                                                style="display:none" onchange="showFilePreview(this)" /></label>
+                                        <div id="preview-container"></div>
+                                        <div id="file-count" style="margin-top:10px; font-weight:bold;"></div>
+                                    </div>
+                                    <div style="display:flex; gap:10px;"><button type="button" class="btn btn-red"
+                                            onclick="showList()">Отмена</button><button type="submit"
+                                            class="btn btn-black btn-full" id="submit-btn"
+                                            style="margin-top:0">Опубликовать</button></div>
+                                </form>
+                            </div>
+                        </div> <!-- FORM VIEW -->
                     </div>
                     <div id="auth-modal" class="modal-overlay">
                         <div class="auth-window">
@@ -1899,6 +1917,38 @@
                         }
                         function safeVal(id) { const e = document.getElementById(id); return e ? e.value : "" }
                         function setVal(i, v) { const e = document.getElementById(i); if (e) e.value = v }
+                        // Автоматический вход при загрузке страницы, если ранее был авторизован
+                        function tryAutoLogin() {
+                            const savedPhone = localStorage.getItem('vezdehod_auth_phone');
+                            if (savedPhone) {
+                                // Можно добавить дополнительную проверку, например запрос к серверу
+                                // Но для вашего текущего уровня достаточно просто восстановить состояние
+                                currentUser = {
+                                    phoneNumber: savedPhone,
+                                    uid: "hardcoded-admin-001" // или другой способ идентификации
+                                };
+                                currentUserName = localStorage.getItem('vezdehod_username') || "Пользователь";
+
+                                // Проверяем, админ ли это
+                                const normPhone = savedPhone.replace(/\D/g, '');
+                                const normAdmin = ADMIN_PHONE.replace(/\D/g, '');
+                                isAdmin = (normPhone === normAdmin);
+
+                                updateAuthUI(currentUser);
+
+                                // Если админ — сразу обновляем вкладку админки, если она открыта
+                                if (isAdmin) {
+                                    const adminTab = document.getElementById('admin-tab-link');
+                                    if (adminTab) adminTab.classList.remove('hidden');
+                                }
+                            }
+                        }
+
+                        // Вызываем при загрузке
+                        document.addEventListener('DOMContentLoaded', () => {
+                            tryAutoLogin();
+                            loadAds();
+                        });
                         document.addEventListener('DOMContentLoaded', () => { loadAds(); });
                         let startY = 0; let ptrDist = 0; const ptrThreshold = 80;
                         const ptrIndicator = document.getElementById('ptr-indicator');
