@@ -1526,13 +1526,14 @@
 
                                     <script>
                                         (function () {
-
                                             const SHEET_CSV_URL =
                                                 'https://docs.google.com/spreadsheets/d/1xU4C49DHBBlz0FdfGbc-kAZBBJlBVdgGxcYL68QKhUc/export?format=csv&gid=736473411';
 
                                             const ICON_VK = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/VK_Compact_Logo_%282021-present%29.svg/1024px-VK_Compact_Logo_%282021-present%29.svg.png';
                                             const ICON_YT = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png';
                                             const ICON_WEB = 'https://cdn-icons-png.flaticon.com/512/1006/1006771.png';
+                                            const ICON_TG = 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg';
+                                            const ICON_RUTUBE = 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Rutube_icon.svg';
 
                                             function parseCSV(text) {
                                                 const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
@@ -1540,13 +1541,16 @@
 
                                                 return lines.map(line => {
                                                     const v = line.split(',');
+                                                    // Пропускаем № → начинаем с индекса 1
                                                     return {
                                                         name: v[1] || '',
                                                         city: v[2] || '',
                                                         logo: v[3] || '',
                                                         vk: v[4] || '',
                                                         youtube: v[5] || '',
-                                                        website: v[6] || ''
+                                                        website: v[6] || '',
+                                                        rutube: v[7] || '',
+                                                        telegram: v[8] || ''
                                                     };
                                                 });
                                             }
@@ -1554,32 +1558,48 @@
                                             function renderManufacturers(manufacturers) {
                                                 const grid = document.getElementById('manufacturer-grid');
                                                 if (!grid) return;
+
                                                 grid.innerHTML = '';
 
                                                 manufacturers.forEach(m => {
                                                     const card = document.createElement('div');
                                                     card.className = 'manufacturer-card';
 
+                                                    // Логотип
                                                     const logoWrap = document.createElement('div');
                                                     logoWrap.className = 'manufacturer-logo-container';
-
                                                     const img = document.createElement('img');
                                                     img.className = 'manufacturer-logo';
                                                     img.src = m.logo || '';
                                                     img.alt = m.name || '';
                                                     logoWrap.appendChild(img);
 
+                                                    // Название
                                                     const name = document.createElement('div');
                                                     name.className = 'manufacturer-name';
                                                     name.textContent = m.name || '';
 
+                                                    // Город
                                                     const city = document.createElement('div');
                                                     city.className = 'manufacturer-city';
                                                     city.textContent = m.city || '';
 
+                                                    // Соцсети
                                                     const socials = document.createElement('div');
                                                     socials.className = 'manufacturer-socials';
 
+                                                    // Сайт
+                                                    if (m.website) {
+                                                        const a = document.createElement('a');
+                                                        a.href = m.website;
+                                                        a.target = '_blank';
+                                                        const i = document.createElement('img');
+                                                        i.src = ICON_WEB;
+                                                        a.appendChild(i);
+                                                        socials.appendChild(a);
+                                                    }
+                                                    
+                                                    // VK
                                                     if (m.vk) {
                                                         const a = document.createElement('a');
                                                         a.href = m.vk;
@@ -1590,6 +1610,7 @@
                                                         socials.appendChild(a);
                                                     }
 
+                                                    // YouTube
                                                     if (m.youtube) {
                                                         const a = document.createElement('a');
                                                         a.href = m.youtube;
@@ -1600,12 +1621,25 @@
                                                         socials.appendChild(a);
                                                     }
 
-                                                    if (m.website) {
+
+                                                    // Rutube
+                                                    if (m.rutube) {
                                                         const a = document.createElement('a');
-                                                        a.href = m.website;
+                                                        a.href = m.rutube;
                                                         a.target = '_blank';
                                                         const i = document.createElement('img');
-                                                        i.src = ICON_WEB;
+                                                        i.src = ICON_RUTUBE;
+                                                        a.appendChild(i);
+                                                        socials.appendChild(a);
+                                                    }
+
+                                                    // Telegram
+                                                    if (m.telegram) {
+                                                        const a = document.createElement('a');
+                                                        a.href = m.telegram;
+                                                        a.target = '_blank';
+                                                        const i = document.createElement('img');
+                                                        i.src = ICON_TG;
                                                         a.appendChild(i);
                                                         socials.appendChild(a);
                                                     }
@@ -1624,14 +1658,11 @@
                                                 .then(csv => {
                                                     const manufacturers = parseCSV(csv);
                                                     renderManufacturers(manufacturers);
-                                                    window.manufacturers = manufacturers;
+                                                    window.manufacturers = manufacturers; // если нужно где-то ещё использовать
                                                 })
                                                 .catch(err => console.error('Ошибка загрузки таблицы:', err));
-
                                         })();
                                     </script>
-
-
                                 </div>
                             </div>
                             <div id="tab-content-admin" class="tab-content">
@@ -1917,26 +1948,21 @@
                         }
                         function safeVal(id) { const e = document.getElementById(id); return e ? e.value : "" }
                         function setVal(i, v) { const e = document.getElementById(i); if (e) e.value = v }
-                        // Автоматический вход при загрузке страницы, если ранее был авторизован
                         function tryAutoLogin() {
                             const savedPhone = localStorage.getItem('vezdehod_auth_phone');
                             if (savedPhone) {
-                                // Можно добавить дополнительную проверку, например запрос к серверу
-                                // Но для вашего текущего уровня достаточно просто восстановить состояние
                                 currentUser = {
                                     phoneNumber: savedPhone,
-                                    uid: "hardcoded-admin-001" // или другой способ идентификации
+                                    uid: "hardcoded-admin-001"
                                 };
                                 currentUserName = localStorage.getItem('vezdehod_username') || "Пользователь";
 
-                                // Проверяем, админ ли это
                                 const normPhone = savedPhone.replace(/\D/g, '');
                                 const normAdmin = ADMIN_PHONE.replace(/\D/g, '');
                                 isAdmin = (normPhone === normAdmin);
 
                                 updateAuthUI(currentUser);
 
-                                // Если админ — сразу обновляем вкладку админки, если она открыта
                                 if (isAdmin) {
                                     const adminTab = document.getElementById('admin-tab-link');
                                     if (adminTab) adminTab.classList.remove('hidden');
@@ -1944,7 +1970,6 @@
                             }
                         }
 
-                        // Вызываем при загрузке
                         document.addEventListener('DOMContentLoaded', () => {
                             tryAutoLogin();
                             loadAds();
@@ -2013,7 +2038,6 @@
                             }
                         }
                         function applyFilters() {
-                            // Фильтруем только одобренные объявления для общего списка
                             let approvedAds = allAds.filter(ad => (ad.status || '').toLowerCase().trim() === 'approved');
 
                             const minStr = getPriceValue('f-price-min');
@@ -2061,7 +2085,6 @@
 
                             renderGrid(filtered);
 
-                            // Если админ, рендерим и список на модерацию
                             if (isAdmin) {
                                 let pendingAds = allAds.filter(ad => (ad.status || '').toLowerCase().trim() === 'pending');
                                 renderModerationGrid(pendingAds);
