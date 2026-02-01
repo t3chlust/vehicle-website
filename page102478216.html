@@ -1544,13 +1544,45 @@
 
                                             let manufacturers = [];
                                             let synonymToOfficial = new Map();   // "тингер" → "TINGER", "трекер" → "TRACKER" и т.д.
-
+                                            // ВРЕМЕННАЯ ОТЛАДКА — посмотри в консоль F12
+                                            setTimeout(() => {
+                                                console.log("Все синонимы и их официальные названия:");
+                                                synonymToOfficial.forEach((official, syn) => {
+                                                    console.log(`"${syn}" → "${official}"`);
+                                                });
+                                                if (synonymToOfficial.size === 0) {
+                                                    console.warn("synonymToOfficial пустая! Синонимы не загрузились.");
+                                                }
+                                            }, 2000);
+                                            synonymToOfficial.forEach((official, key) => {
+                                                console.log(`Синоним: "${key}" → Официальное: "${official}"`);
+                                            });
                                             function parseCSV(text) {
                                                 const lines = text.split('\n').map(l => l.trim()).filter(l => l);
                                                 lines.shift(); // убираем заголовки
 
                                                 return lines.map(line => {
-                                                    const cols = line.split(',');
+                                                    // Более надёжный разбор CSV-строки (учитываем кавычки)
+                                                    const cols = [];
+                                                    let current = '';
+                                                    let inQuotes = false;
+
+                                                    for (let i = 0; i < line.length; i++) {
+                                                        const char = line[i];
+                                                        if (char === '"' && !inQuotes) {
+                                                            inQuotes = true;
+                                                        } else if (char === '"' && inQuotes) {
+                                                            inQuotes = false;
+                                                        } else if (char === ',' && !inQuotes) {
+                                                            cols.push(current.trim());
+                                                            current = '';
+                                                        } else {
+                                                            current += char;
+                                                        }
+                                                    }
+                                                    // Последнее значение
+                                                    cols.push(current.trim());
+
                                                     const name = (cols[1] || '').trim();
                                                     const city = (cols[2] || '').trim();
                                                     const logo = (cols[3] || '').trim();
@@ -1559,23 +1591,32 @@
                                                     const website = (cols[6] || '').trim();
                                                     const rutube = (cols[7] || '').trim();
                                                     const telegram = (cols[8] || '').trim();
-                                                    const aliases = (cols[9] || '').trim();
+                                                    let aliasesRaw = (cols[9] || '').trim();
 
                                                     const entry = { name, city, logo, vk, youtube, website, rutube, telegram };
 
-                                                    // Заполняем карту синоним → официальное название
-                                                    if (name) {
-                                                        const lowerName = name.toLowerCase();
-                                                        synonymToOfficial.set(lowerName, name);  // само название тоже можно искать
-                                                    }
+                                                    // Очищаем синонимы от кавычек и лишних пробелов
+                                                    if (aliasesRaw) {
+                                                        // Убираем внешние кавычки, если они есть вокруг всего столбца
+                                                        aliasesRaw = aliasesRaw.replace(/^"+|"+$/g, '').trim();
 
-                                                    if (aliases) {
-                                                        aliases.split(',').forEach(s => {
-                                                            const clean = s.trim().toLowerCase();
+                                                        // Разделяем по запятым и очищаем каждую часть
+                                                        aliasesRaw.split(',').forEach(part => {
+                                                            let clean = part
+                                                                .trim()
+                                                                .replace(/^"+|"+$/g, '')   // убираем кавычки в начале и конце каждого элемента
+                                                                .replace(/\s+/g, ' ')      // нормализуем пробелы
+                                                                .trim();
+
                                                             if (clean) {
-                                                                synonymToOfficial.set(clean, name);
+                                                                synonymToOfficial.set(clean.toLowerCase(), name);
                                                             }
                                                         });
+                                                    }
+
+                                                    // Само название тоже добавляем как возможный поисковый вариант
+                                                    if (name) {
+                                                        synonymToOfficial.set(name.toLowerCase(), name);
                                                     }
 
                                                     return entry;
@@ -1699,30 +1740,44 @@
                                                         });
 
                                                         input.addEventListener('input', function () {
-                                                            const typed = this.value.trim().toLowerCase();
+                                                            // Берём то, что ввёл пользователь
+                                                            let typed = this.value.trim();
+
+                                                            // Если ничего не ввели — показываем все
+                                                            if (!typed) {
+                                                                fillDatalist();
+                                                                return;
+                                                            }
+
+                                                            // Приводим к нижнему регистру ОДИН РАЗ
+                                                            typed = typed.toLowerCase();
+
                                                             const datalist = document.getElementById('manufacturer-suggestions');
                                                             if (!datalist) return;
 
                                                             datalist.innerHTML = '';
 
-                                                            if (!typed) {
-                                                                fillDatalist();           // если поле пустое — показываем все
-                                                                return;
-                                                            }
+                                                            const found = new Set();
 
-                                                            // Собираем все подходящие официальные названия
-                                                            const suggestions = new Set();
-
-                                                            // Проходим по всем синонимам и названиям
-                                                            synonymToOfficial.forEach((official, key) => {
-                                                                // key — это или синоним, или само название в нижнем регистре
+                                                            // Проходим по всем синонимам
+                                                            synonymToOfficial.forEach(function (official, key) {
+                                                                // key уже в нижнем регистре (из parseCSV)
                                                                 if (key.startsWith(typed)) {
-                                                                    suggestions.add(official);
+                                                                    found.add(official);
                                                                 }
                                                             });
 
-                                                            // Сортируем и добавляем в datalist
-                                                            [...suggestions]
+                                                            // Если ничего не нашли — можно показать хотя бы похожие (опционально)
+                                                            if (found.size === 0 && typed.length >= 2) {
+                                                                synonymToOfficial.forEach(function (official, key) {
+                                                                    if (key.includes(typed)) {
+                                                                        found.add(official);
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            // Заполняем datalist
+                                                            [...found]
                                                                 .sort()
                                                                 .forEach(name => {
                                                                     const option = document.createElement('option');
