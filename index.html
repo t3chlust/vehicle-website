@@ -616,6 +616,10 @@
                                 font-size: 19px;
                             }
 
+                            div[style*="rgba(0, 102, 204"]  .form-input {
+                                margin-bottom: 0;
+                            }
+
                             .badge-wrap {
                                 display: flex;
                                 flex-direction: row;
@@ -1835,7 +1839,13 @@
                                         <option value="Цельнорамный">Цельнорамный</option>
                                         <option value="Переломный">Переломный</option>
                                         <option value="Бортоповоротный">Бортоповоротный</option>
-                                    </select> <input class="form-input" id="inp-title" placeholder="Марка и модель" />
+                                    </select> 
+                                    <div style="background:rgba(0, 102, 204, 0.1); padding:10px; border-radius:8px; margin:0 0 10px 0;">
+                                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                            <input class="form-input" id="inp-brand" placeholder="Марка" />
+                                            <input class="form-input" id="inp-model" placeholder="Модель" />
+                                        </div>
+                                    </div>
                                     <input type="text" class="form-input" id="inp-price" placeholder="Цена (₽)"
                                         list="price-list" oninput="formatPriceInput(this)" />
                                     <div class="form-section-title">Состояние</div> <select class="form-select"
@@ -2592,10 +2602,16 @@
 
                                 const priceVal = getPriceValue('inp-price');
 
+                                const brand = safeVal('inp-brand');
+                                const model = safeVal('inp-model');
+                                const title = [brand, model].filter(Boolean).join(' ').trim();
+
                                 const pl = {
                                     action: isEditMode ? 'edit' : 'create',
                                     rowIndex: safeVal('edit-row-index'),
-                                    title: safeVal('inp-title'),
+                                    title: title,
+                                    brand: brand,
+                                    model: model,
                                     price: priceVal,
                                     desc: desc,
                                     name: safeVal('inp-name'),
@@ -2624,9 +2640,6 @@
                                 const json = await response.json();
                                 if (json.status !== 'success') {
                                     throw new Error(json.message || 'Ошибка операции');
-                                }
-                                if (json.message === 'pending') {
-                                    alert('Ваше объявление отправлено на модерацию!');
                                 }
                                 document.getElementById('main-form').reset();
                                 document.getElementById('preview-container').innerHTML = '';
@@ -2702,7 +2715,8 @@
                             document.getElementById('form-title').innerText = "Редактирование";
                             document.getElementById('submit-btn').innerText = "Сохранить";
                             setVal('edit-row-index', ad.rowIndex);
-                            setVal('inp-title', ad.title);
+                            setVal('inp-brand', ad.brand || "");
+                            setVal('inp-model', ad.model || "");
                             setVal('inp-price', Number(ad.price || 0).toLocaleString('ru-RU').replace(/,/g, ' '));
                             setVal('inp-desc', (ad.desc || "").replace(NEW_STATUS_TAG, "").trim());
                             setVal('inp-name', ad.name);
