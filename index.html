@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>купитьвездеход.рф</title>
-    <link rel="shortcut icon" href="images/logo.png" type="image/x-icon" /> <!-- Assets -->
+    <link rel="shortcut icon" href="images/logo2.svg" type="image/x-icon" /> <!-- Assets -->
     <script
         type="text/javascript">function t_onReady(func) { if (document.readyState != 'loading') { func(); } else { document.addEventListener('DOMContentLoaded', func); } }
             function t_onFuncLoad(funcName, okFunc, time) { if (typeof window[funcName] === 'function') { okFunc(); } else { setTimeout(function () { t_onFuncLoad(funcName, okFunc, time); }, (time || 100)); } }</script>
@@ -39,6 +39,8 @@
                                 document.getElementById('auth-phone').value = '+7';
 
                                 document.getElementById('auth-modal').classList.add('active');
+                                
+                                updateSmsButtonState();
                             }
                             function closeAuthModal() { document.getElementById('auth-modal').classList.remove('active') }
                             function verifySmsCode() {
@@ -1930,8 +1932,10 @@
                             <div id="auth-step-1">
                                 <div style="font-size:20px;font-weight:700;margin-bottom:15px;">Вход</div> <input
                                     class="form-input" id="auth-phone" type="tel" placeholder="+7..." value="+7"
-                                    oninput="handlePhoneInput(this)" />
-                                <div id="recaptcha-container"></div> <button class="btn btn-black btn-full"
+                                    oninput="handlePhoneInput(this)"
+                                    onpaste="event.preventDefault(); handlePhoneInputPaste(this)"
+                                    onkeypress="if(event.key==='Enter' && !this.closest('#auth-step-1').querySelector('.btn-black').disabled) sendSmsCode()" />
+                                <div id="recaptcha-container"></div> <button class="btn btn-black btn-full" disabled
                                     onclick="sendSmsCode()">Отправить код</button> <button class="btn btn-full"
                                     onclick="closeAuthModal()" style="background:#eee;">Отмена</button>
                             </div>
@@ -1939,7 +1943,8 @@
                                 <div class="modal-close" onclick="closeAuthModal()">×</div>
 
                                 <div style="font-size:20px;font-weight:700;margin-bottom:15px;">Введите код</div>
-                                <input class="form-input" id="auth-code" type="number" placeholder="Код из SMS" />
+                                <input class="form-input" id="auth-code" type="number" placeholder="Код из SMS"
+                                    onkeypress="if(event.key==='Enter') verifySmsCode()" />
                                 <button class="btn btn-black btn-full" onclick="verifySmsCode()">Подтвердить</button>
                             </div>
                         </div>
@@ -2135,7 +2140,60 @@
                         });
                         function toggleFilters() { const fw = document.getElementById('filters-wrapper'); if (fw.classList.contains('open')) { fw.classList.remove('open'); } else { fw.classList.add('open'); } }
                         function checkIsNew(ad) { if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true; if (ad.condition === 'new') return true; return false; }
-                        function handlePhoneInput(input) { if (!input.value.startsWith('+7')) { input.value = '+7' + input.value.replace(/[^0-9]/g, ''); } }
+                        function handlePhoneInput(input) { 
+                            // Оставляем только цифры и +
+                            let value = input.value.replace(/[^0-9+]/g, '');
+                            console.log('Step 1 - Входное значение:', input.value);
+                            console.log('Step 2 - После удаления спецсимволов:', value);
+                            
+                            // Извлекаем только цифры
+                            let digits = value.replace(/[^0-9]/g, '');
+                            console.log('Step 3 - Только цифры:', digits);
+                            
+                            // Если начинается с 7 (и не +7), удаляем первую 7
+                            if (digits.startsWith('7')) {
+                                digits = digits.substring(1);
+                                console.log('Step 4 - Удалили первую 7:', digits);
+                            }
+                            
+                            // Ограничиваем максимум 10 цифр (после +7)
+                            digits = digits.substring(0, 10);
+                            console.log('Step 5 - После ограничения до 10 цифр:', digits);
+                            
+                            // Форматируем в +7XXXXXXXXXX
+                            input.value = '+7' + digits;
+                            console.log('Step 6 - Финальное значение:', input.value);
+                            
+                            updateSmsButtonState();
+                        }
+                        
+                        function handlePhoneInputPaste(input) {
+                            // Получаем текст из буфера обмена
+                            navigator.clipboard.readText().then(text => {
+                                // Очищаем и устанавливаем новое значение
+                                input.value = text;
+                                // Обрабатываем
+                                handlePhoneInput(input);
+                            }).catch(() => {
+                                // Fallback если clipboard API не доступен
+                                // Просто используем текущее значение поля
+                                handlePhoneInput(input);
+                            });
+                        }
+                        function updateSmsButtonState() {
+                            const phoneInput = document.getElementById('auth-phone');
+                            const sendBtn = document.querySelector('#auth-step-1 .btn-black');
+                            
+                            if (!phoneInput || !sendBtn) return;
+                            
+                            // Проверяем: номер должен быть +7 + 10 цифр = 12 символов всего
+                            const digitCount = phoneInput.value.replace(/[^0-9]/g, '').length;
+                            const isValid = phoneInput.value.startsWith('+7') && digitCount === 11;
+                            
+                            sendBtn.disabled = !isValid;
+                            sendBtn.style.opacity = isValid ? '1' : '0.5';
+                            sendBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+                        }
                         function checkTenderVisibility() { const type = document.getElementById('inp-seller-type').value; const tenderDiv = document.getElementById('div-tender'); if (type === 'factory' || type === 'dealer') { tenderDiv.classList.remove('hidden'); } else { tenderDiv.classList.add('hidden'); document.getElementById('inp-tender').value = 'no'; } }
                         function checkConditionVisibility() { const cond = document.getElementById('inp-condition').value; const mileageDiv = document.getElementById('div-mileage'); if (cond === 'used') { mileageDiv.classList.remove('hidden'); } else { mileageDiv.classList.add('hidden'); document.getElementById('inp-mileage').value = ''; } }
                         function checkTechTypeVisibility() {
