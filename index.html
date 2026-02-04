@@ -1613,8 +1613,15 @@
                                                     card.className = 'manufacturer-card';
                                                     card.id = `manuf-${m.name.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
                                                     card.style.cursor = 'pointer';
-                                                    card.onclick = () => {
-                                                        window.location.href = `/manufacturer.html?name=${encodeURIComponent(m.name)}`;
+                                                    card.onclick = (e) => {
+                                                        const url = `/manufacturer.html?name=${encodeURIComponent(m.name)}`;
+                                                        if (e.ctrlKey || e.metaKey) {
+                                                            // Ctrl/Cmd + клик = новая вкладка
+                                                            window.open(url, '_blank');
+                                                        } else {
+                                                            // Обычный клик = текущая вкладка
+                                                            window.location.href = url;
+                                                        }
                                                     };
 
                                                     // Логотип
@@ -2571,9 +2578,41 @@
                         });
                         async function loadAds() {
                             try {
-                                const r = await fetch(GOOGLE_SCRIPT_URL + '?t=' + new Date().getTime()); allAds = await r.json(); applyFilters(); const urlParams = new URLSearchParams(window.location.search); const adId = urlParams.get('id'); if (adId) { const found = allAds.find(a => String(a.rowIndex) === String(adId)); if (found && found.status === 'approved') { openAd(found); } } if (typeof currentUser !== 'undefined' && currentUser) updateAuthUI(currentUser);
+                                const r = await fetch(GOOGLE_SCRIPT_URL + '?t=' + new Date().getTime());
+                                const raw = await r.json();
+
+                                // Преобразуем записи: если есть Brand и Model, комбинируем их в title
+                                allAds = (Array.isArray(raw) ? raw : []).map(ad => {
+                                    const brand = String(ad.brand || ad.Brand || ad.Бренд || ad.BrandName || '').trim();
+                                    const model = String(ad.model || ad.Model || ad.Модель || ad.ModelName || '').trim();
+                                    const combined = [brand, model].filter(Boolean).join(' ').trim();
+                                    if (combined) ad.title = combined;
+                                    // Гарантируем, что поле title существует
+                                    if (typeof ad.title === 'undefined' || ad.title === null) ad.title = '';
+                                    return ad;
+                                });
+
+                                applyFilters();
+
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const adId = urlParams.get('id');
+                                if (adId) {
+                                    const found = allAds.find(a => String(a.rowIndex) === String(adId));
+                                    if (found && found.status === 'approved') {
+                                        openAd(found);
+                                    }
+                                }
+
+                                if (typeof currentUser !== 'undefined' && currentUser) updateAuthUI(currentUser);
+
                                 ptrIndicator.style.opacity = '0';
-                            } catch (e) { console.log(e) } finally { document.getElementById('loading-ads').style.display = 'none'; hideLoader(); ptrIndicator.style.opacity = '0'; }
+                            } catch (e) {
+                                console.log(e)
+                            } finally {
+                                document.getElementById('loading-ads').style.display = 'none';
+                                hideLoader();
+                                ptrIndicator.style.opacity = '0';
+                            }
                         }
                         function showLoader(t) { document.getElementById('loader-text').innerText = t; document.getElementById('global-loader').style.opacity = '1'; document.getElementById('global-loader').style.pointerEvents = 'all'; }
                         function hideLoader() { document.getElementById('global-loader').style.opacity = '0'; document.getElementById('global-loader').style.pointerEvents = 'none'; ptrIndicator.style.opacity = '0'; }

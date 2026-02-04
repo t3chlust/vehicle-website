@@ -257,7 +257,7 @@
 
     <script>
         // Глобальные переменные
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4-k2sHUk-d6e_2xqBCQF7X_a1ztN4y8kU3gP9bZMCJqmDZvE7P-FCHQgQQQnE_4zA/usercallback';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUI4vRlqW88m7jcx5sPQYg6PMDv0nVQ3U4ollXorvzPB1MaiNMkUEn7kQjN8UcPnVy/exec';
         
         // Иконки соцсетей
         const ICONS = {
@@ -327,13 +327,15 @@
             if (ad.power) infoParts.push(ad.power + ' л.с.');
             if (ad.transmission) infoParts.push(ad.transmission);
 
+            const adTitle =[ad.brand, ad.model].filter(Boolean).join(' ').trim() || "Без названия";
+
             const card = document.createElement('div');
             card.className = 'ad-card';
             card.onclick = () => openAd(ad);
             card.innerHTML = `
                 <img class="ad-card-img" src="${mainImage}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">
                 <div class="ad-card-content">
-                    <div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div>
+                    <div class="ad-card-title" title="${adTitle}">${adTitle}</div>
                     <div class="ad-card-price">${Number(ad.price || 0).toLocaleString()} ₽</div>
                     <div class="badge-wrap">${badgesHtml}</div>
                     <div class="ad-card-info">${infoParts.join(' • ')}</div>
@@ -378,11 +380,53 @@
 
             container.innerHTML = headerHtml;
 
+            // Нормализуем альтернативные названия производителя к нижнему регистру
+            const altNamesLower = (manufacturer.altNames || []).map(n => n.toLowerCase().trim());
+            
+            // Добавляем и основное название
+            altNamesLower.push(manufacturer.name.toLowerCase().trim());
+
+            console.log('=== DEBUG renderManufacturerPage ===');
+            console.log('Производитель:', manufacturer.name);
+            console.log('Альтернативные названия (оригинальные):', manufacturer.altNames);
+            console.log('Все названия для сравнения (нижний регистр):', altNamesLower);
+            console.log('Всего объявлений:', manufacturerAds.length);
+            
+            // Показываем ВСЕ объявления с matching brand
+            console.log('\nВсе объявления с matching brand:');
+            const matchingBrand = manufacturerAds.filter(ad => {
+                const adBrand = (ad.brand || '').toLowerCase().trim();
+                return altNamesLower.includes(adBrand);
+            });
+            matchingBrand.forEach((ad, idx) => {
+                console.log(`  [${idx}] "${ad.brand} ${ad.model}" | rowIndex: ${ad.rowIndex} | status="${ad.status}" | sellerType="${ad.sellerType}"`);
+            });
+            console.log(`Найдено объявлений с matching brand: ${matchingBrand.length}`);
+
             // Фильтруем объявления этого производителя
-            const approvedAds = manufacturerAds.filter(ad => 
-                (ad.status || '').toLowerCase().trim() === 'approved' &&
-                (ad.name || '').toLowerCase().trim() === manufacturer.name.toLowerCase().trim()
-            );
+            const approvedAds = manufacturerAds.filter(ad => {
+                const adBrand = (ad.brand || '').toLowerCase().trim();
+                const brandMatches = altNamesLower.includes(adBrand);
+                
+                if (!brandMatches) return false;
+                
+                const statusOk = (ad.status || '').toLowerCase().trim() === 'approved';
+                const sellerTypeOk = (ad.sellerType || '').toLowerCase().trim() === 'factory';
+                
+                if (!statusOk || !sellerTypeOk) {
+                    console.log(`  ✗ Объявление "${ad.brand} ${ad.model}" отфильтровано: status="${ad.status}" (ok=${statusOk}), sellerType="${ad.sellerType}" (ok=${sellerTypeOk})`);
+                }
+                
+                return statusOk && sellerTypeOk;
+            });
+
+            console.log('\nИтоговые объявления для отображения:');
+            approvedAds.forEach((ad, idx) => {
+                const adTitle = ad.title || [ad.brand, ad.model].filter(Boolean).join(' ').trim() || "Без названия";
+                console.log(`  [${idx}] ${adTitle} | rowIndex: ${ad.rowIndex}`);
+            });
+            console.log(`Всего для отображения: ${approvedAds.length}`);
+            console.log('====================================');
 
             // Добавляем заголовок объявлений
             const adsSection = document.createElement('div');
@@ -404,7 +448,7 @@
             } else {
                 const empty = document.createElement('div');
                 empty.className = 'empty-message';
-                empty.textContent = 'У этого производителя пока нет объявлений';
+                empty.textContent = 'Здесь нет объявлений напрямую от завода';
                 container.appendChild(empty);
             }
         }
@@ -430,10 +474,21 @@
                 const csv = await response.text();
                 const manufacturers = parseCSV(csv);
                 
-                // Находим нужного производителя
-                const manufacturer = manufacturers.find(m => 
-                    m.name.toLowerCase().trim() === decodeURIComponent(manufacturerName).toLowerCase().trim()
-                );
+                // Нормализуем поисковое название
+                const searchNameLower = decodeURIComponent(manufacturerName).toLowerCase().trim();
+                
+                // Находим производителя по основному названию или по альтернативным названиям
+                const manufacturer = manufacturers.find(m => {
+                    const mainNameLower = m.name.toLowerCase().trim();
+                    
+                    // Проверяем основное название
+                    if (mainNameLower === searchNameLower) return true;
+                    
+                    // Проверяем альтернативные названия
+                    return (m.altNames || []).some(alt => 
+                        alt.toLowerCase().trim() === searchNameLower
+                    );
+                });
 
                 if (!manufacturer) {
                     document.getElementById('manufacturer-content').innerHTML = 
@@ -485,8 +540,14 @@
                 const website = (cols[6] || '').trim();
                 const rutube = (cols[7] || '').trim();
                 const telegram = (cols[8] || '').trim();
+                const altNamesRaw = (cols[9] || '').trim();
 
-                return { name, city, logo, vk, youtube, website, rutube, telegram };
+                // Парсим "Название 2" как список альтернативных названий через запятую
+                const altNames = altNamesRaw
+                    ? altNamesRaw.split(',').map(n => n.trim()).filter(n => n)
+                    : [];
+
+                return { name, city, logo, vk, youtube, website, rutube, telegram, altNames };
             });
         }
 
