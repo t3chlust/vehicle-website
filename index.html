@@ -1612,6 +1612,10 @@
                                                     const card = document.createElement('div');
                                                     card.className = 'manufacturer-card';
                                                     card.id = `manuf-${m.name.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
+                                                    card.style.cursor = 'pointer';
+                                                    card.onclick = () => {
+                                                        window.location.href = `/manufacturer.html?name=${encodeURIComponent(m.name)}`;
+                                                    };
 
                                                     // Логотип
                                                     const logoWrap = document.createElement('div');
@@ -1641,6 +1645,7 @@
                                                         if (!url) return;
                                                         const a = document.createElement('a');
                                                         a.href = url; a.target = '_blank';
+                                                        a.onclick = (e) => e.stopPropagation();
                                                         const i = document.createElement('img');
                                                         i.src = icon;
                                                         a.appendChild(i);

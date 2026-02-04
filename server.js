@@ -9,6 +9,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/manufacturer.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'manufacturer.html'));
+});
+
 app.listen(3000, '0.0.0.0', () => {
   console.log('Сайт запущен на порту 3000');
 });
