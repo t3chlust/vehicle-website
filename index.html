@@ -561,15 +561,21 @@
 
                             .ad-card-tender-badge {
                                 width: 100%;
-                                text-align: center;
-                                padding: 8px 15px;
+                                text-align: left;
+                                padding: 8px 12px;
                                 font-weight: 700;
                                 font-size: 13px;
-                                white-space: nowrap;
+                                line-height: 1.1;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-start;
+                                white-space: normal;
+                                word-break: normal;
+                                overflow-wrap: break-word;
                             }
 
                             .ad-card-tender-badge.visible {
-                                display: block;
+                                display: flex;
                                 background: #ab47bc;
                                 color: #fff;
                             }
@@ -675,15 +681,21 @@
 
                                 .ad-card-tender-badge {
                                     width: 100%;
-                                    text-align: center;
-                                    padding: 8px 15px;
+                                    text-align: left;
+                                    padding: 6px 10px;
                                     font-weight: 700;
-                                    font-size: 13px;
-                                    white-space: nowrap;
+                                    font-size: 12px;
+                                    line-height: 1.15;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: flex-start;
+                                    white-space: normal;
+                                    word-break: normal;
+                                    overflow-wrap: break-word;
                                 }
 
                                 .ad-card-tender-badge.visible {
-                                    display: block;
+                                    display: flex;
                                     background: #ab47bc;
                                     color: #fff;
                                 }
@@ -813,19 +825,24 @@
                             }
 
                             .modal-tender-banner {
-                                width: 100%;
+                                /* width: 100%; */
                                 background: #ab47bc;
                                 color: #fff;
-                                text-align: center;
+                                text-align: left;
                                 padding: 12px 20px;
                                 font-weight: 700;
                                 font-size: 14px;
                                 display: none;
-                                white-space: nowrap;
+                                line-height: 1.1;
+                                white-space: normal;
+                                word-break: normal;
+                                overflow-wrap: break-word;
                             }
 
                             .modal-tender-banner.visible {
-                                display: block;
+                                display: flex;
+                                justify-content: flex-start;
+                                align-items: center;
                             }
 
                             @media (max-width: 600px) {
@@ -1534,14 +1551,14 @@
                                             setTimeout(() => {
                                                 console.log("Все синонимы и их официальные названия:");
                                                 synonymToOfficial.forEach((official, syn) => {
-                                                    console.log(`"${syn}" → "${official}"`);
+                                                    // console.log(`"${syn}" → "${official}"`);
                                                 });
                                                 if (synonymToOfficial.size === 0) {
-                                                    console.warn("synonymToOfficial пустая! Синонимы не загрузились.");
+                                                    // console.warn("synonymToOfficial пустая! Синонимы не загрузились.");
                                                 }
                                             }, 2000);
                                             synonymToOfficial.forEach((official, key) => {
-                                                console.log(`Синоним: "${key}" → Официальное: "${official}"`);
+                                                // console.log(`Синоним: "${key}" → Официальное: "${official}"`);
                                             });
                                             function parseCSV(text) {
                                                 const lines = text.split('\n').map(l => l.trim()).filter(l => l);
