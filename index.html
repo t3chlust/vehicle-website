@@ -1799,7 +1799,8 @@
                                                             // Заполняем кастомный список ниже поля
                                                             if (listDiv) {
                                                                 listDiv.innerHTML = '';
-                                                                const arr = [...found].sort();
+                                                                const all = [...found].sort();
+                                                                const arr = all.slice(0, 5); // показываем максимум 5 подсказок
                                                                 if (arr.length === 0) {
                                                                     listDiv.style.display = 'none';
                                                                 } else {
