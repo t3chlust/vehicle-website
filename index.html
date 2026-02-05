@@ -1526,10 +1526,10 @@
                                 </div>
                                 <div id="tab-content-manufacturers" class="tab-content">
                                     <div style="margin-bottom: 25px; max-width: 500px;">
-                                        <input type="text" id="manufacturer-search" class="form-input filter-input"
-                                            placeholder="Поиск производителя" autocomplete="off"
-                                            list="manufacturer-suggestions" />
-                                        <datalist id="manufacturer-suggestions"></datalist>
+                                        <div class="search-container">
+                                            <input type="text" id="searchInput" class="form-input filter-input" placeholder="Поиск производителя" autocomplete="off">
+                                        </div>
+                                        <div id="manufacturerList" style="display:none; margin-top:8px;"></div>
                                     </div>
                                     <div class="manufacturer-grid" id="manufacturer-grid">
                                         <!-- Manufacturer cards will be rendered here from the JS `manufacturers` array -->
@@ -1707,19 +1707,24 @@
                                                 });
                                             }
 
-                                            function findAndScroll() {
-                                                const input = document.getElementById('manufacturer-search');
-                                                if (!input) return;
-
-                                                const val = input.value.trim();
+                                            function findAndScroll(name) {
+                                                const input = document.getElementById('searchInput');
+                                                let val = name ? name : (input ? input.value.trim() : '');
                                                 if (!val) return;
 
                                                 const lower = val.toLowerCase();
-                                                const officialName = synonymToOfficial.get(lower);
+                                                let officialName = synonymToOfficial.get(lower);
+
+                                                // Если прямого соответствия нет, попробуем найти точное совпадение среди официальных названий
+                                                if (!officialName) {
+                                                    const officialSet = new Set();
+                                                    synonymToOfficial.forEach(official => officialSet.add(official));
+                                                    const exact = [...officialSet].find(n => n.toLowerCase() === val.toLowerCase());
+                                                    if (exact) officialName = exact;
+                                                }
 
                                                 if (officialName) {
-                                                    // ← Вот это главное изменение
-                                                    input.value = officialName;  // подставляем официальное название в поле
+                                                    if (input) input.value = officialName;  // подставляем официальное название в поле
 
                                                     const id = `manuf-${officialName.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
                                                     const card = document.getElementById(id);
@@ -1733,6 +1738,9 @@
                                                     } else {
                                                         console.warn('Карточка не найдена по id:', id);
                                                     }
+
+                                                    const listDiv = document.getElementById('manufacturerList');
+                                                    if (listDiv) listDiv.style.display = 'none';
                                                 }
                                             }
                                             // Загрузка
@@ -1743,10 +1751,10 @@
                                                     renderManufacturers(manufacturers);
                                                     fillDatalist();
 
-                                                    const input = document.getElementById('manufacturer-search');
+                                                    const input = document.getElementById('searchInput');
                                                     if (input) {
                                                         // Срабатывает при выборе из списка или нажатии Enter
-                                                        input.addEventListener('change', findAndScroll);
+                                                        input.addEventListener('change', () => findAndScroll());
                                                         input.addEventListener('keypress', e => {
                                                             if (e.key === 'Enter') {
                                                                 e.preventDefault();
@@ -1757,20 +1765,17 @@
                                                         input.addEventListener('input', function () {
                                                             // Берём то, что ввёл пользователь
                                                             let typed = this.value.trim();
+                                                            const listDiv = document.getElementById('manufacturerList');
 
-                                                            // Если ничего не ввели — показываем все
+                                                            // Если ничего не ввели — прячем список и возвращаем все варианты
                                                             if (!typed) {
                                                                 fillDatalist();
+                                                                if (listDiv) listDiv.style.display = 'none';
                                                                 return;
                                                             }
 
                                                             // Приводим к нижнему регистру ОДИН РАЗ
                                                             typed = typed.toLowerCase();
-
-                                                            const datalist = document.getElementById('manufacturer-suggestions');
-                                                            if (!datalist) return;
-
-                                                            datalist.innerHTML = '';
 
                                                             const found = new Set();
 
@@ -1791,14 +1796,40 @@
                                                                 });
                                                             }
 
-                                                            // Заполняем datalist
-                                                            [...found]
-                                                                .sort()
-                                                                .forEach(name => {
-                                                                    const option = document.createElement('option');
-                                                                    option.value = name;
-                                                                    datalist.appendChild(option);
-                                                                });
+                                                            // Заполняем кастомный список ниже поля
+                                                            if (listDiv) {
+                                                                listDiv.innerHTML = '';
+                                                                const arr = [...found].sort();
+                                                                if (arr.length === 0) {
+                                                                    listDiv.style.display = 'none';
+                                                                } else {
+                                                                    arr.forEach(name => {
+                                                                        const item = document.createElement('div');
+                                                                        item.className = 'manufacturer';
+                                                                        item.setAttribute('data-target', name);
+                                                                        item.textContent = name;
+                                                                        item.addEventListener('click', function (e) {
+                                                                            e.preventDefault();
+                                                                            // Подставляем официальное название и скроллим
+                                                                            input.value = name;
+                                                                            listDiv.style.display = 'none';
+                                                                            findAndScroll(name);
+                                                                        });
+                                                                        listDiv.appendChild(item);
+                                                                    });
+                                                                    listDiv.style.display = 'block';
+                                                                }
+                                                            }
+                                                        });
+
+                                                        // Скрываем список подсказок по клику вне поля
+                                                        document.addEventListener('click', function (e) {
+                                                            const listDiv = document.getElementById('manufacturerList');
+                                                            const inputEl = document.getElementById('searchInput');
+                                                            if (!listDiv || !inputEl) return;
+                                                            if (!listDiv.contains(e.target) && e.target !== inputEl) {
+                                                                listDiv.style.display = 'none';
+                                                            }
                                                         });
                                                     }
                                                 })
