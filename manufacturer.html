@@ -227,6 +227,217 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-window {
+            background: white;
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 8px;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #f5f5f5;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-gallery-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .gallery-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 8px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            transition: background 0.2s;
+        }
+
+        .gallery-arrow:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .arrow-left {
+            left: 10px;
+        }
+
+        .arrow-right {
+            right: 10px;
+        }
+
+        .modal-content {
+            padding: 30px;
+        }
+
+        .modal-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .modal-title-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2a2a2a;
+        }
+
+        .modal-badges-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .specs-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .specs-table td:first-child {
+            font-weight: 600;
+            width: 40%;
+            color: #666;
+        }
+
+        /* Lightbox Styles */
+        .lightbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-overlay.active {
+            display: flex;
+        }
+
+        .lightbox-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         @media (max-width: 768px) {
             .manufacturer-header {
                 flex-direction: column;
@@ -239,6 +450,26 @@
 
             .ad-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .modal-window {
+                max-height: 95vh;
+            }
+
+            .gallery-wrapper {
+                height: 300px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .modal-title-text {
+                font-size: 20px;
+            }
+
+            .modal-title-row {
+                flex-direction: column;
             }
         }
     </style>
@@ -255,9 +486,57 @@
         </div>
     </div>
 
+    <!-- Modal Window -->
+    <div id="modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-window" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="closeModalDirect()">×</div>
+            <div class="gallery-wrapper" id="gallery-wrapper">
+                <div id="arrow-prev" class="gallery-arrow arrow-left" onclick="galleryPrev(event)">‹</div>
+                <div class="gallery-track" id="gallery-track"></div>
+                <div id="arrow-next" class="gallery-arrow arrow-right" onclick="galleryNext(event)">›</div>
+            </div>
+            <div class="modal-content">
+                <div class="modal-title-row">
+                    <div class="modal-title-text" id="modal-title"></div>
+                    <div class="modal-badges-row">
+                        <div id="modal-badges" style="display:flex; align-items:center; gap: 6px; flex-wrap: wrap;"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <div id="modal-price" style="font-size: 20px; font-weight: 600;"></div>
+                </div>
+                <div style="background:#f9f9f9; padding:20px; border-radius:12px; margin-bottom:30px;">
+                    <div style="font-size:14px;color:#888;font-weight:bold;">Продавец</div>
+                    <div id="modal-name" style="font-size:18px;font-weight:bold;"></div>
+                    <div id="modal-location" style="color:#666;margin-top:5px;font-size:14px;"></div>
+                    <a id="modal-phone" href="#" style="font-size:20px;color:#0066cc;text-decoration:none;display:block;margin-top:5px;"></a>
+                </div>
+                <h4 style="margin-bottom:15px; font-size: 18px; font-weight: 700;">Характеристики</h4>
+                <table class="specs-table">
+                    <tbody id="modal-specs"></tbody>
+                </table>
+                <h4 style="margin-bottom:15px; font-size: 18px; font-weight: 700;">Описание</h4>
+                <div id="modal-desc" style="white-space: pre-wrap;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox for zooming images -->
+    <div id="lightbox" class="lightbox-overlay" onclick="closeLightbox()">
+        <div class="lightbox-close" onclick="closeLightbox()">×</div>
+        <div class="lightbox-img-wrapper" id="lightbox-wrapper">
+            <img id="lightbox-img" class="lightbox-img" src="" onclick="event.stopPropagation()">
+        </div>
+    </div>
+
     <script>
         // Глобальные переменные
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUI4vRlqW88m7jcx5sPQYg6PMDv0nVQ3U4ollXorvzPB1MaiNMkUEn7kQjN8UcPnVy/exec';
+        const NEW_STATUS_TAG = '***STATUS_NEW***';
+        
+        let currentAd = null;
+        let currentPhotos = [];
+        let currentPhotoIndex = 0;
         
         // Иконки соцсетей
         const ICONS = {
@@ -267,6 +546,52 @@
             TG: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
             RUTUBE: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Rutube_icon.svg'
         };
+
+        // Modal functions
+        function closeModal(e) { 
+            if (e.target.id === 'modal') closeModalDirect(); 
+        }
+        
+        function closeModalDirect() { 
+            document.getElementById('modal').classList.remove('active'); 
+            document.body.style.overflow = 'auto'; 
+        }
+
+        function openLightbox(url) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        function updateGallery() {
+            const track = document.getElementById('gallery-track');
+            if (track.getAttribute('data-ad-id') !== String(currentAd.rowIndex)) {
+                track.innerHTML = currentPhotos.map(url => `
+                    <div class="gallery-slide">
+                        <img class="modal-gallery-img" src="${url}" onclick="openLightbox('${url}')">
+                    </div>
+                `).join('');
+                track.setAttribute('data-ad-id', currentAd.rowIndex);
+            }
+            track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
+        }
+
+        function galleryNext(e) { 
+            if (e) e.stopPropagation(); 
+            currentPhotoIndex++; 
+            if (currentPhotoIndex >= currentPhotos.length) currentPhotoIndex = 0; 
+            updateGallery(); 
+        }
+
+        function galleryPrev(e) { 
+            if (e) e.stopPropagation(); 
+            currentPhotoIndex--; 
+            if (currentPhotoIndex < 0) currentPhotoIndex = currentPhotos.length - 1; 
+            updateGallery(); 
+        }
 
         // Получить название производителя из URL
         function getManufacturerNameFromUrl() {
@@ -291,22 +616,74 @@
             }
         }
 
-        // Показать объявление в модальном окне (упрощенная версия)
+        // Показать объявление в модальном окне
         function openAd(ad) {
-            const details = [
-                `Название: ${ad.title || 'Без названия'}`,
-                `Цена: ${Number(ad.price || 0).toLocaleString()} ₽`,
-                `Город: ${ad.city || '-'}`,
-                `Продавец: ${ad.name || '-'}`,
-                `Телефон: ${ad.phone || '-'}`
-            ].join('\n');
+            currentAd = ad;
+            currentPhotos = [];
+            currentPhotoIndex = 0;
             
-            alert(details);
+            document.getElementById('modal-title').innerText = ad.title || "";
+            document.getElementById('modal-price').innerText = Number(ad.price || 0).toLocaleString() + ' ₽';
+            
+            let cleanDesc = (ad.desc || "").replace(NEW_STATUS_TAG, "").replace(/#COLOR_\S+/g, "").replace(/#WHEELS_\S+/g, "").trim();
+            document.getElementById('modal-desc').innerText = cleanDesc;
+            
+            document.getElementById('modal-name').innerText = ad.name || "Продавец";
+            document.getElementById('modal-location').innerText = ad.city || "";
+            
+            const phEl = document.getElementById('modal-phone');
+            if (phEl) {
+                phEl.innerText = ad.phone || "";
+                phEl.href = "tel:" + (ad.phone || "");
+            }
+
+            let bgHtml = '';
+            if (checkIsNew(ad)) bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
+            if (ad.sellerType === 'private') bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
+            if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
+            document.getElementById('modal-badges').innerHTML = bgHtml;
+
+            let sp = [
+                { l: "Тип продавца", v: ad.sellerType === 'factory' ? 'Производитель' : (ad.sellerType === 'dealer' ? 'Дилер' : (ad.sellerType === 'private' ? 'Владелец' : '')) },
+                { l: "Город", v: ad.city },
+                { l: "Тип техники", v: ad.techType === 'vezdehod' ? 'Вездеход' : (ad.techType === 'trailer' ? 'Прицеп' : (ad.techType === 'moto' ? 'Мото-техника' : '')) },
+            ];
+
+            if (ad.techType === 'vezdehod') {
+                sp.push({ l: "Конструкция", v: ad.constructionType });
+            }
+
+            if (ad.techType === 'trailer') {
+                sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
+            } else {
+                let wf = ad.wheelFormula;
+                sp.push({ l: "Тип шасси", v: wf });
+                sp.push({ l: "Плавающий", v: ((ad.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
+                sp.push({ l: "Двигатель", v: ad.engine });
+                sp.push({ l: "Мощность", v: ad.power ? ad.power + ' л.с.' : '' });
+                sp.push({ l: "Трансмиссия", v: ad.transmission });
+                sp.push({ l: "Топливо", v: ad.fuel });
+                sp.push({ l: "Колеса", v: ad.wheels });
+                sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
+            }
+
+            sp.push({ l: "Документы", v: ad.docs || 'Нет' });
+            sp.push({ l: "Цвет", v: ad.color });
+            
+            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+
+            let phs = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+            currentPhotos = phs;
+            updateGallery();
+            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
+            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
+            
+            document.getElementById('modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         // Функция для проверки новизны объявления
         function checkIsNew(ad) {
-            const NEW_STATUS_TAG = '🆕 НОВОЕ!';
             if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true;
             if (ad.condition === 'new') return true;
             return false;
