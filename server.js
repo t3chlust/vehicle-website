@@ -38,7 +38,25 @@ app.post('/send-sms', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Номер телефона не предоставлен' });
     }
 
-    // Генерируем код
+    // Специальная обработка для админского номера
+    const ADMIN_PHONE = '+79829817369';
+    if (phone === ADMIN_PHONE) {
+      // Для админа используем фиксированный код "1" без отправки СМС
+      const code = '1';
+      verificationCodes.set(phone, {
+        code: code,
+        createdAt: Date.now()
+      });
+      console.log(`✅ Админский номер ${phone} - код установлен на: ${code}`);
+      
+      return res.json({ 
+        success: true, 
+        message: 'Код подтверждения готов (админский номер)',
+        smsId: 'admin-local-001'
+      });
+    }
+
+    // Генерируем код для обычных номеров
     const code = generateCode();
     
     // Сохраняем код с временем создания
