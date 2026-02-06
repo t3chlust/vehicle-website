@@ -49,13 +49,30 @@
                                     alert("Введите код");
                                     return;
                                 }
-                                showLoader("Проверка...");
-                                const correctCode = "1";
-                                setTimeout(() => {
-                                    hideLoader();
-                                    if (code === correctCode) {
-                                        const phone = safeVal('auth-phone').trim();
+                                
+                                const phone = safeVal('auth-phone').trim();
+                                if (!phone) {
+                                    alert("Ошибка: номер телефона не найден");
+                                    return;
+                                }
 
+                                showLoader("Проверка кода...");
+                                
+                                // Отправляем код на сервер для проверки
+                                fetch('/verify-code', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        phone: phone,
+                                        code: code
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    hideLoader();
+                                    if (data.success) {
                                         // Запоминаем, что пользователь авторизован
                                         localStorage.setItem('vezdehod_auth_phone', phone);
                                         localStorage.setItem('vezdehod_username', "Админ"); // или имя, если будет
@@ -69,9 +86,14 @@
                                         closeAuthModal();
                                         updateAuthUI(currentUser);
                                     } else {
-                                        alert("Неверный код");
+                                        alert("Ошибка: " + (data.error || "Неверный код"));
                                     }
-                                }, 800);
+                                })
+                                .catch(error => {
+                                    hideLoader();
+                                    console.error('Ошибка:', error);
+                                    alert("Ошибка при проверке кода: " + error.message);
+                                });
                             }
                             function doLogout() {
                                 localStorage.removeItem('vezdehod_auth_phone');
@@ -107,10 +129,34 @@
 
                                 showLoader("Отправка SMS...");
 
-                                hideLoader();
-
-                                document.getElementById('auth-step-1').classList.add('hidden');
-                                document.getElementById('auth-step-2').classList.remove('hidden');
+                                // Отправляем номер телефона на сервер
+                                fetch('/send-sms', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        phone: formattedPhone
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    hideLoader();
+                                    if (data.success) {
+                                        // Переходим к вводу кода
+                                        document.getElementById('auth-step-1').classList.add('hidden');
+                                        document.getElementById('auth-step-2').classList.remove('hidden');
+                                        document.getElementById('auth-code').value = '';
+                                        document.getElementById('auth-code').focus();
+                                    } else {
+                                        alert("Ошибка при отправке СМС: " + (data.error || "Неизвестная ошибка"));
+                                    }
+                                })
+                                .catch(error => {
+                                    hideLoader();
+                                    console.error('Ошибка:', error);
+                                    alert("Ошибка при отправке СМС: " + error.message);
+                                });
                             }
                             function getPriceVal(v) {
                                 if (!v) return 0;
