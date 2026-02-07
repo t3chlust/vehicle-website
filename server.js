@@ -16,14 +16,69 @@ const CODE_TTL = 10 * 60 * 1000;
 
 // Создаем пул соединений с MariaDB
 const pool = mysql.createPool({
-  host: 'localhost',
+  host: process.env.DB_HOST || 'localhost',
   user: 'root',
-  password: '',
-  database: 'vehicle-website',
+  password: 'rhyKrag004',
+  database: 'vehicle_website',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
+
+function bitToBool(value) {
+  if (Buffer.isBuffer(value)) {
+    return value.length > 0 && value[0] === 1;
+  }
+  return value === 1 || value === true;
+}
+
+function normalizeName(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function normalizePhoneDigits(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+
+function formatPhoneForDisplay(value) {
+  const digits = normalizePhoneDigits(value);
+  if (!digits) return '';
+
+  let local = digits;
+  if (digits.length === 11 && (digits.startsWith('7') || digits.startsWith('8'))) {
+    local = digits.slice(1);
+  } else if (digits.length === 10) {
+    local = digits;
+  }
+
+  if (local.length === 10) {
+    return `+7 (${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6, 8)}-${local.slice(8, 10)}`;
+  }
+
+  return `+${digits}`;
+}
+
+async function getLookupTables(connection) {
+  const [chassis] = await connection.query('SELECT id, name FROM chassis ORDER BY id');
+  const [transmission] = await connection.query('SELECT id, name FROM transmission ORDER BY id');
+  const [fuel] = await connection.query('SELECT id, name FROM fuel ORDER BY id');
+  const [document] = await connection.query('SELECT id, name FROM document ORDER BY id');
+  const [vehicleType] = await connection.query('SELECT id, name FROM vehicle_type ORDER BY id');
+  const [constructionType] = await connection.query('SELECT id, name FROM construction_type ORDER BY id');
+
+  return { chassis, transmission, fuel, document, vehicleType, constructionType };
+}
+
+function resolveIdByName(list, value, defaultId = null) {
+  if (value === null || value === undefined || value === '') return defaultId;
+
+  const raw = String(value).trim();
+  if (/^\d+$/.test(raw)) return Number(raw);
+
+  const target = normalizeName(raw);
+  const found = list.find((item) => normalizeName(item.name) === target);
+  return found ? found.id : defaultId;
+}
 
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -168,11 +223,19 @@ app.get('/api/ads', async (req, res) => {
     // Получаем все объявления
     const [advertisements] = await connection.query(`
       SELECT 
-        a.id, a.price, a.name, a.phone, a.city, a.\`condition\`, a.sellerType, a.tender,
-        a.wheel, a.color, a.mileage, a.engine, a.power, a.transmission, a.fuel, a.wheels,
-        a.amphibious, a.document, a.technical, a.constructionType, a.brand,
-        a.model, a.status, a.creationDate
+        a.id, a.price, a.name, a.phone, a.city, a.\`new\` AS isNew, a.sellerType, a.tender,
+        a.chassis, c.name AS chassisName, a.color, a.mileage, a.engine, a.power,
+        a.transmission, t.name AS transmissionName, a.fuel, f.name AS fuelName,
+        a.wheelSize, a.amphibious, a.document, d.name AS documentName,
+        a.vehicleType, vt.name AS vehicleTypeName, a.constructionType, ct.name AS constructionName,
+        a.brand, a.model, a.status, a.creationDate, a.capacity
       FROM advertisement a
+      LEFT JOIN chassis c ON a.chassis = c.id
+      LEFT JOIN transmission t ON a.transmission = t.id
+      LEFT JOIN fuel f ON a.fuel = f.id
+      LEFT JOIN document d ON a.document = d.id
+      LEFT JOIN vehicle_type vt ON a.vehicleType = vt.id
+      LEFT JOIN construction_type ct ON a.constructionType = ct.id
       ORDER BY a.creationDate DESC
     `);
 
@@ -184,41 +247,45 @@ app.get('/api/ads', async (req, res) => {
       );
       
       const title = [ad.brand, ad.model].filter(Boolean).join(' ').trim();
+      const isNew = bitToBool(ad.isNew);
+      const tenderFlag = bitToBool(ad.tender);
+      const amphibiousFlag = bitToBool(ad.amphibious);
+      const vehicleTypeName = ad.vehicleTypeName || '';
 
       return {
         rowIndex: ad.id,
         price: ad.price,
         name: ad.name,
-        phone: ad.phone,
+        phone: formatPhoneForDisplay(ad.phone),
         city: ad.city,
-        condition: ad.condition === 1 ? 'new' : 'used',
+        condition: isNew ? 'new' : 'used',
         sellerType: ad.sellerType === 1 ? 'factory' : (ad.sellerType === 2 ? 'dealer' : 'private'),
-        tender: ad.tender ? 'yes' : 'no',
-        wheel: ad.wheel,
+        tender: tenderFlag ? 'yes' : 'no',
+        wheel: ad.chassis,
         color: ad.color,
         mileage: ad.mileage,
         engine: ad.engine,
         power: ad.power,
-        transmission: ad.transmission === 1 ? 'АКПП' : 'МКПП',
-        fuel: ad.fuel === 1 ? 'Бензин' : 'Дизель',
-        wheels: ad.wheels,
-        amphibious: ad.amphibious ? 'yes' : 'no',
+        transmission: ad.transmissionName || '',
+        fuel: ad.fuelName || '',
+        wheels: ad.wheelSize || '',
+        amphibious: amphibiousFlag ? 'yes' : 'no',
         document: ad.document,
-        technical: ad.technical === 1 ? 'vezdehod' : (ad.technical === 2 ? 'moto' : 'trailer'),
-        constructionType: ad.constructionType === 1 ? 'Цельнорамный' : 'Переломный',
+        technical: vehicleTypeName,
+        constructionType: ad.constructionName || '',
         manufacturer: ad.brand,
         model: ad.model,
         status: ad.status === 1 ? 'approved' : 'pending',
         creationDate: ad.creationDate,
         photos: photos.map(p => p.photo).join(','),
-        wheelFormula: ad.wheel === 1 ? 'Колёсный' : 'Гусеничный',
+        wheelFormula: ad.chassisName || '',
         title: title,
         brand: ad.brand || '',
         desc: '',
         region: '',
-        docs: ad.document === 1 ? 'ЭПСМ' : 'Нет',
-        capacity: 0,
-        techType: ad.technical === 1 ? 'vezdehod' : (ad.technical === 2 ? 'moto' : 'trailer')
+        docs: ad.documentName || 'Без документов',
+        capacity: ad.capacity || 0,
+        techType: vehicleTypeName
       };
     }));
 
@@ -241,32 +308,72 @@ app.post('/api/ads', async (req, res) => {
     } = req.body;
 
     const connection = await pool.getConnection();
+    const lookups = await getLookupTables(connection);
+
+    const sellerTypeId = sellerType === 'factory' ? 1 : (sellerType === 'dealer' ? 2 : 0);
+    const conditionFlag = condition === 'new' ? 1 : 0;
+    const tenderFlag = tender === 'yes' ? 1 : 0;
+    const amphibiousFlag = amphibious === 'yes' ? 1 : 0;
+
+    const chassisId = resolveIdByName(
+      lookups.chassis,
+      wheelFormula,
+      lookups.chassis[0] ? lookups.chassis[0].id : null
+    );
+
+    const transmissionId = resolveIdByName(
+      lookups.transmission,
+      transmission,
+      lookups.transmission[0] ? lookups.transmission[0].id : null
+    );
+
+    const fuelId = resolveIdByName(
+      lookups.fuel,
+      fuel,
+      lookups.fuel[0] ? lookups.fuel[0].id : null
+    );
+
+    const defaultDocumentId = resolveIdByName(
+      lookups.document,
+      'Без документов',
+      lookups.document[0] ? lookups.document[0].id : null
+    );
+
+    const documentId = resolveIdByName(
+      lookups.document,
+      docs,
+      defaultDocumentId
+    );
+
+    const vehicleTypeName = techType;
+    const vehicleTypeId = resolveIdByName(
+      lookups.vehicleType,
+      vehicleTypeName,
+      lookups.vehicleType[0] ? lookups.vehicleType[0].id : null
+    );
+
+    const constructionId = resolveIdByName(
+      lookups.constructionType,
+      constructionType,
+      lookups.constructionType[0] ? lookups.constructionType[0].id : null
+    );
+
+    const normalizedPhone = normalizePhoneDigits(phone);
 
     try {
       if (action === 'create') {
         // Вставляем новое объявление
-        const conditionId = condition === 'new' ? 1 : 2;
-        const sellerTypeId = sellerType === 'factory' ? 1 : (sellerType === 'dealer' ? 2 : 0);
-        const transmissionId = transmission === 'АКПП' ? 1 : 2;
-        const fuelId = fuel === 'Бензин' ? 1 : 2;
-        const wheelId = wheelFormula === 'Колёсный' ? 1 : 2;
-        const technicalId = techType === 'vezdehod' ? 1 : (techType === 'moto' ? 2 : 3);
-        const constructionId = constructionType === 'Цельнорамный' ? 1 : 2;
-        const documentId = docs === 'ЭПСМ' ? 1 : 0;
-        const amphibiousFlag = amphibious === 'yes' ? 1 : 0;
-        const tenderFlag = tender === 'yes' ? 1 : 0;
-
         const [result] = await connection.query(
           `INSERT INTO advertisement 
-            (price, name, phone, city, condition, sellerType, tender, wheel, 
-             color, mileage, engine, power, transmission, fuel, wheels, 
-             amphibious, document, technical, constructionType, brand, model, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            (price, name, phone, city, \`new\`, sellerType, tender, chassis, 
+             color, mileage, engine, power, transmission, fuel, wheelSize, 
+             amphibious, document, vehicleType, constructionType, brand, model, status, capacity)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            price || 0, name, phone, city, conditionId, sellerTypeId, tenderFlag,
-            wheelId, color, mileage || 0, engine, power || 0, transmissionId, fuelId,
-            wheels, amphibiousFlag, documentId, technicalId, constructionId,
-            brand || null, model, 2 // status = 2 (pending)
+            price || 0, name, normalizedPhone, city, conditionFlag, sellerTypeId, tenderFlag,
+            chassisId, color, mileage || 0, engine, power || 0, transmissionId, fuelId,
+            wheels || '', amphibiousFlag, documentId, vehicleTypeId, constructionId,
+            brand || null, model, 2, capacity || null // status = 2 (pending)
           ]
         );
 
@@ -288,29 +395,18 @@ app.post('/api/ads', async (req, res) => {
 
       } else if (action === 'edit') {
         // Обновляем существующее объявление
-        const conditionId = condition === 'new' ? 1 : 2;
-        const sellerTypeId = sellerType === 'factory' ? 1 : (sellerType === 'dealer' ? 2 : 0);
-        const transmissionId = transmission === 'АКПП' ? 1 : 2;
-        const fuelId = fuel === 'Бензин' ? 1 : 2;
-        const wheelId = wheelFormula === 'Колёсный' ? 1 : 2;
-        const technicalId = techType === 'vezdehod' ? 1 : (techType === 'moto' ? 2 : 3);
-        const constructionId = constructionType === 'Цельнорамный' ? 1 : 2;
-        const documentId = docs === 'ЭПСМ' ? 1 : 0;
-        const amphibiousFlag = amphibious === 'yes' ? 1 : 0;
-        const tenderFlag = tender === 'yes' ? 1 : 0;
-
         await connection.query(
           `UPDATE advertisement SET 
-            price = ?, name = ?, phone = ?, city = ?, condition = ?, sellerType = ?,
-            tender = ?, wheel = ?, color = ?, mileage = ?, engine = ?, power = ?,
-            transmission = ?, fuel = ?, wheels = ?, amphibious = ?, document = ?,
-            technical = ?, constructionType = ?, brand = ?, model = ?
+            price = ?, name = ?, phone = ?, city = ?, \`new\` = ?, sellerType = ?,
+            tender = ?, chassis = ?, color = ?, mileage = ?, engine = ?, power = ?,
+            transmission = ?, fuel = ?, wheelSize = ?, amphibious = ?, document = ?,
+            vehicleType = ?, constructionType = ?, brand = ?, model = ?, capacity = ?
            WHERE id = ?`,
           [
-            price || 0, name, phone, city, conditionId, sellerTypeId, tenderFlag,
-            wheelId, color, mileage || 0, engine, power || 0, transmissionId, fuelId,
-            wheels, amphibiousFlag, documentId, technicalId, constructionId,
-            brand || null, model, rowIndex
+            price || 0, name, normalizedPhone, city, conditionFlag, sellerTypeId, tenderFlag,
+            chassisId, color, mileage || 0, engine, power || 0, transmissionId, fuelId,
+            wheels || '', amphibiousFlag, documentId, vehicleTypeId, constructionId,
+            brand || null, model, capacity || null, rowIndex
           ]
         );
 
@@ -361,7 +457,9 @@ app.post('/api/ads/delete', async (req, res) => {
         return res.status(404).json({ status: 'error', message: 'Объявление не найдено' });
       }
 
-      if (ads[0].phone !== phone) {
+      const storedPhone = normalizePhoneDigits(ads[0].phone);
+      const requestPhone = normalizePhoneDigits(phone);
+      if (storedPhone !== requestPhone) {
         connection.release();
         return res.status(403).json({ status: 'error', message: 'Доступ запрещен' });
       }
@@ -432,7 +530,7 @@ app.get('/api/manufacturers', async (req, res) => {
     const connection = await pool.getConnection();
     
     // Получаем всех производителей
-    const [manufacturers] = await connection.query('SELECT * FROM manufacturer ORDER BY name');
+    const [manufacturers] = await connection.query('SELECT * FROM manufacturer_cards ORDER BY name');
 
     // Получаем синонимы для каждого производителя
     const result = await Promise.all(manufacturers.map(async (mfr) => {
@@ -473,7 +571,7 @@ app.get('/api/manufacturer-synonyms', async (req, res) => {
       SELECT 
         m.id, m.name, m.city, m.logo, m.vk, m.youtube, m.website, m.rutube, m.telegram,
         GROUP_CONCAT(ms.name SEPARATOR ',') as aliases
-      FROM manufacturer m
+      FROM manufacturer_cards m
       LEFT JOIN manufacturer_synonym ms ON m.id = ms.manufacturer
       GROUP BY m.id
       ORDER BY m.name
@@ -504,12 +602,36 @@ app.get('/api/manufacturer-synonyms', async (req, res) => {
 });
 
 // ========================
+// API Endpoints для фильтров
+// ========================
+
+app.get('/api/filters', async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const lookups = await getLookupTables(connection);
+    connection.release();
+
+    res.json({
+      chassis: lookups.chassis,
+      transmission: lookups.transmission,
+      fuel: lookups.fuel,
+      document: lookups.document,
+      vehicleType: lookups.vehicleType,
+      constructionType: lookups.constructionType
+    });
+  } catch (error) {
+    console.error('❌ Ошибка при получении фильтров:', error);
+    res.status(500).json({ error: 'Ошибка при получении фильтров: ' + error.message });
+  }
+});
+
+// ========================
 // Запуск сервера
 // ========================
 
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✨ Сайт запущен на порту ${PORT}`);
-  console.log(`📊 Подключение к MariaDB: vehicle-website`);
+  console.log(`📊 Подключение к MariaDB: vehicle_website`);
 });
 

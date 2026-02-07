@@ -1522,7 +1522,7 @@
                                                             <option value="">Любое</option>
                                                             <option value="Бензин">Бензин</option>
                                                             <option value="Дизель">Дизель</option>
-                                                            <option value="Электро">Электро</option>
+                                                            <option value="Электричество">Электричество</option>
                                                             <option value="Газ">Газ</option>
                                                         </select></div>
                                                     <div class="filter-item"><label
@@ -1530,8 +1530,8 @@
                                                             class="filter-input" id="f-docs" onchange="applyFilters()">
                                                             <option value="">Любые</option>
                                                             <option value="ЭПСМ">ЭПСМ (ПСМ)</option>
-                                                            <option value="СпортИнвентарь">Спорт.инвентарь</option>
-                                                            <option value="Нет">Без документов</option>
+                                                            <option value="Спорт.инвентарь">Спорт.инвентарь</option>
+                                                            <option value="Без документов">Без документов</option>
                                                         </select></div>
                                                     <div class="filter-item"><label
                                                             class="filter-label">Плавающий</label><select
@@ -1548,13 +1548,13 @@
                                                             <option value="yes">Да</option>
                                                             <option value="no">Нет</option>
                                                         </select></div>
-                                                    <div class="filter-item"><label class="filter-label">Тип
+                                                        <div class="filter-item"><label class="filter-label">Тип
                                                             техники</label><select class="filter-input" id="f-tech-type"
                                                             onchange="applyFilters()">
                                                             <option value="">Любой</option>
-                                                            <option value="vezdehod">Вездеход</option>
-                                                            <option value="moto">Мото-техника</option>
-                                                            <option value="trailer">Прицеп</option>
+                                                            <option value="Вездеход">Вездеход</option>
+                                                            <option value="Мото-техника">Мото-техника</option>
+                                                            <option value="Прицеп">Прицеп</option>
                                                         </select></div>
                                                     <div class="filter-item"><label
                                                             class="filter-label">Конструкция</label><select
@@ -1908,9 +1908,9 @@
                                         class="form-input" id="inp-city" placeholder="Город" />
                                     <div class="form-section-title">Основное</div> <select class="form-select"
                                         id="inp-tech-type" onchange="checkTechTypeVisibility()">
-                                        <option value="vezdehod" selected>Вездеход</option>
-                                        <option value="moto">Мото-техника</option>
-                                        <option value="trailer">Прицеп</option>
+                                        <option value="Вездеход" selected>Вездеход</option>
+                                        <option value="Мото-техника">Мото-техника</option>
+                                        <option value="Прицеп">Прицеп</option>
                                     </select> <select class="form-select" id="inp-construction">
                                         <option value="">Конструкция вездехода</option>
                                         <option value="Цельнорамный">Цельнорамный</option>
@@ -1952,7 +1952,7 @@
                                             <option value="">Топливо</option>
                                             <option value="Бензин">Бензин</option>
                                             <option value="Дизель">Дизель</option>
-                                            <option value="Электро">Электро</option>
+                                            <option value="Электричество">Электричество</option>
                                             <option value="Газ">Газ</option>
                                         </select> <select class="form-select" id="inp-wheel-f">
                                             <option value="">Тип шасси</option>
@@ -1984,8 +1984,8 @@
                                         </select> <select class="form-select" id="inp-docs">
                                             <option value="">Документы</option>
                                             <option value="ЭПСМ">ЭПСМ (ПСМ)</option>
-                                            <option value="СпортИнвентарь">Спорт.инвентарь</option>
-                                            <option value="Нет">Без документов</option>
+                                            <option value="Спорт.инвентарь">Спорт.инвентарь</option>
+                                            <option value="Без документов">Без документов</option>
                                         </select>
                                     </div>
                                     <div id="div-wheels">
@@ -2097,10 +2097,77 @@
                     </div>
                     <script>
                         const GOOGLE_SCRIPT_URL = "/api/ads";
+                        const FILTERS_API_URL = "/api/filters";
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
                         let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], currentAd = null, isEditMode = false, isAdmin = false;
                         let currentPhotoIndex = 0; let currentPhotos = [];
+
+                        function rebuildSelect(selectId, options, getValue, getLabel) {
+                            const select = document.getElementById(selectId);
+                            if (!select) return;
+                            const placeholder = select.options[0] ? select.options[0].cloneNode(true) : null;
+                            const existingValues = new Set();
+                            select.innerHTML = '';
+                            if (placeholder) {
+                                select.appendChild(placeholder);
+                                existingValues.add(placeholder.value);
+                            }
+                            options.forEach((item) => {
+                                const value = getValue(item);
+                                if (existingValues.has(value)) return;
+                                const opt = document.createElement('option');
+                                opt.value = value;
+                                opt.textContent = getLabel(item);
+                                select.appendChild(opt);
+                                existingValues.add(value);
+                            });
+                        }
+
+                        async function loadFilters() {
+                            try {
+                                const response = await fetch(FILTERS_API_URL);
+                                const data = await response.json();
+                                if (!data) return;
+
+                                const chassis = data.chassis || [];
+                                const transmission = data.transmission || [];
+                                const fuel = data.fuel || [];
+                                const docs = data.document || [];
+                                const vehicleType = data.vehicleType || [];
+                                const constructionType = data.constructionType || [];
+
+                                rebuildSelect('f-wheels', chassis, (item) => item.name, (item) => item.name);
+                                rebuildSelect('inp-wheel-f', chassis, (item) => item.name, (item) => item.name);
+
+                                rebuildSelect('f-trans', transmission, (item) => item.name, (item) => item.name);
+                                rebuildSelect('inp-trans', transmission, (item) => item.name, (item) => item.name);
+
+                                rebuildSelect('f-fuel', fuel, (item) => item.name, (item) => item.name);
+                                rebuildSelect('inp-fuel', fuel, (item) => item.name, (item) => item.name);
+
+                                rebuildSelect('f-docs', docs, (item) => item.name, (item) => item.name);
+                                rebuildSelect('inp-docs', docs, (item) => item.name, (item) => item.name);
+
+                                rebuildSelect('f-construction', constructionType, (item) => item.name, (item) => item.name);
+                                rebuildSelect('inp-construction', constructionType, (item) => item.name, (item) => item.name);
+
+                                rebuildSelect(
+                                    'f-tech-type',
+                                    vehicleType,
+                                    (item) => item.name,
+                                    (item) => item.name
+                                );
+                                rebuildSelect(
+                                    'inp-tech-type',
+                                    vehicleType,
+                                    (item) => item.name,
+                                    (item) => item.name
+                                );
+                            } catch (error) {
+                                console.error('Ошибка загрузки фильтров:', error);
+                            }
+                        }
 
                         function showTab(element, tabName) {
                             // Force hide all tabs first
@@ -2181,11 +2248,11 @@
                             }
                         }
 
-                        document.addEventListener('DOMContentLoaded', () => {
+                        document.addEventListener('DOMContentLoaded', async () => {
                             tryAutoLogin();
+                            await loadFilters();
                             loadAds();
                         });
-                        document.addEventListener('DOMContentLoaded', () => { loadAds(); });
                         let startY = 0; let ptrDist = 0; const ptrThreshold = 80;
                         const ptrIndicator = document.getElementById('ptr-indicator');
                         const wrapper = document.getElementById('main-wrapper');
@@ -2293,9 +2360,9 @@
                             mainSpecs.classList.remove('hidden');
                             capDiv.classList.add('hidden');
                             wheelsDiv.classList.remove('hidden');
-                            if (type === 'vezdehod') {
+                            if (type === 'Вездеход') {
                                 constrInp.classList.remove('hidden');
-                            } else if (type === 'trailer') {
+                            } else if (type === 'Прицеп') {
                                 mainSpecs.classList.add('hidden');
                                 wheelsDiv.classList.add('hidden');
                                 capDiv.classList.remove('hidden');
@@ -2328,7 +2395,7 @@
                                 if (trans && (ad.transmission || "").trim() !== trans) return false;
                                 if (fuel && (ad.fuel || "").trim() !== fuel) return false;
                                 if (docs) {
-                                    if (docs === 'Нет') { if (ad.docs && ad.docs !== 'Нет') return false; }
+                                    if (docs === 'Без документов') { if (ad.docs && ad.docs !== 'Без документов') return false; }
                                     else if ((ad.docs || "").trim() !== docs) return false;
                                 }
                                 if (tender && (ad.tender || "no") !== tender) return false;
@@ -2420,14 +2487,14 @@
                             let sp = [
                                 { l: "Тип продавца", v: sType },
                                 { l: "Город", v: ad.city },
-                                { l: "Тип техники", v: ad.techType === 'vezdehod' ? 'Вездеход' : (ad.techType === 'trailer' ? 'Прицеп' : (ad.techType === 'moto' ? 'Мото-техника' : '')) },
+                                { l: "Тип техники", v: ad.techType || '' },
                             ];
 
-                            if (ad.techType === 'vezdehod') {
+                            if (ad.techType === 'Вездеход') {
                                 sp.push({ l: "Конструкция", v: ad.constructionType });
                             }
 
-                            if (ad.techType === 'trailer') {
+                            if (ad.techType === 'Прицеп') {
                                 sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
                             } else {
                                 sp.push({ l: "Тип шасси", v: wf });
@@ -2440,7 +2507,7 @@
                                 sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
                             }
 
-                            sp.push({ l: "Документы", v: ad.docs || 'Нет' });
+                            sp.push({ l: "Документы", v: ad.docs || 'Без документов' });
                             sp.push({ l: "Цвет", v: ad.color });
                             document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
                             const acts = document.getElementById('modal-owner-actions'); const norm = p => String(p).replace(/[^0-9]/g, '');
@@ -2836,7 +2903,7 @@
                             setVal('inp-tender', ad.tender || "no");
                             setVal('inp-amphibious', ad.amphibious || "no");
                             setVal('inp-docs', ad.docs || "");
-                            setVal('inp-tech-type', ad.techType || "vezdehod");
+                            setVal('inp-tech-type', ad.techType || "Вездеход");
                             setVal('inp-construction', ad.constructionType || "");
                             setVal('inp-capacity', ad.capacity || "");
                             checkTechTypeVisibility();
