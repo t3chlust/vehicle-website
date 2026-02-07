@@ -20,6 +20,7 @@
   "homepage": "https://github.com/t3chlust/vehicle-website#readme",
   "dependencies": {
     "express": "^5.2.1",
+    "mysql2": "^3.16.3",
     "node-sms-ru": "^0.3.0"
   }
 }

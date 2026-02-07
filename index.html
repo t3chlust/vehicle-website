@@ -1607,7 +1607,7 @@
 
                                     <script>
                                         (function () {
-                                            const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1xU4C49DHBBlz0FdfGbc-kAZBBJlBVdgGxcYL68QKhUc/export?format=csv&gid=736473411';
+                                            const SHEET_CSV_URL = '/api/manufacturer-synonyms';
 
                                             const ICON_VK = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/VK_Compact_Logo_%282021-present%29.svg/1024px-VK_Compact_Logo_%282021-present%29.svg.png';
                                             const ICON_YT = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png';
@@ -1630,69 +1630,27 @@
                                             synonymToOfficial.forEach((official, key) => {
                                                 // console.log(`Синоним: "${key}" → Официальное: "${official}"`);
                                             });
-                                            function parseCSV(text) {
-                                                const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-                                                lines.shift(); // убираем заголовки
+                                            function parseManufacturers(data) {
+                                                // Data is already a JSON array from the API
+                                                return data.map(entry => {
+                                                    const { name, city, logo, vk, youtube, website, rutube, telegram, aliases } = entry;
 
-                                                return lines.map(line => {
-                                                    // Более надёжный разбор CSV-строки (учитываем кавычки)
-                                                    const cols = [];
-                                                    let current = '';
-                                                    let inQuotes = false;
-
-                                                    for (let i = 0; i < line.length; i++) {
-                                                        const char = line[i];
-                                                        if (char === '"' && !inQuotes) {
-                                                            inQuotes = true;
-                                                        } else if (char === '"' && inQuotes) {
-                                                            inQuotes = false;
-                                                        } else if (char === ',' && !inQuotes) {
-                                                            cols.push(current.trim());
-                                                            current = '';
-                                                        } else {
-                                                            current += char;
-                                                        }
-                                                    }
-                                                    // Последнее значение
-                                                    cols.push(current.trim());
-
-                                                    const name = (cols[1] || '').trim();
-                                                    const city = (cols[2] || '').trim();
-                                                    const logo = (cols[3] || '').trim();
-                                                    const vk = (cols[4] || '').trim();
-                                                    const youtube = (cols[5] || '').trim();
-                                                    const website = (cols[6] || '').trim();
-                                                    const rutube = (cols[7] || '').trim();
-                                                    const telegram = (cols[8] || '').trim();
-                                                    let aliasesRaw = (cols[9] || '').trim();
-
-                                                    const entry = { name, city, logo, vk, youtube, website, rutube, telegram };
-
-                                                    // Очищаем синонимы от кавычек и лишних пробелов
-                                                    if (aliasesRaw) {
-                                                        // Убираем внешние кавычки, если они есть вокруг всего столбца
-                                                        aliasesRaw = aliasesRaw.replace(/^"+|"+$/g, '').trim();
-
-                                                        // Разделяем по запятым и очищаем каждую часть
-                                                        aliasesRaw.split(',').forEach(part => {
-                                                            let clean = part
-                                                                .trim()
-                                                                .replace(/^"+|"+$/g, '')   // убираем кавычки в начале и конце каждого элемента
-                                                                .replace(/\s+/g, ' ')      // нормализуем пробелы
-                                                                .trim();
-
-                                                            if (clean) {
-                                                                synonymToOfficial.set(clean.toLowerCase(), name);
-                                                            }
-                                                        });
-                                                    }
-
-                                                    // Само название тоже добавляем как возможный поисковый вариант
+                                                    // Добавляем основное название
                                                     if (name) {
                                                         synonymToOfficial.set(name.toLowerCase(), name);
                                                     }
 
-                                                    return entry;
+                                                    // Добавляем синонимы
+                                                    if (aliases && Array.isArray(aliases)) {
+                                                        aliases.forEach(alias => {
+                                                            const clean = alias.trim().toLowerCase();
+                                                            if (clean) {
+                                                                synonymToOfficial.set(clean, name);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    return { name, city, logo, vk, youtube, website, rutube, telegram };
                                                 });
                                             }
 
@@ -1815,9 +1773,9 @@
                                             }
                                             // Загрузка
                                             fetch(SHEET_CSV_URL)
-                                                .then(r => r.text())
-                                                .then(csv => {
-                                                    manufacturers = parseCSV(csv);
+                                                .then(r => r.json())
+                                                .then(data => {
+                                                    manufacturers = parseManufacturers(data);
                                                     renderManufacturers(manufacturers);
                                                     fillDatalist();
 
@@ -2138,7 +2096,7 @@
                         <p style="margin-top:15px;" id="loader-text">Загрузка...</p>
                     </div>
                     <script>
-                        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUI4vRlqW88m7jcx5sPQYg6PMDv0nVQ3U4ollXorvzPB1MaiNMkUEn7kQjN8UcPnVy/exec";
+                        const GOOGLE_SCRIPT_URL = "/api/ads";
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
                         let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], currentAd = null, isEditMode = false, isAdmin = false;
@@ -2755,7 +2713,11 @@
                                     constructionType: safeVal('inp-construction'),
                                     capacity: safeVal('inp-capacity')
                                 };
-                                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(pl) });
+                                const response = await fetch('/api/ads', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(pl) 
+                                });
                                 const json = await response.json();
                                 if (json.status !== 'success') {
                                     throw new Error(json.message || 'Ошибка операции');
@@ -2768,7 +2730,7 @@
                         });
                         async function loadAds() {
                             try {
-                                const r = await fetch(GOOGLE_SCRIPT_URL + '?t=' + new Date().getTime());
+                                const r = await fetch('/api/ads?t=' + new Date().getTime());
                                 const raw = await r.json();
 
                                 // Преобразуем записи: если есть Brand и Model, комбинируем их в title
@@ -2828,7 +2790,26 @@
                         }
                         function editCurrentAd() { closeModalDirect(); openEditMode(currentAd) }
                         function deleteCurrentAd() { if (confirm("Удалить?")) { closeModalDirect(); sendDelete(parseInt(currentAd.rowIndex), currentAd.phone); } }
-                        async function sendDelete(r, p) { showLoader("Удаление..."); try { const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', rowIndex: r, phone: p }) }); const json = await response.json(); if (json.status !== 'success') { throw new Error(json.message || 'Ошибка удаления'); } await loadAds(); } catch (e) { alert(e.message); hideLoader(); } finally { hideLoader() } }
+                        async function sendDelete(r, p) { 
+                            showLoader("Удаление..."); 
+                            try { 
+                                const response = await fetch('/api/ads/delete', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ rowIndex: r, phone: p }) 
+                                }); 
+                                const json = await response.json(); 
+                                if (json.status !== 'success') { 
+                                    throw new Error(json.message || 'Ошибка удаления'); 
+                                } 
+                                await loadAds(); 
+                            } catch (e) { 
+                                alert(e.message); 
+                                hideLoader(); 
+                            } finally { 
+                                hideLoader() 
+                            } 
+                        }
                         function openEditMode(ad) {
                             isEditMode = true;
                             document.getElementById('form-title').innerText = "Редактирование";
@@ -2896,8 +2877,11 @@
                             if (!isAdmin || !currentUser) return;
                             showLoader('Одобряю...');
                             try {
-                                const payload = { action: 'approve', rowIndex: rowIndex, phone: currentUser.phoneNumber };
-                                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                                const response = await fetch('/api/ads/approve', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ rowIndex: rowIndex }) 
+                                });
                                 const result = await response.json();
                                 if (result.status !== 'success') throw new Error(result.message || 'Ошибка одобрения');
                                 await loadAds(); // Reload all data
@@ -2913,8 +2897,11 @@
                             if (!confirm('Вы уверены, что хотите отклонить (удалить) это объявление?')) return;
                             showLoader('Отклоняю...');
                             try {
-                                const payload = { action: 'reject', rowIndex: rowIndex, phone: currentUser.phoneNumber };
-                                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                                const response = await fetch('/api/ads/reject', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ rowIndex: rowIndex }) 
+                                });
                                 const result = await response.json();
                                 if (result.status !== 'success') throw new Error(result.message || 'Ошибка отклонения');
                                 await loadAds(); // Reload all data
