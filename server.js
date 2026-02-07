@@ -71,7 +71,8 @@ app.post('/send-sms', async (req, res) => {
     // Отправляем СМС через SMS.RU с параметром test=1
     const sendResult = await smsru.sendSms({
       to: phone,
-      msg: message
+      msg: message,
+      from: 'vezdehod.ru'
       // test: 1  // Тестовый режим - СМС не будет реально отправлена
     });
 
