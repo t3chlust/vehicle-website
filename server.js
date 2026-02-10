@@ -317,7 +317,7 @@ app.get('/api/ads', async (req, res) => {
         a.transmission, t.name AS transmissionName, a.fuel, f.name AS fuelName,
         a.wheelSize, a.amphibious, a.document, d.name AS documentName,
         a.vehicleType, vt.name AS vehicleTypeName, a.constructionType, ct.name AS constructionName,
-        a.brand, a.model, a.status, a.creationDate, a.capacity,
+        a.brand, a.model, a.confirmed, a.creationDate, a.capacity,
         u.name AS userName, u.phone AS userPhone
       FROM advertisement a
       LEFT JOIN chassis c ON a.chassis = c.id
@@ -344,6 +344,8 @@ app.get('/api/ads', async (req, res) => {
       const amphibiousFlag = bitToBool(ad.amphibious);
       const vehicleTypeName = ad.vehicleTypeName || '';
 
+      const confirmedFlag = bitToBool(ad.confirmed);
+
       return {
         rowIndex: ad.id,
         price: ad.price,
@@ -368,7 +370,8 @@ app.get('/api/ads', async (req, res) => {
         constructionType: ad.constructionName || '',
         manufacturer: ad.brand,
         model: ad.model,
-        status: ad.status === 1 ? 'approved' : 'pending',
+        confirmed: confirmedFlag,
+        status: confirmedFlag ? 'approved' : 'pending',
         creationDate: ad.creationDate,
         photos: photos.map(p => p.photo).join(','),
         wheelFormula: ad.chassisName || '',
@@ -470,13 +473,13 @@ app.post('/api/ads', async (req, res) => {
           `INSERT INTO advertisement 
             (price, userId, city, \`new\`, sellerType, tender, chassis, 
              color, mileage, engine, power, transmission, fuel, wheelSize, 
-             amphibious, document, vehicleType, constructionType, brand, model, status, capacity)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             amphibious, document, vehicleType, constructionType, brand, model, confirmed, capacity)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)` ,
           [
             price || 0, resolvedUserId, city, conditionFlag, resolvedSellerTypeId, tenderFlag,
             chassisId, color, mileage || 0, engine, power || 0, transmissionId, fuelId,
             wheels || '', amphibiousFlag, documentId, vehicleTypeId, constructionId,
-            brand || null, model, 2, capacity || null // status = 2 (pending)
+            brand || null, model, 0, capacity || null
           ]
         );
 
@@ -599,7 +602,7 @@ app.post('/api/ads/approve', async (req, res) => {
     const connection = await pool.getConnection();
     
     // Статус 1 = одобрено (approved)
-    await connection.query('UPDATE advertisement SET status = 1 WHERE id = ?', [rowIndex]);
+    await connection.query('UPDATE advertisement SET confirmed = 1 WHERE id = ?', [rowIndex]);
     
     connection.release();
     res.json({ status: 'success', message: 'Объявление одобрено' });
@@ -628,6 +631,39 @@ app.post('/api/ads/reject', async (req, res) => {
   }
 });
 
+// POST /api/parts/approve - одобрить запчасть (админ)
+app.post('/api/parts/approve', async (req, res) => {
+  try {
+    const { rowIndex } = req.body;
+
+    const connection = await pool.getConnection();
+    await connection.query('UPDATE part SET confirmed = 1 WHERE id = ?', [rowIndex]);
+    connection.release();
+    res.json({ status: 'success', message: 'Запчасть одобрена' });
+  } catch (error) {
+    console.error('❌ Ошибка при одобрении запчасти:', error);
+    res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
+  }
+});
+
+// POST /api/parts/reject - отклонить запчасть (админ)
+app.post('/api/parts/reject', async (req, res) => {
+  try {
+    const { rowIndex } = req.body;
+
+    const connection = await pool.getConnection();
+
+    await connection.query('DELETE FROM part_photo WHERE part = ?', [rowIndex]);
+    await connection.query('DELETE FROM part WHERE id = ?', [rowIndex]);
+
+    connection.release();
+    res.json({ status: 'success', message: 'Запчасть отклонена и удалена' });
+  } catch (error) {
+    console.error('❌ Ошибка при отклонении запчасти:', error);
+    res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
+  }
+});
+
 // ========================
 // API Endpoints для запчастей
 // ========================
@@ -639,7 +675,7 @@ app.get('/api/parts', async (req, res) => {
 
     const [parts] = await connection.query(`
       SELECT
-        p.id, p.name AS partName, p.brand, p.date, p.price, p.userId, p.condition, p.sellerType,
+        p.id, p.name AS partName, p.brand, p.date, p.price, p.userId, p.condition, p.sellerType, p.confirmed,
         st.name AS sellerTypeName, p.city,
         u.name AS userName, u.phone AS userPhone
       FROM part p
@@ -663,6 +699,7 @@ app.get('/api/parts', async (req, res) => {
         price: part.price || 0,
         city: part.city || '',
         condition: bitToBool(part.condition) ? 'new' : 'used',
+        confirmed: bitToBool(part.confirmed),
         sellerType: part.sellerTypeName || '',
         sellerTypeId: part.sellerType,
         name: part.userName || '',
@@ -723,8 +760,8 @@ app.post('/api/parts', async (req, res) => {
       if (action === 'create') {
         const [result] = await connection.query(
           `INSERT INTO part
-            (name, brand, date, price, userId, \`condition\`, sellerType, city)
-           VALUES (?, ?, NOW(), ?, ?, ?, ?, ?)`,
+            (name, brand, date, price, userId, \`condition\`, sellerType, city, confirmed)
+           VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?)`,
           [
             partName || 'Запчасть',
             brand || null,
@@ -732,7 +769,8 @@ app.post('/api/parts', async (req, res) => {
             resolvedUserId,
             conditionFlag,
             resolvedSellerTypeId,
-            city || null
+            city || null,
+            0
           ]
         );
 

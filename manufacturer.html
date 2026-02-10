@@ -887,7 +887,7 @@
                 return altNamesLower.includes(adBrand);
             });
             matchingBrand.forEach((ad, idx) => {
-                console.log(`  [${idx}] "${ad.brand} ${ad.model}" | rowIndex: ${ad.rowIndex} | status="${ad.status}" | sellerType="${ad.sellerType}"`);
+                console.log(`  [${idx}] "${ad.brand} ${ad.model}" | rowIndex: ${ad.rowIndex} | confirmed="${ad.confirmed}" | sellerType="${ad.sellerType}"`);
             });
             console.log(`Найдено объявлений с matching brand: ${matchingBrand.length}`);
 
@@ -898,11 +898,11 @@
                 
                 if (!brandMatches) return false;
                 
-                const statusOk = (ad.status || '').toLowerCase().trim() === 'approved';
+                const statusOk = ad.confirmed === true;
                 const sellerTypeOk = isFactorySellerLabel(getSellerTypeLabel(ad));
                 
                 if (!statusOk || !sellerTypeOk) {
-                    console.log(`  ✗ Объявление "${ad.brand} ${ad.model}" отфильтровано: status="${ad.status}" (ok=${statusOk}), sellerType="${ad.sellerType}" (ok=${sellerTypeOk})`);
+                    console.log(`  ✗ Объявление "${ad.brand} ${ad.model}" отфильтровано: confirmed="${ad.confirmed}" (ok=${statusOk}), sellerType="${ad.sellerType}" (ok=${sellerTypeOk})`);
                 }
                 
                 return statusOk && sellerTypeOk;
@@ -912,7 +912,7 @@
                 const sellerTypeOk = isFactorySellerLabel(getSellerTypeLabel(part));
                 if (!sellerTypeOk) return false;
                 const candidate = [part.brand, part.name, part.partName, part.title].filter(Boolean).join(' ');
-                return matchesManufacturer(candidate, altNamesLower);
+                return part.confirmed === true && matchesManufacturer(candidate, altNamesLower);
             });
 
             const combined = [];

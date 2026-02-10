@@ -2332,8 +2332,9 @@
 
                             // Admin Refresh
                             if (tabName === 'admin' && typeof isAdmin !== 'undefined' && isAdmin && typeof allAds !== 'undefined') {
-                                let pendingAds = allAds.filter(ad => (ad.status || '').toLowerCase().trim() === 'pending');
-                                if (typeof renderModerationGrid === 'function') renderModerationGrid(pendingAds);
+                                if (typeof renderModerationGrid === 'function') {
+                                    renderModerationGrid(getPendingModerationItems());
+                                }
                             }
                         }
                         function formatPriceInput(input) {
@@ -2587,7 +2588,7 @@
                             checkConditionVisibility();
                         }
                         function applyFilters() {
-                            let approvedAds = allAds.filter(ad => (ad.status || '').toLowerCase().trim() === 'approved');
+                            let approvedAds = allAds.filter(ad => ad.confirmed === true);
 
                             const minStr = getPriceValue('f-price-min');
                             const maxStr = getPriceValue('f-price-max');
@@ -2635,12 +2636,11 @@
                             renderGrid(filtered);
 
                             if (isAdmin) {
-                                let pendingAds = allAds.filter(ad => (ad.status || '').toLowerCase().trim() === 'pending');
-                                renderModerationGrid(pendingAds);
+                                renderModerationGrid(getPendingModerationItems());
                             }
                         }
                         function buildAdSearchIndex(ads) {
-                            const approved = (ads || []).filter(ad => (ad.status || '').toLowerCase().trim() === 'approved');
+                            const approved = (ads || []).filter(ad => ad.confirmed === true);
                             adSearchIndex = approved
                                 .map(ad => {
                                     const title = (ad.title || '').trim();
@@ -2756,13 +2756,16 @@
                             partSearchIndex = (parts || [])
                                 .map(part => {
                                     const title = (part.partName || part.title || '').trim();
+                                    const brand = (part.brand || '').trim();
                                     return {
                                         id: part.rowIndex,
                                         title: title,
-                                        titleLower: title.toLowerCase()
+                                        titleLower: title.toLowerCase(),
+                                        brand: brand,
+                                        brandLower: brand.toLowerCase()
                                     };
                                 })
-                                .filter(item => item.title);
+                                .filter(item => item.title || item.brand);
                         }
                         function findPartAndScroll(value) {
                             const input = document.getElementById('partsSearchInput');
@@ -2771,9 +2774,9 @@
                             if (!val) return;
 
                             const lower = val.toLowerCase();
-                            let match = partSearchIndex.find(item => item.titleLower === lower);
+                            let match = partSearchIndex.find(item => item.titleLower === lower || item.brandLower === lower);
                             if (!match) {
-                                match = partSearchIndex.find(item => item.titleLower.includes(lower));
+                                match = partSearchIndex.find(item => item.titleLower.includes(lower) || item.brandLower.includes(lower));
                             }
 
                             if (match) {
@@ -2813,13 +2816,13 @@
                                 typed = typed.toLowerCase();
                                 const found = [];
                                 for (const item of partSearchIndex) {
-                                    if (item.titleLower.startsWith(typed)) {
+                                    if (item.titleLower.startsWith(typed) || item.brandLower.startsWith(typed)) {
                                         found.push(item);
                                     }
                                 }
                                 if (found.length === 0 && typed.length >= 2) {
                                     for (const item of partSearchIndex) {
-                                        if (item.titleLower.includes(typed)) {
+                                        if (item.titleLower.includes(typed) || item.brandLower.includes(typed)) {
                                             found.push(item);
                                         }
                                     }
@@ -2829,8 +2832,9 @@
                                 const uniq = new Set();
                                 const arr = [];
                                 for (const item of found) {
-                                    if (!uniq.has(item.titleLower)) {
-                                        uniq.add(item.titleLower);
+                                    const key = item.titleLower || item.brandLower;
+                                    if (key && !uniq.has(key)) {
+                                        uniq.add(key);
                                         arr.push(item);
                                     }
                                     if (arr.length >= 5) break;
@@ -2915,6 +2919,7 @@
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
 
                                 let infoParts = [];
+                                if (part.brand) infoParts.push(part.brand);
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
 
@@ -3054,6 +3059,7 @@
                             let sp = [
                                 { l: "Тип", v: 'Запчасть' },
                                 { l: "Название", v: part.partName || part.title },
+                                { l: "Бренд", v: part.brand || '' },
                                 { l: "Состояние", v: part.condition === 'new' ? 'Новая' : 'Б/У' },
                                 { l: "Тип продавца", v: sellerLabel },
                                 { l: "Город", v: part.city }
@@ -3291,7 +3297,9 @@
                                     isAdmin = true;
                                     adminTab.classList.remove('hidden');
                                     if (typeof allAds !== 'undefined') {
-                                        let pCount = allAds.filter(a => (a.status || '').toLowerCase().trim() === 'pending').length;
+                                        const pendingAds = (allAds || []).filter(a => a.confirmed !== true).length;
+                                        const pendingParts = (allParts || []).filter(p => p.confirmed !== true).length;
+                                        const pCount = pendingAds + pendingParts;
                                         adminTab.innerText = `Админка (${pCount})`;
                                     } else { adminTab.innerText = `Админка`; }
                                 }
@@ -3425,12 +3433,15 @@
                                 applyFilters();
                                 buildAdSearchIndex(allAds);
                                 initAdsSearch();
+                                if (isAdmin) {
+                                    renderModerationGrid(getPendingModerationItems());
+                                }
 
                                 const urlParams = new URLSearchParams(window.location.search);
                                 const adId = urlParams.get('id');
                                 if (adId) {
                                     const found = allAds.find(a => String(a.rowIndex) === String(adId));
-                                    if (found && found.status === 'approved') {
+                                    if (found && found.confirmed === true) {
                                         openAd(found);
                                     }
                                 }
@@ -3451,9 +3462,13 @@
                                 const r = await fetch('/api/parts?t=' + new Date().getTime());
                                 const raw = await r.json();
                                 allParts = Array.isArray(raw) ? raw : [];
-                                renderPartsGrid(allParts);
-                                buildPartSearchIndex(allParts);
+                                const confirmedParts = allParts.filter(p => p.confirmed === true);
+                                renderPartsGrid(confirmedParts);
+                                buildPartSearchIndex(confirmedParts);
                                 initPartsSearch();
+                                if (isAdmin) {
+                                    renderModerationGrid(getPendingModerationItems());
+                                }
                             } catch (e) {
                                 console.log(e);
                             } finally {
@@ -3572,26 +3587,45 @@
                         }
 
                         // --- NEW ADMIN FUNCTIONS ---
-                        function renderModerationGrid(ads) {
+                        function getPendingModerationItems() {
+                            const pendingAds = (allAds || []).filter(ad => ad.confirmed !== true);
+                            const pendingParts = (allParts || []).filter(part => part.confirmed !== true);
+                            const merged = [
+                                ...pendingAds.map(ad => ({ type: 'ad', item: ad })),
+                                ...pendingParts.map(part => ({ type: 'part', item: part }))
+                            ];
+                            merged.sort((a, b) => Number(b.item.rowIndex || 0) - Number(a.item.rowIndex || 0));
+                            return merged;
+                        }
+                        function renderModerationGrid(items) {
                             const container = document.getElementById('moderation-grid');
                             const placeholder = document.getElementById('moderation-placeholder');
                             container.innerHTML = '';
 
-                            if (ads.length === 0) {
+                            if (items.length === 0) {
                                 placeholder.style.display = 'block';
                                 return;
                             }
 
                             placeholder.style.display = 'none';
 
-                            ads.forEach(ad => {
-                                let firstPhoto = ad.photos ? ad.photos.split(',')[0] : 'https://placehold.co/400?text=Нет+фото';
+                            items.forEach(entry => {
+                                const item = entry.item;
+                                const isPart = entry.type === 'part';
+                                let firstPhoto = item.photos ? item.photos.split(',')[0] : 'https://placehold.co/400?text=Нет+фото';
                                 if (firstPhoto && !firstPhoto.startsWith('http')) firstPhoto = 'https://placehold.co/400?text=Нет+фото';
+
+                                const viewHandler = isPart
+                                    ? `openPart(allParts.find(p=>String(p.rowIndex)===String(${item.rowIndex})))`
+                                    : `openAd(allAds.find(a=>String(a.rowIndex)===String(${item.rowIndex})))`;
+                                const approveHandler = isPart ? `approvePart(${item.rowIndex})` : `approveAd(${item.rowIndex})`;
+                                const rejectHandler = isPart ? `rejectPart(${item.rowIndex})` : `rejectAd(${item.rowIndex})`;
+                                const titlePrefix = isPart ? 'Запчасть: ' : '';
 
                                 const card = document.createElement('div');
                                 card.className = 'moderation-card';
                                 card.innerHTML = `
-            <img src="${firstPhoto}" class="moderation-card-img" /> <div class="moderation-card-info"> <div class="moderation-card-title">${ad.title || 'Без названия'}</div> <div class="moderation-card-price">${Number(ad.price || 0).toLocaleString()} ₽</div> </div> <div class="moderation-card-actions"> <button class="btn btn-black" onclick="openAd(allAds.find(a=>String(a.rowIndex)===String(${ad.rowIndex})))" style="height:36px; line-height:36px; font-size:13px; margin-bottom:5px;">Посмотреть</button> <button class="btn btn-approve" onclick="approveAd(${ad.rowIndex})">Одобрить</button> <button class="btn btn-reject" onclick="rejectAd(${ad.rowIndex})">Отклонить</button> </div>
+            <img src="${firstPhoto}" class="moderation-card-img" /> <div class="moderation-card-info"> <div class="moderation-card-title">${titlePrefix}${item.title || 'Без названия'}</div> <div class="moderation-card-price">${Number(item.price || 0).toLocaleString()} ₽</div> </div> <div class="moderation-card-actions"> <button class="btn btn-black" onclick="${viewHandler}" style="height:36px; line-height:36px; font-size:13px; margin-bottom:5px;">Посмотреть</button> <button class="btn btn-approve" onclick="${approveHandler}">Одобрить</button> <button class="btn btn-reject" onclick="${rejectHandler}">Отклонить</button> </div>
         `;
                                 container.appendChild(card);
                             });
@@ -3629,6 +3663,44 @@
                                 const result = await response.json();
                                 if (result.status !== 'success') throw new Error(result.message || 'Ошибка отклонения');
                                 await loadAds(); // Reload all data
+                            } catch (e) {
+                                alert('Ошибка: ' + e.message);
+                            } finally {
+                                hideLoader();
+                            }
+                        }
+                        async function approvePart(rowIndex) {
+                            if (!isAdmin || !currentUser) return;
+                            showLoader('Одобряю...');
+                            try {
+                                const response = await fetch('/api/parts/approve', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ rowIndex: rowIndex }) 
+                                });
+                                const result = await response.json();
+                                if (result.status !== 'success') throw new Error(result.message || 'Ошибка одобрения');
+                                await loadParts();
+                            } catch (e) {
+                                alert('Ошибка: ' + e.message);
+                            } finally {
+                                hideLoader();
+                            }
+                        }
+
+                        async function rejectPart(rowIndex) {
+                            if (!isAdmin || !currentUser) return;
+                            if (!confirm('Вы уверены, что хотите отклонить (удалить) эту запчасть?')) return;
+                            showLoader('Отклоняю...');
+                            try {
+                                const response = await fetch('/api/parts/reject', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ rowIndex: rowIndex }) 
+                                });
+                                const result = await response.json();
+                                if (result.status !== 'success') throw new Error(result.message || 'Ошибка отклонения');
+                                await loadParts();
                             } catch (e) {
                                 alert('Ошибка: ' + e.message);
                             } finally {
