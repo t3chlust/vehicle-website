@@ -723,7 +723,7 @@ app.post('/api/parts', async (req, res) => {
       if (action === 'create') {
         const [result] = await connection.query(
           `INSERT INTO part
-            (name, brand, date, price, userId, condition, sellerType, city)
+            (name, brand, date, price, userId, `condition`, sellerType, city)
            VALUES (?, ?, NOW(), ?, ?, ?, ?, ?)`,
           [
             partName || 'Запчасть',
@@ -753,7 +753,7 @@ app.post('/api/parts', async (req, res) => {
       } else if (action === 'edit') {
         await connection.query(
           `UPDATE part SET
-            name = ?, brand = ?, price = ?, userId = ?, condition = ?, sellerType = ?, city = ?
+            name = ?, brand = ?, price = ?, userId = ?, `condition` = ?, sellerType = ?, city = ?
            WHERE id = ?`,
           [
             partName || 'Запчасть',

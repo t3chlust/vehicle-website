@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `advertisement` (
   CONSTRAINT `FK_advertisement_construction` FOREIGN KEY (`constructionType`) REFERENCES `construction_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_document` FOREIGN KEY (`document`) REFERENCES `document` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_fuel` FOREIGN KEY (`fuel`) REFERENCES `fuel` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-	CONSTRAINT `FK_advertisement_technical` FOREIGN KEY (`vehicleType`) REFERENCES `advertisement_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_advertisement_technical` FOREIGN KEY (`vehicleType`) REFERENCES `advertisement_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_transmission` FOREIGN KEY (`transmission`) REFERENCES `transmission` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_wheel` FOREIGN KEY (`chassis`) REFERENCES `chassis` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `advertisement_relation_8` FOREIGN KEY (`sellerType`) REFERENCES `seller_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
@@ -98,6 +98,20 @@ CREATE TABLE IF NOT EXISTS `advertisement_status` (
 INSERT INTO `advertisement_status` (`id`, `name`) VALUES
 	(1, 'Принято'),
 	(2, 'В ожидании');
+
+-- Дамп структуры для таблица vehicle_website.advertisement_type
+CREATE TABLE IF NOT EXISTS `advertisement_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Дамп данных таблицы vehicle_website.advertisement_type: ~4 rows (приблизительно)
+INSERT INTO `advertisement_type` (`id`, `name`) VALUES
+	(1, 'Вездеход'),
+	(2, 'Мото-техника'),
+	(3, 'Прицеп'),
+	(4, 'Запчасть');
 
 -- Дамп структуры для таблица vehicle_website.chassis
 CREATE TABLE IF NOT EXISTS `chassis` (
@@ -353,7 +367,8 @@ CREATE TABLE IF NOT EXISTS `part` (
   `userId` int(11) NOT NULL DEFAULT 0,
   `condition` bit(1) NOT NULL,
   `sellerType` int(11) NOT NULL,
-  `city` varchar(100) DEFAULT NULL,
+  `city` varchar(100) NOT NULL,
+  `brand` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_part_seller_type` (`sellerType`),
   KEY `FK_part_user_personal_data` (`userId`),
@@ -399,30 +414,29 @@ INSERT INTO `transmission` (`id`, `name`) VALUES
 	(2, 'МКПП'),
 	(3, 'Вариатор');
 
+-- Дамп структуры для таблица vehicle_website.user_favorite_ad
+CREATE TABLE IF NOT EXISTS `user_favorite_ad` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ad` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_user_favorite_ad_advertisement` (`ad`),
+  CONSTRAINT `FK_user_favorite_ad_advertisement` FOREIGN KEY (`ad`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Дамп данных таблицы vehicle_website.user_favorite_ad: ~0 rows (приблизительно)
+
 -- Дамп структуры для таблица vehicle_website.user_personal_data
 CREATE TABLE IF NOT EXISTS `user_personal_data` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `phone` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп данных таблицы vehicle_website.user_personal_data: ~1 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.user_personal_data: ~2 rows (приблизительно)
 INSERT INTO `user_personal_data` (`id`, `name`, `phone`) VALUES
-	(1, 'Матвей', '79829817369');
-
--- Дамп структуры для таблица vehicle_website.advertisement_type
-CREATE TABLE IF NOT EXISTS `advertisement_type` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Дамп данных таблицы vehicle_website.advertisement_type: ~3 rows (приблизительно)
-INSERT INTO `advertisement_type` (`id`, `name`) VALUES
-	(1, 'Вездеход'),
-	(2, 'Мото-техника'),
-	(3, 'Прицеп');
+	(1, 'Админ', '79829817369'),
+	(3, 'Павел', '79129260707');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
