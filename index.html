@@ -30,13 +30,54 @@
                     <div class="t-width t-width_100 "> <!-- nominify begin -->
                         <script>
                             function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
-                            function closeModalDirect() { document.getElementById('modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
+                            function closeModalDirect() {
+                                document.getElementById('modal').classList.remove('active');
+                                document.body.style.overflow = 'auto';
+                                const btnAdd = document.getElementById('btn-add-ad');
+                                const tabs = document.getElementById('tabs-container');
+                                if (btnAdd && typeof currentUser !== 'undefined' && currentUser && tabs && tabs.style.display !== 'none') {
+                                    btnAdd.classList.remove('hidden');
+                                }
+                            }
+                            function showRegistrationPrompt() {
+                                const nameInput = document.getElementById('auth-name');
+                                const hint = null;
+                                const btn = document.getElementById('auth-register-btn');
+                                const codeBlock = document.getElementById('auth-code-block');
+                                const title = document.getElementById('auth-title-step2');
+                                if (nameInput) {
+                                    nameInput.classList.remove('hidden');
+                                    nameInput.focus();
+                                }
+                                if (hint) hint.classList.remove('hidden');
+                                if (btn) btn.classList.remove('hidden');
+                                if (codeBlock) codeBlock.classList.add('hidden');
+                                if (title) title.innerText = 'Введите имя';
+                            }
+
+                            function hideRegistrationPrompt() {
+                                const nameInput = document.getElementById('auth-name');
+                                const hint = null;
+                                const btn = document.getElementById('auth-register-btn');
+                                const codeBlock = document.getElementById('auth-code-block');
+                                const title = document.getElementById('auth-title-step2');
+                                if (nameInput) {
+                                    nameInput.classList.add('hidden');
+                                    nameInput.value = '';
+                                }
+                                if (hint) hint.classList.add('hidden');
+                                if (btn) btn.classList.add('hidden');
+                                if (codeBlock) codeBlock.classList.remove('hidden');
+                                if (title) title.innerText = 'Введите код';
+                            }
+
                             function openAuthModal() {
                                 document.getElementById('auth-step-1').classList.remove('hidden');
                                 document.getElementById('auth-step-2').classList.add('hidden');
 
                                 document.getElementById('auth-code').value = '';
                                 document.getElementById('auth-phone').value = '+7';
+                                hideRegistrationPrompt();
 
                                 document.getElementById('auth-modal').classList.add('active');
                                 
@@ -72,22 +113,49 @@
                                 .then(response => response.json())
                                 .then(data => {
                                     hideLoader();
-                                    if (data.success) {
-                                        // Запоминаем, что пользователь авторизован
-                                        localStorage.setItem('vezdehod_auth_phone', phone);
-                                        localStorage.setItem('vezdehod_username', "Админ"); // или имя, если будет
-
-                                        currentUser = {
-                                            phoneNumber: phone,
-                                            uid: "hardcoded-admin-001"
-                                        };
-                                        currentUserName = "Админ";
-
-                                        closeAuthModal();
-                                        updateAuthUI(currentUser);
-                                    } else {
+                                    if (!data.success) {
                                         alert("Ошибка: " + (data.error || "Неверный код"));
+                                        return;
                                     }
+
+                                    fetch('/api/users/exists', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            phone: phone
+                                        })
+                                    })
+                                    .then(resp => resp.json())
+                                    .then(userCheck => {
+                                        if (!userCheck.success) {
+                                            throw new Error(userCheck.error || 'Ошибка проверки пользователя');
+                                        }
+
+                                        if (userCheck.exists) {
+                                            const user = userCheck.user || {};
+                                            localStorage.setItem('vezdehod_auth_phone', phone);
+                                            localStorage.setItem('vezdehod_username', user.name || 'Пользователь');
+                                            localStorage.setItem('vezdehod_user_id', user.id || '');
+
+                                            currentUser = {
+                                                phoneNumber: phone,
+                                                uid: `local-${user.id || 'unknown'}`,
+                                                id: user.id,
+                                                name: user.name
+                                            };
+                                            currentUserName = user.name || 'Пользователь';
+
+                                            closeAuthModal();
+                                            updateAuthUI(currentUser);
+                                        } else {
+                                            showRegistrationPrompt();
+                                        }
+                                    })
+                                    .catch(err => {
+                                        alert("Ошибка: " + err.message);
+                                    });
                                 })
                                 .catch(error => {
                                     hideLoader();
@@ -98,6 +166,7 @@
                             function doLogout() {
                                 localStorage.removeItem('vezdehod_auth_phone');
                                 localStorage.removeItem('vezdehod_username');
+                                localStorage.removeItem('vezdehod_user_id');
 
                                 currentUser = null;
                                 currentUserName = "";
@@ -129,7 +198,6 @@
 
                                 showLoader("Отправка SMS...");
 
-                                // Отправляем номер телефона на сервер
                                 fetch('/send-sms', {
                                     method: 'POST',
                                     headers: {
@@ -143,6 +211,7 @@
                                 .then(data => {
                                     hideLoader();
                                     if (data.success) {
+                                        hideRegistrationPrompt();
                                         // Переходим к вводу кода
                                         document.getElementById('auth-step-1').classList.add('hidden');
                                         document.getElementById('auth-step-2').classList.remove('hidden');
@@ -155,8 +224,55 @@
                                 .catch(error => {
                                     hideLoader();
                                     console.error('Ошибка:', error);
-                                    alert("Ошибка при отправке СМС: " + error.message);
+                                    alert("Ошибка: " + error.message);
                                 });
+                            }
+
+                            function completeRegistration() {
+                                const phone = safeVal('auth-phone').trim();
+                                const name = safeVal('auth-name').trim();
+                                if (!name) {
+                                    alert('Введите имя');
+                                    return;
+                                }
+
+                                showLoader('Регистрация...');
+                                fetch('/api/users/ensure', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        phone: phone,
+                                        name: name
+                                    })
+                                })
+                                .then(resp => resp.json())
+                                .then(userData => {
+                                    if (!userData.success) {
+                                        throw new Error(userData.error || 'Не удалось создать пользователя');
+                                    }
+
+                                    const user = userData.user || {};
+                                    localStorage.setItem('vezdehod_auth_phone', phone);
+                                    localStorage.setItem('vezdehod_username', user.name || 'Пользователь');
+                                    localStorage.setItem('vezdehod_user_id', user.id || '');
+
+                                    currentUser = {
+                                        phoneNumber: phone,
+                                        uid: `local-${user.id || 'unknown'}`,
+                                        id: user.id,
+                                        name: user.name
+                                    };
+                                    currentUserName = user.name || 'Пользователь';
+
+                                    closeAuthModal();
+                                    updateAuthUI(currentUser);
+                                })
+                                .catch(err => {
+                                    alert('Ошибка: ' + err.message);
+                                })
+                                .finally(() => hideLoader());
                             }
                             function getPriceVal(v) {
                                 if (!v) return 0;
@@ -300,6 +416,7 @@
                                 margin-top: 10px;
                                 display: block;
                             }
+
 
                             .action-buttons-group {
                                 margin-top: 30px;
@@ -1449,18 +1566,25 @@
                                 </div>
                                 <div class="header-actions"> <button id="btn-login" class="btn btn-black"
                                         onclick="openAuthModal()">Войти</button> <button id="btn-add-ad"
-                                        class="btn btn-purple hidden" onclick="openCreateMode()">+ Подать</button>
+                                        class="btn btn-purple hidden" onclick="openCreateMode()">+ Подать объявление</button>
                                     <button id="btn-logout" class="btn btn-black hidden"
                                         onclick="doLogout()">Выйти</button>
                                 </div>
                             </div>
-                            <div class="tabs-nav" id="tabs-nav"> <button class="tab-link active"
-                                    onclick="showTab(this, 'ads')">Объявления</button> <button class="tab-link"
+                                <div class="tabs-nav" id="tabs-nav"> <button class="tab-link active"
+                                    onclick="showTab(this, 'ads')">Техника</button> <button class="tab-link"
+                                    onclick="showTab(this, 'parts')">Запчасти</button> <button class="tab-link"
                                     onclick="showTab(this, 'manufacturers')">Производители</button> <button
                                     id="admin-tab-link" class="tab-link hidden"
                                     onclick="showTab(this, 'admin')">Админка</button> </div>
                             <div id="tabs-container">
                                 <div id="tab-content-ads" class="tab-content active">
+                                    <div style="margin-bottom: 25px; max-width: 500px;">
+                                        <div class="search-container">
+                                            <input type="text" id="adsSearchInput" class="form-input filter-input" placeholder="Поиск техники" autocomplete="off">
+                                        </div>
+                                        <div id="adsSearchList" style="display:none; margin-top:8px;"></div>
+                                    </div>
                                     <div id="view-filters" class="filters-container fade-in"
                                         style="animation-delay: 0.2s;">
                                         <div class="filters-toggle-btn" onclick="toggleFilters()">Фильтры</div>
@@ -1592,6 +1716,14 @@
                                             <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
                                         </div>
                                         <div id="ads-container" class="ad-grid"></div>
+                                    </div>
+                                </div>
+                                <div id="tab-content-parts" class="tab-content">
+                                    <div id="view-parts-list" style="min-height: 400px;">
+                                        <div id="loading-parts" style="text-align:center; padding: 60px; color:#888;">
+                                            <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
+                                        </div>
+                                        <div id="parts-container" class="ad-grid"></div>
                                     </div>
                                 </div>
                                 <div id="tab-content-manufacturers" class="tab-content">
@@ -1878,15 +2010,6 @@
                             <div id="view-form" class="hidden fade-in">
                                 <h3 id="form-title" style="margin-top:0">Новое объявление</h3>
                                 <form id="main-form"> <input type="hidden" id="edit-row-index" />
-                                    <div
-                                        style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px;">
-                                        <div class="form-section-title" style="margin-top:0">Ваши контакты</div>
-                                        <div style="display:grid; grid-template-columns: 1fr; gap:10px;"> <input
-                                                class="form-input" id="inp-name" placeholder="Ваше имя" /> <input
-                                                class="form-input" id="inp-phone" placeholder="Телефон" disabled
-                                                readonly />
-                                        </div>
-                                    </div>
                                     <div class="form-section-title">Информация о продавце</div> <select
                                         class="form-select" id="inp-seller-type" onchange="checkTenderVisibility()">
                                         <option value="" disabled selected>Кто вы?</option>
@@ -1911,13 +2034,19 @@
                                         <option value="Вездеход" selected>Вездеход</option>
                                         <option value="Мото-техника">Мото-техника</option>
                                         <option value="Прицеп">Прицеп</option>
+                                        <option value="Запчасть">Запчасть</option>
                                     </select> <select class="form-select" id="inp-construction">
                                         <option value="">Конструкция вездехода</option>
                                         <option value="Цельнорамный">Цельнорамный</option>
                                         <option value="Переломный">Переломный</option>
                                         <option value="Бортоповоротный">Бортоповоротный</option>
                                     </select> 
-                                    <div style="background:rgba(0, 102, 204, 0.1); padding:10px; border-radius:8px; margin:0 0 10px 0;">
+                                    <div id="div-part-only" class="hidden">
+                                        <div class="form-section-title">Данные запчасти</div>
+                                        <input class="form-input" id="inp-part-title" placeholder="Название запчасти" />
+                                    </div>
+                                    <div id="div-brand-model"
+                                        style="background:rgba(0, 102, 204, 0.1); padding:10px; border-radius:8px; margin:0 0 10px 0;">
                                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                                             <input class="form-input" id="inp-brand" placeholder="Марка" />
                                             <input class="form-input" id="inp-model" placeholder="Модель" />
@@ -1964,7 +2093,7 @@
                                             <option value="no">Нет</option>
                                         </select>
                                     </div>
-                                    <div
+                                    <div id="div-color-docs"
                                         style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
                                         <select class="form-select" id="inp-color">
                                             <option value="">Цвет</option>
@@ -2017,7 +2146,8 @@
                     <div id="auth-modal" class="modal-overlay">
                         <div class="auth-window">
                             <div id="auth-step-1">
-                                <div style="font-size:20px;font-weight:700;margin-bottom:15px;">Вход</div> <input
+                                <div id="auth-title-step1" style="font-size:20px;font-weight:700;margin-bottom:12px;">Вход</div>
+                                <input
                                     class="form-input" id="auth-phone" type="tel" placeholder="+7..." value="+7"
                                     oninput="handlePhoneInput(this)"
                                     onpaste="event.preventDefault(); handlePhoneInputPaste(this)"
@@ -2029,10 +2159,14 @@
                             <div id="auth-step-2" class="hidden">
                                 <div class="modal-close" onclick="closeAuthModal()">×</div>
 
-                                <div style="font-size:20px;font-weight:700;margin-bottom:15px;">Введите код</div>
-                                <input class="form-input" id="auth-code" type="number" placeholder="Код из SMS"
-                                    onkeypress="if(event.key==='Enter') verifySmsCode()" />
-                                <button class="btn btn-black btn-full" onclick="verifySmsCode()">Подтвердить</button>
+                                <div id="auth-title-step2" style="font-size:20px;font-weight:700;margin-bottom:15px;">Введите код</div>
+                                <div id="auth-code-block">
+                                    <input class="form-input" id="auth-code" type="number" placeholder="Код из SMS"
+                                        onkeypress="if(event.key==='Enter') verifySmsCode()" />
+                                    <button class="btn btn-black btn-full" onclick="verifySmsCode()">Подтвердить</button>
+                                </div>
+                                <input class="form-input hidden" id="auth-name" type="text" placeholder="Ваше имя" />
+                                <button id="auth-register-btn" class="btn btn-black btn-full hidden" onclick="completeRegistration()">Зарегистрироваться</button>
                             </div>
                         </div>
                     </div>
@@ -2100,7 +2234,8 @@
                         const FILTERS_API_URL = "/api/filters";
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
-                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], currentAd = null, isEditMode = false, isAdmin = false;
+                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [];
+                        let currentItemType = 'ad';
                         let currentPhotoIndex = 0; let currentPhotos = [];
 
                         function rebuildSelect(selectId, options, getValue, getLabel) {
@@ -2136,6 +2271,7 @@
                                 const docs = data.document || [];
                                 const vehicleType = data.vehicleType || [];
                                 const constructionType = data.constructionType || [];
+                                const sellerType = data.sellerType || [];
 
                                 rebuildSelect('f-wheels', chassis, (item) => item.name, (item) => item.name);
                                 rebuildSelect('inp-wheel-f', chassis, (item) => item.name, (item) => item.name);
@@ -2151,6 +2287,8 @@
 
                                 rebuildSelect('f-construction', constructionType, (item) => item.name, (item) => item.name);
                                 rebuildSelect('inp-construction', constructionType, (item) => item.name, (item) => item.name);
+
+                                rebuildSelect('inp-seller-type', sellerType, (item) => String(item.id), (item) => item.name);
 
                                 rebuildSelect(
                                     'f-tech-type',
@@ -2226,12 +2364,32 @@
                         }
                         function safeVal(id) { const e = document.getElementById(id); return e ? e.value : "" }
                         function setVal(i, v) { const e = document.getElementById(i); if (e) e.value = v }
+                        function normalizeText(value) { return String(value || '').toLowerCase().trim(); }
+                        function getSellerTypeLabel(ad) { return ad && (ad.sellerType || ad.sellerTypeName) ? (ad.sellerType || ad.sellerTypeName) : ''; }
+                        function isPrivateSellerLabel(label) { return normalizeText(label) === 'владелец'; }
+                        function isFactorySellerLabel(label) { return normalizeText(label) === 'производитель'; }
+                        function isTenderSellerLabel(label) {
+                            const val = normalizeText(label);
+                            return val === 'производитель' || val === 'дилер' || val === 'диллер';
+                        }
+                        function setSellerTypeSelectByLabel(label) {
+                            const select = document.getElementById('inp-seller-type');
+                            if (!select) return;
+                            const target = normalizeText(label);
+                            if (!target) return;
+                            const options = Array.from(select.options || []);
+                            const found = options.find(opt => normalizeText(opt.textContent) === target);
+                            if (found) select.value = found.value;
+                        }
                         function tryAutoLogin() {
                             const savedPhone = localStorage.getItem('vezdehod_auth_phone');
                             if (savedPhone) {
+                                const savedUserId = localStorage.getItem('vezdehod_user_id');
                                 currentUser = {
                                     phoneNumber: savedPhone,
-                                    uid: "hardcoded-admin-001"
+                                    uid: savedUserId ? `local-${savedUserId}` : "hardcoded-admin-001",
+                                    id: savedUserId ? Number(savedUserId) : undefined,
+                                    name: localStorage.getItem('vezdehod_username') || "Пользователь"
                                 };
                                 currentUserName = localStorage.getItem('vezdehod_username') || "Пользователь";
 
@@ -2252,6 +2410,7 @@
                             tryAutoLogin();
                             await loadFilters();
                             loadAds();
+                            loadParts();
                         });
                         let startY = 0; let ptrDist = 0; const ptrThreshold = 80;
                         const ptrIndicator = document.getElementById('ptr-indicator');
@@ -2348,25 +2507,79 @@
                             sendBtn.style.opacity = isValid ? '1' : '0.5';
                             sendBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
                         }
-                        function checkTenderVisibility() { const type = document.getElementById('inp-seller-type').value; const tenderDiv = document.getElementById('div-tender'); if (type === 'factory' || type === 'dealer') { tenderDiv.classList.remove('hidden'); } else { tenderDiv.classList.add('hidden'); document.getElementById('inp-tender').value = 'no'; } }
-                        function checkConditionVisibility() { const cond = document.getElementById('inp-condition').value; const mileageDiv = document.getElementById('div-mileage'); if (cond === 'used') { mileageDiv.classList.remove('hidden'); } else { mileageDiv.classList.add('hidden'); document.getElementById('inp-mileage').value = ''; } }
+                        function checkTenderVisibility() {
+                            const select = document.getElementById('inp-seller-type');
+                            const tenderDiv = document.getElementById('div-tender');
+                            if (!select || !tenderDiv) return;
+                            const selected = select.options[select.selectedIndex];
+                            const label = selected ? selected.textContent : '';
+                            if (isTenderSellerLabel(label)) {
+                                tenderDiv.classList.remove('hidden');
+                            } else {
+                                tenderDiv.classList.add('hidden');
+                                document.getElementById('inp-tender').value = 'no';
+                            }
+                        }
+                        function checkConditionVisibility() {
+                            const cond = document.getElementById('inp-condition').value;
+                            const mileageDiv = document.getElementById('div-mileage');
+                            const type = document.getElementById('inp-tech-type').value;
+                            if (type === 'Запчасть') {
+                                mileageDiv.classList.add('hidden');
+                                document.getElementById('inp-mileage').value = '';
+                                return;
+                            }
+                            if (cond === 'used') {
+                                mileageDiv.classList.remove('hidden');
+                            } else {
+                                mileageDiv.classList.add('hidden');
+                                document.getElementById('inp-mileage').value = '';
+                            }
+                        }
                         function checkTechTypeVisibility() {
                             const type = document.getElementById('inp-tech-type').value;
                             const constrInp = document.getElementById('inp-construction');
                             const mainSpecs = document.getElementById('div-main-specs');
                             const capDiv = document.getElementById('div-capacity');
                             const wheelsDiv = document.getElementById('div-wheels');
+                            const brandModelDiv = document.getElementById('div-brand-model');
+                            const colorDocsDiv = document.getElementById('div-color-docs');
+                            const partOnlyDiv = document.getElementById('div-part-only');
+                            const specsTitle = document.getElementById('specs-title');
+                            const tenderDiv = document.getElementById('div-tender');
                             constrInp.classList.add('hidden');
                             mainSpecs.classList.remove('hidden');
                             capDiv.classList.add('hidden');
                             wheelsDiv.classList.remove('hidden');
+                            brandModelDiv.classList.remove('hidden');
+                            colorDocsDiv.classList.remove('hidden');
+                            partOnlyDiv.classList.add('hidden');
+                            specsTitle.classList.remove('hidden');
+                            if (tenderDiv) tenderDiv.classList.remove('hidden');
                             if (type === 'Вездеход') {
                                 constrInp.classList.remove('hidden');
                             } else if (type === 'Прицеп') {
                                 mainSpecs.classList.add('hidden');
                                 wheelsDiv.classList.add('hidden');
                                 capDiv.classList.remove('hidden');
+                            } else if (type === 'Запчасть') {
+                                constrInp.classList.add('hidden');
+                                mainSpecs.classList.add('hidden');
+                                wheelsDiv.classList.add('hidden');
+                                capDiv.classList.add('hidden');
+                                brandModelDiv.classList.add('hidden');
+                                colorDocsDiv.classList.add('hidden');
+                                partOnlyDiv.classList.remove('hidden');
+                                specsTitle.classList.add('hidden');
+                                if (tenderDiv) {
+                                    tenderDiv.classList.add('hidden');
+                                    document.getElementById('inp-tender').value = 'no';
+                                }
                             }
+                            if (type !== 'Запчасть') {
+                                setVal('inp-part-title', '');
+                            }
+                            checkConditionVisibility();
                         }
                         function applyFilters() {
                             let approvedAds = allAds.filter(ad => (ad.status || '').toLowerCase().trim() === 'approved');
@@ -2421,6 +2634,119 @@
                                 renderModerationGrid(pendingAds);
                             }
                         }
+                        function buildAdSearchIndex(ads) {
+                            const approved = (ads || []).filter(ad => (ad.status || '').toLowerCase().trim() === 'approved');
+                            adSearchIndex = approved
+                                .map(ad => {
+                                    const title = (ad.title || '').trim();
+                                    return {
+                                        id: ad.rowIndex,
+                                        title: title,
+                                        titleLower: title.toLowerCase()
+                                    };
+                                })
+                                .filter(item => item.title);
+                        }
+                        function findAdAndScroll(value) {
+                            const input = document.getElementById('adsSearchInput');
+                            const listDiv = document.getElementById('adsSearchList');
+                            let val = value ? String(value).trim() : (input ? input.value.trim() : '');
+                            if (!val) return;
+
+                            const lower = val.toLowerCase();
+                            let match = adSearchIndex.find(item => item.titleLower === lower);
+                            if (!match) {
+                                match = adSearchIndex.find(item => item.titleLower.includes(lower));
+                            }
+
+                            if (match) {
+                                if (input) input.value = match.title;
+                                const card = document.getElementById(`ad-${match.id}`);
+                                if (card) {
+                                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    card.style.transition = 'background 1.2s';
+                                    card.style.background = 'rgba(171, 71, 188, 0.35)';
+                                    setTimeout(() => { card.style.background = ''; }, 1600);
+                                }
+                            }
+                            if (listDiv) listDiv.style.display = 'none';
+                        }
+                        function initAdsSearch() {
+                            if (adsSearchInitialized) return;
+                            const input = document.getElementById('adsSearchInput');
+                            const listDiv = document.getElementById('adsSearchList');
+                            if (!input || !listDiv) return;
+                            adsSearchInitialized = true;
+
+                            input.addEventListener('change', () => findAdAndScroll());
+                            input.addEventListener('keypress', e => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    findAdAndScroll();
+                                }
+                            });
+
+                            input.addEventListener('input', function () {
+                                let typed = this.value.trim();
+                                if (!typed) {
+                                    listDiv.style.display = 'none';
+                                    return;
+                                }
+
+                                typed = typed.toLowerCase();
+                                const found = [];
+                                for (const item of adSearchIndex) {
+                                    if (item.titleLower.startsWith(typed)) {
+                                        found.push(item);
+                                    }
+                                }
+                                if (found.length === 0 && typed.length >= 2) {
+                                    for (const item of adSearchIndex) {
+                                        if (item.titleLower.includes(typed)) {
+                                            found.push(item);
+                                        }
+                                    }
+                                }
+
+                                listDiv.innerHTML = '';
+                                const uniq = new Set();
+                                const arr = [];
+                                for (const item of found) {
+                                    if (!uniq.has(item.titleLower)) {
+                                        uniq.add(item.titleLower);
+                                        arr.push(item);
+                                    }
+                                    if (arr.length >= 5) break;
+                                }
+
+                                if (arr.length === 0) {
+                                    listDiv.style.display = 'none';
+                                } else {
+                                    arr.forEach(item => {
+                                        const el = document.createElement('div');
+                                        el.className = 'manufacturer';
+                                        el.setAttribute('data-target', String(item.id));
+                                        el.textContent = item.title;
+                                        el.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            input.value = item.title;
+                                            listDiv.style.display = 'none';
+                                            findAdAndScroll(item.title);
+                                        });
+                                        listDiv.appendChild(el);
+                                    });
+                                    listDiv.style.display = 'block';
+                                }
+                            });
+
+                            document.addEventListener('click', function (e) {
+                                const inputEl = document.getElementById('adsSearchInput');
+                                if (!listDiv || !inputEl) return;
+                                if (!listDiv.contains(e.target) && e.target !== inputEl) {
+                                    listDiv.style.display = 'none';
+                                }
+                            });
+                        }
                         function renderGrid(ads) {
                             const c = document.getElementById('ads-container');
                             c.innerHTML = '';
@@ -2430,9 +2756,10 @@
                                 let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
 
+                                const sellerLabel = getSellerTypeLabel(ad);
                                 let badgesHtml = '';
                                 if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
-                                if (ad.sellerType === 'private') badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
+                                if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
 
                                 let tenderClass = ''; let tenderHtml = 'В РЕЕСТРЕ МИНПРОМТОРГА';
@@ -2446,13 +2773,65 @@
 
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
+                                d.id = `ad-${ad.rowIndex}`;
                                 d.onclick = () => openAd(ad);
                                 d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge${tenderClass}">${tenderHtml}</div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
                             });
                             setTimeout(() => c.classList.add('loaded'), 50);
                         }
+                        function renderPartsGrid(parts) {
+                            const c = document.getElementById('parts-container');
+                            c.innerHTML = '';
+                            c.classList.remove('loaded');
+                            if (!parts || parts.length === 0) {
+                                c.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Ничего не найдено</div>';
+                                return;
+                            }
+                            parts.forEach(part => {
+                                let ph = part.photos ? part.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
+                                if (mI && !mI.startsWith('http')) mI = '';
+
+                                const sellerLabel = getSellerTypeLabel(part);
+                                let badgesHtml = '';
+                                if (part.condition === 'new') badgesHtml += '<span class="badge-new">НОВАЯ</span>';
+                                if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
+
+                                let infoParts = [];
+                                if (part.city) infoParts.push(part.city);
+                                if (sellerLabel) infoParts.push(sellerLabel);
+
+                                const d = document.createElement('div');
+                                d.className = 'ad-card';
+                                d.onclick = () => openPart(part);
+                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge placeholder">В РЕЕСТРЕ МИНПРОМТОРГА</div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                c.appendChild(d);
+                            });
+                            setTimeout(() => c.classList.add('loaded'), 50);
+                        }
+                        function configureModalActions(type) {
+                            const actions = document.getElementById('modal-owner-actions');
+                            if (!actions) return;
+                            const editBtn = actions.querySelector('button:nth-child(1)');
+                            const deleteBtn = actions.querySelector('button:nth-child(2)');
+                            if (!editBtn || !deleteBtn) return;
+
+                            if (type === 'part') {
+                                editBtn.classList.add('hidden');
+                                deleteBtn.onclick = deleteCurrentPart;
+                                deleteBtn.innerText = 'Удалить';
+                            } else {
+                                editBtn.classList.remove('hidden');
+                                editBtn.onclick = editCurrentAd;
+                                deleteBtn.onclick = deleteCurrentAd;
+                                deleteBtn.innerText = 'Удалить';
+                            }
+                        }
+
                         function openAd(ad) {
+                            const btnAdd = document.getElementById('btn-add-ad');
+                            if (btnAdd) btnAdd.classList.add('hidden');
+                            currentItemType = 'ad';
                             currentAd = ad; currentPhotos = []; currentPhotoIndex = 0;
                             document.getElementById('modal-title').innerText = ad.title || "";
                             document.getElementById('modal-price').innerText = Number(ad.price || 0).toLocaleString() + ' ₽';
@@ -2462,9 +2841,10 @@
                             document.getElementById('modal-location').innerText = ad.city || "";
                             const phEl = document.getElementById('modal-phone'); if (phEl) { phEl.innerText = ad.phone || ""; phEl.href = "tel:" + (ad.phone || ""); }
 
+                            const sellerLabel = getSellerTypeLabel(ad);
                             let bgHtml = '';
                             if (checkIsNew(ad)) bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
-                            if (ad.sellerType === 'private') bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
+                            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
                             if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
                             document.getElementById('modal-badges').innerHTML = bgHtml;
 
@@ -2481,7 +2861,7 @@
                             updateGallery();
                             document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
                             document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
-                            let sType = ad.sellerType || ""; if (sType === 'factory') sType = 'Производитель'; else if (sType === 'dealer') sType = 'Дилер'; else if (sType === 'private') sType = 'Владелец';
+                            let sType = getSellerTypeLabel(ad);
                             let wf = ad.wheelFormula;
 
                             let sp = [
@@ -2511,10 +2891,71 @@
                             sp.push({ l: "Цвет", v: ad.color });
                             document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
                             const acts = document.getElementById('modal-owner-actions'); const norm = p => String(p).replace(/[^0-9]/g, '');
-                            if (acts) { if (currentUser && (norm(currentUser.phoneNumber) === norm(ad.phone) || isAdmin)) acts.classList.add('visible'); else acts.classList.remove('visible'); }
+                            if (acts) {
+                                if (currentUser && (norm(currentUser.phoneNumber) === norm(ad.phone) || isAdmin)) {
+                                    acts.classList.add('visible');
+                                    configureModalActions('ad');
+                                } else {
+                                    acts.classList.remove('visible');
+                                }
+                            }
                             document.getElementById('modal').classList.add('active'); document.body.style.overflow = 'hidden';
 
                             updateMetaTags(ad);
+                        }
+
+                        function openPart(part) {
+                            const btnAdd = document.getElementById('btn-add-ad');
+                            if (btnAdd) btnAdd.classList.add('hidden');
+                            currentItemType = 'part';
+                            currentAd = part; currentPhotos = []; currentPhotoIndex = 0;
+
+                            document.getElementById('modal-title').innerText = part.title || 'Запчасть';
+                            document.getElementById('modal-price').innerText = Number(part.price || 0).toLocaleString() + ' ₽';
+                            document.getElementById('modal-desc').innerText = '';
+                            document.getElementById('modal-name').innerText = part.name || 'Продавец';
+                            document.getElementById('modal-location').innerText = part.city || '';
+                            const phEl = document.getElementById('modal-phone');
+                            if (phEl) { phEl.innerText = part.phone || ""; phEl.href = "tel:" + (part.phone || ""); }
+
+                            const sellerLabel = getSellerTypeLabel(part);
+                            let bgHtml = '';
+                            if (part.condition === 'new') bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
+                            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
+                            document.getElementById('modal-badges').innerHTML = bgHtml;
+
+                            const tenderBanner = document.getElementById('modal-tender-banner');
+                            tenderBanner.classList.remove('visible');
+
+                            let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+                            currentPhotos = phs;
+                            updateGallery();
+                            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
+                            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
+
+                            let sp = [
+                                { l: "Тип", v: 'Запчасть' },
+                                { l: "Название", v: part.partName || part.title },
+                                { l: "Состояние", v: part.condition === 'new' ? 'Новая' : 'Б/У' },
+                                { l: "Тип продавца", v: sellerLabel },
+                                { l: "Город", v: part.city }
+                            ];
+
+                            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+                            const acts = document.getElementById('modal-owner-actions');
+                            const norm = p => String(p).replace(/[^0-9]/g, '');
+                            if (acts) {
+                                if (currentUser && (norm(currentUser.phoneNumber) === norm(part.phone) || isAdmin)) {
+                                    acts.classList.add('visible');
+                                    configureModalActions('part');
+                                } else {
+                                    acts.classList.remove('visible');
+                                }
+                            }
+                            document.getElementById('modal').classList.add('active');
+                            document.body.style.overflow = 'hidden';
+
+                            updateMetaTags(part);
                         }
                         function updateMetaTags(ad) {
                             let existingOgImage = document.querySelector('meta[property="og:image"]');
@@ -2688,13 +3129,24 @@
                             else { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); alert("Ссылка скопирована!"); }
                         }
                         function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
-                        function closeModalDirect() { document.getElementById('modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
+                        function closeModalDirect() {
+                            document.getElementById('modal').classList.remove('active');
+                            document.body.style.overflow = 'auto';
+                            const btnAdd = document.getElementById('btn-add-ad');
+                            const tabs = document.getElementById('tabs-container');
+                            if (btnAdd && typeof currentUser !== 'undefined' && currentUser && tabs && tabs.style.display !== 'none') {
+                                btnAdd.classList.remove('hidden');
+                            }
+                        }
                         function updateAuthUI(user) {
                             const btnLogin = document.getElementById('btn-login');
                             const btnLogout = document.getElementById('btn-logout');
                             const btnAdd = document.getElementById('btn-add-ad');
                             const authInfo = document.getElementById('auth-info');
                             const adminTab = document.getElementById('admin-tab-link');
+                            const tabs = document.getElementById('tabs-container');
+                            const modal = document.getElementById('modal');
+                            const formView = document.getElementById('view-form');
 
                             isAdmin = false;
                             adminTab.classList.add('hidden');
@@ -2702,10 +3154,17 @@
                             if (user) {
                                 btnLogin.classList.add('hidden');
                                 btnLogout.classList.remove('hidden');
-                                btnAdd.classList.remove('hidden');
+                                const isModalOpen = modal && modal.classList.contains('active');
+                                const isFormOpen = formView && !formView.classList.contains('hidden');
+                                if (tabs && tabs.style.display !== 'none' && !isModalOpen && !isFormOpen) {
+                                    btnAdd.classList.remove('hidden');
+                                } else {
+                                    btnAdd.classList.add('hidden');
+                                }
 
-                                let displayPhone = user.phoneNumber || user.email || "Пользователь";
-                                authInfo.innerText = displayPhone;
+                                let displayName = user.name || currentUserName || "Пользователь";
+                                let displayPhone = user.phoneNumber || user.email || "";
+                                authInfo.innerText = displayPhone ? `${displayName} • ${displayPhone}` : displayName;
 
                                 let uPhone = String(user.phoneNumber || "").replace(/\D/g, '');
                                 let aPhone = String(ADMIN_PHONE).replace(/\D/g, '');
@@ -2745,6 +3204,38 @@
                                 if (cond === 'new') desc += NEW_STATUS_TAG;
 
                                 const priceVal = getPriceValue('inp-price');
+                                const techType = safeVal('inp-tech-type');
+                                if (techType === 'Запчасть') {
+                                    const payload = {
+                                        action: 'create',
+                                        rowIndex: '',
+                                        partName: safeVal('inp-part-title'),
+                                        price: priceVal,
+                                        condition: safeVal('inp-condition'),
+                                        sellerTypeId: safeVal('inp-seller-type'),
+                                        city: safeVal('inp-city'),
+                                        phone: currentUser.phoneNumber,
+                                        name: currentUserName || '',
+                                        userId: currentUser.id,
+                                        photos: phU
+                                    };
+                                    const response = await fetch('/api/parts', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(payload)
+                                    });
+                                    const json = await response.json();
+                                    if (json.status !== 'success') {
+                                        throw new Error(json.message || 'Ошибка операции');
+                                    }
+                                    document.getElementById('main-form').reset();
+                                    document.getElementById('preview-container').innerHTML = '';
+                                    document.getElementById('file-count').innerText = '';
+                                    showList();
+                                    loadParts();
+                                    showTab(document.querySelector('.tab-link[onclick*="parts"]'), 'parts');
+                                    return;
+                                }
 
                                 const brand = safeVal('inp-brand');
                                 const model = safeVal('inp-model');
@@ -2758,8 +3249,9 @@
                                     model: model,
                                     price: priceVal,
                                     desc: desc,
-                                    name: safeVal('inp-name'),
+                                    name: currentUserName || '',
                                     phone: currentUser.phoneNumber,
+                                    userId: currentUser.id,
                                     photos: phU,
                                     engine: safeVal('inp-engine'),
                                     power: safeVal('inp-power'),
@@ -2769,7 +3261,7 @@
                                     region: "",
                                     city: safeVal('inp-city'),
                                     condition: cond,
-                                    sellerType: safeVal('inp-seller-type'),
+                                    sellerTypeId: safeVal('inp-seller-type'),
                                     tender: safeVal('inp-tender'),
                                     wheelFormula: safeVal('inp-wheel-f'),
                                     color: safeVal('inp-color'),
@@ -2812,6 +3304,8 @@
                                 });
 
                                 applyFilters();
+                                buildAdSearchIndex(allAds);
+                                initAdsSearch();
 
                                 const urlParams = new URLSearchParams(window.location.search);
                                 const adId = urlParams.get('id');
@@ -2833,15 +3327,29 @@
                                 ptrIndicator.style.opacity = '0';
                             }
                         }
+                        async function loadParts() {
+                            try {
+                                const r = await fetch('/api/parts?t=' + new Date().getTime());
+                                const raw = await r.json();
+                                allParts = Array.isArray(raw) ? raw : [];
+                                renderPartsGrid(allParts);
+                            } catch (e) {
+                                console.log(e);
+                            } finally {
+                                const loading = document.getElementById('loading-parts');
+                                if (loading) loading.style.display = 'none';
+                            }
+                        }
                         function showLoader(t) { document.getElementById('loader-text').innerText = t; document.getElementById('global-loader').style.opacity = '1'; document.getElementById('global-loader').style.pointerEvents = 'all'; }
                         function hideLoader() { document.getElementById('global-loader').style.opacity = '0'; document.getElementById('global-loader').style.pointerEvents = 'none'; ptrIndicator.style.opacity = '0'; }
                         function openCreateMode() {
                             isEditMode = false;
+                            document.getElementById('btn-add-ad').classList.add('hidden');
                             document.getElementById('form-title').innerText = "Новое объявление";
                             document.getElementById('submit-btn').innerText = "Отправить на модерацию";
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
-                            document.getElementById('view-form').classList.remove('hidden'); // Show form
+                            document.getElementById('view-form').classList.remove('hidden');
                             document.getElementById('main-form').reset();
                             document.getElementById('preview-container').innerHTML = '';
                             document.getElementById('file-count').innerText = '';
@@ -2852,18 +3360,22 @@
                             document.getElementById('view-form').classList.add('hidden'); // Hide form
                             document.getElementById('tabs-nav').style.display = 'flex'; // Show tabs nav
                             document.getElementById('tabs-container').style.display = 'block'; // Show tabs content
+                            if (currentUser) {
+                                document.getElementById('btn-add-ad').classList.remove('hidden');
+                            }
                             // When returning to list, always show the 'ads' tab
                             showTab(document.querySelector('.tab-link[onclick*="ads"]'), 'ads');
                         }
                         function editCurrentAd() { closeModalDirect(); openEditMode(currentAd) }
-                        function deleteCurrentAd() { if (confirm("Удалить?")) { closeModalDirect(); sendDelete(parseInt(currentAd.rowIndex), currentAd.phone); } }
-                        async function sendDelete(r, p) { 
+                        function deleteCurrentAd() { if (confirm("Удалить?")) { closeModalDirect(); sendDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); } }
+                        function deleteCurrentPart() { if (confirm("Удалить?")) { closeModalDirect(); sendPartDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); } }
+                        async function sendDelete(r, p, uId) { 
                             showLoader("Удаление..."); 
                             try { 
                                 const response = await fetch('/api/ads/delete', { 
                                     method: 'POST', 
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ rowIndex: r, phone: p }) 
+                                    body: JSON.stringify({ rowIndex: r, phone: p, userId: uId }) 
                                 }); 
                                 const json = await response.json(); 
                                 if (json.status !== 'success') { 
@@ -2877,16 +3389,36 @@
                                 hideLoader() 
                             } 
                         }
+                        async function sendPartDelete(r, p, uId) { 
+                            showLoader("Удаление..."); 
+                            try { 
+                                const response = await fetch('/api/parts/delete', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ rowIndex: r, phone: p, userId: uId }) 
+                                }); 
+                                const json = await response.json(); 
+                                if (json.status !== 'success') { 
+                                    throw new Error(json.message || 'Ошибка удаления'); 
+                                } 
+                                await loadParts(); 
+                            } catch (e) { 
+                                alert(e.message); 
+                                hideLoader(); 
+                            } finally { 
+                                hideLoader() 
+                            } 
+                        }
                         function openEditMode(ad) {
                             isEditMode = true;
                             document.getElementById('form-title').innerText = "Редактирование";
                             document.getElementById('submit-btn').innerText = "Сохранить";
+                            document.getElementById('btn-add-ad').classList.add('hidden');
                             setVal('edit-row-index', ad.rowIndex);
                             setVal('inp-brand', ad.brand || "");
                             setVal('inp-model', ad.model || "");
                             setVal('inp-price', Number(ad.price || 0).toLocaleString('ru-RU').replace(/,/g, ' '));
                             setVal('inp-desc', (ad.desc || "").replace(NEW_STATUS_TAG, "").trim());
-                            setVal('inp-name', ad.name);
                             setVal('inp-engine', ad.engine);
                             setVal('inp-power', ad.power);
                             setVal('inp-trans', ad.transmission);
@@ -2898,7 +3430,11 @@
                             setVal('inp-wheel-f', ad.wheelFormula);
                             setVal('inp-color', ad.color);
                             if (ad.wheels) { const p = ad.wheels.split('x'); if (p.length >= 2) { setVal('tire-d', p[0]); setVal('tire-w', p[1]) } }
-                            setVal('inp-seller-type', ad.sellerType || "");
+                            if (ad.sellerTypeId) {
+                                setVal('inp-seller-type', String(ad.sellerTypeId));
+                            } else {
+                                setSellerTypeSelectByLabel(getSellerTypeLabel(ad));
+                            }
                             checkTenderVisibility();
                             setVal('inp-tender', ad.tender || "no");
                             setVal('inp-amphibious', ad.amphibious || "no");

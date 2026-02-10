@@ -532,6 +532,7 @@
     <script>
         // Глобальные переменные
         const ADS_API_URL = '/api/ads';
+        const PARTS_API_URL = '/api/parts';
         const MANUFACTURERS_API_URL = '/api/manufacturer-synonyms';
         const NEW_STATUS_TAG = '***STATUS_NEW***';
         
@@ -616,6 +617,16 @@
                 return [];
             }
         }
+        async function loadParts() {
+            try {
+                const response = await fetch(PARTS_API_URL + '?t=' + new Date().getTime());
+                const parts = await response.json();
+                return parts || [];
+            } catch (e) {
+                console.error('Ошибка загрузки запчастей:', e);
+                return [];
+            }
+        }
 
         // Показать объявление в модальном окне
         function openAd(ad) {
@@ -638,23 +649,27 @@
                 phEl.href = "tel:" + (ad.phone || "");
             }
 
+            const sellerLabel = getSellerTypeLabel(ad);
             let bgHtml = '';
             if (checkIsNew(ad)) bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
-            if (ad.sellerType === 'private') bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
+            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
             if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
             document.getElementById('modal-badges').innerHTML = bgHtml;
 
+            const techTypeLabel = ad.techType || '';
+            const techTypeNormalized = normalizeText(techTypeLabel);
+
             let sp = [
-                { l: "Тип продавца", v: ad.sellerType === 'factory' ? 'Производитель' : (ad.sellerType === 'dealer' ? 'Дилер' : (ad.sellerType === 'private' ? 'Владелец' : '')) },
+                { l: "Тип продавца", v: sellerLabel },
                 { l: "Город", v: ad.city },
-                { l: "Тип техники", v: ad.techType === 'vezdehod' ? 'Вездеход' : (ad.techType === 'trailer' ? 'Прицеп' : (ad.techType === 'moto' ? 'Мото-техника' : '')) },
+                { l: "Тип техники", v: techTypeLabel },
             ];
 
-            if (ad.techType === 'vezdehod') {
+            if (techTypeNormalized === 'вездеход') {
                 sp.push({ l: "Конструкция", v: ad.constructionType });
             }
 
-            if (ad.techType === 'trailer') {
+            if (techTypeNormalized === 'прицеп') {
                 sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
             } else {
                 let wf = ad.wheelFormula;
@@ -682,6 +697,48 @@
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
+        function openPart(part) {
+            currentAd = part;
+            currentPhotos = [];
+            currentPhotoIndex = 0;
+
+            document.getElementById('modal-title').innerText = part.title || 'Запчасть';
+            document.getElementById('modal-price').innerText = Number(part.price || 0).toLocaleString() + ' ₽';
+            document.getElementById('modal-desc').innerText = '';
+
+            document.getElementById('modal-name').innerText = part.name || 'Продавец';
+            document.getElementById('modal-location').innerText = part.city || '';
+
+            const phEl = document.getElementById('modal-phone');
+            if (phEl) {
+                phEl.innerText = part.phone || '';
+                phEl.href = 'tel:' + (part.phone || '');
+            }
+
+            const sellerLabel = getSellerTypeLabel(part);
+            let bgHtml = '';
+            if (part.condition === 'new') bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
+            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
+            document.getElementById('modal-badges').innerHTML = bgHtml;
+
+            let sp = [
+                { l: 'Тип', v: 'Запчасть' },
+                { l: 'Название', v: part.partName || part.title },
+                { l: 'Состояние', v: part.condition === 'new' ? 'Новая' : 'Б/У' },
+                { l: 'Тип продавца', v: sellerLabel },
+                { l: 'Город', v: part.city }
+            ];
+            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+
+            let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+            currentPhotos = phs;
+            updateGallery();
+            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
+            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
+
+            document.getElementById('modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
 
         // Функция для проверки новизны объявления
         function checkIsNew(ad) {
@@ -690,14 +747,32 @@
             return false;
         }
 
+        function normalizeText(value) {
+            return String(value || '').toLowerCase().trim();
+        }
+
+        function getSellerTypeLabel(ad) {
+            if (!ad) return '';
+            return ad.sellerType || ad.sellerTypeName || '';
+        }
+
+        function isPrivateSellerLabel(label) {
+            return normalizeText(label) === 'владелец';
+        }
+
+        function isFactorySellerLabel(label) {
+            return normalizeText(label) === 'производитель';
+        }
+
         // Отрендерить карточку объявления
         function createAdCard(ad) {
             let photos = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : [];
             let mainImage = photos.length > 0 ? photos[0] : 'https://placehold.co/400?text=Нет+фото';
 
+            const sellerLabel = getSellerTypeLabel(ad);
             let badgesHtml = '';
             if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
-            if (ad.sellerType === 'private') badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
+            if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
             if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
 
             let infoParts = [];
@@ -721,9 +796,43 @@
             `;
             return card;
         }
+        function createPartCard(part) {
+            let photos = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : [];
+            let mainImage = photos.length > 0 ? photos[0] : 'https://placehold.co/400?text=Нет+фото';
+
+            const sellerLabel = getSellerTypeLabel(part);
+            let badgesHtml = '';
+            if (part.condition === 'new') badgesHtml += '<span class="badge-new">НОВАЯ</span>';
+            if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
+
+            let infoParts = [];
+            if (part.city) infoParts.push(part.city);
+            if (sellerLabel) infoParts.push(sellerLabel);
+
+            const partTitle = part.partName || part.title || 'Запчасть';
+
+            const card = document.createElement('div');
+            card.className = 'ad-card';
+            card.onclick = () => openPart(part);
+            card.innerHTML = `
+                <img class="ad-card-img" src="${mainImage}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">
+                <div class="ad-card-content">
+                    <div class="ad-card-title" title="${partTitle}">${partTitle}</div>
+                    <div class="ad-card-price">${Number(part.price || 0).toLocaleString()} ₽</div>
+                    <div class="badge-wrap">${badgesHtml}</div>
+                    <div class="ad-card-info">${infoParts.join(' • ')}</div>
+                </div>
+            `;
+            return card;
+        }
+        function matchesManufacturer(value, namesLower) {
+            if (!value) return false;
+            const text = String(value).toLowerCase();
+            return namesLower.some(n => text.includes(n));
+        }
 
         // Отрендерить страницу производителя
-        function renderManufacturerPage(manufacturer, manufacturerAds) {
+        function renderManufacturerPage(manufacturer, manufacturerAds, manufacturerParts) {
             const container = document.getElementById('manufacturer-content');
             
             if (!manufacturer) {
@@ -789,13 +898,34 @@
                 if (!brandMatches) return false;
                 
                 const statusOk = (ad.status || '').toLowerCase().trim() === 'approved';
-                const sellerTypeOk = (ad.sellerType || '').toLowerCase().trim() === 'factory';
+                const sellerTypeOk = isFactorySellerLabel(getSellerTypeLabel(ad));
                 
                 if (!statusOk || !sellerTypeOk) {
                     console.log(`  ✗ Объявление "${ad.brand} ${ad.model}" отфильтровано: status="${ad.status}" (ok=${statusOk}), sellerType="${ad.sellerType}" (ok=${sellerTypeOk})`);
                 }
                 
                 return statusOk && sellerTypeOk;
+            });
+
+            const approvedParts = manufacturerParts.filter(part => {
+                const sellerTypeOk = isFactorySellerLabel(getSellerTypeLabel(part));
+                if (!sellerTypeOk) return false;
+                const candidate = [part.name, part.partName, part.title].filter(Boolean).join(' ');
+                return matchesManufacturer(candidate, altNamesLower);
+            });
+
+            const combined = [];
+            approvedAds.forEach(ad => {
+                combined.push({ type: 'ad', item: ad, date: ad.creationDate || '' });
+            });
+            approvedParts.forEach(part => {
+                combined.push({ type: 'part', item: part, date: part.date || '' });
+            });
+            combined.sort((a, b) => {
+                const da = a.date ? Date.parse(a.date) : 0;
+                const db = b.date ? Date.parse(b.date) : 0;
+                if (da && db) return db - da;
+                return Number(b.item.rowIndex || 0) - Number(a.item.rowIndex || 0);
             });
 
             console.log('\nИтоговые объявления для отображения:');
@@ -808,25 +938,29 @@
 
             // Добавляем заголовок объявлений
             const adsSection = document.createElement('div');
-            
-            if (approvedAds.length > 0) {
+
+            if (combined.length > 0) {
                 const title = document.createElement('h2');
                 title.className = 'ads-title';
-                title.textContent = `Объявления (${approvedAds.length})`;
+                title.textContent = `Предложения (${combined.length})`;
                 container.appendChild(title);
 
                 const grid = document.createElement('div');
                 grid.className = 'ad-grid';
 
-                approvedAds.forEach(ad => {
-                    grid.appendChild(createAdCard(ad));
+                combined.forEach(entry => {
+                    if (entry.type === 'part') {
+                        grid.appendChild(createPartCard(entry.item));
+                    } else {
+                        grid.appendChild(createAdCard(entry.item));
+                    }
                 });
 
                 container.appendChild(grid);
             } else {
                 const empty = document.createElement('div');
                 empty.className = 'empty-message';
-                empty.textContent = 'Здесь нет объявлений напрямую от завода';
+                empty.textContent = 'Здесь нет объявлений и запчастей этого производителя';
                 container.appendChild(empty);
             }
         }
@@ -843,6 +977,7 @@
 
             // Загружаем объявления
             const allAds = await loadAds();
+            const allParts = await loadParts();
 
             // Загружаем информацию о производителях
             try {
@@ -875,7 +1010,7 @@
                 // Обновляем заголовок страницы
                 document.title = `${manufacturer.name} - купитьвездеход.рф`;
 
-                renderManufacturerPage(manufacturer, allAds);
+                renderManufacturerPage(manufacturer, allAds, allParts);
             } catch (e) {
                 console.error('Ошибка загрузки производителей:', e);
                 document.getElementById('manufacturer-content').innerHTML = 

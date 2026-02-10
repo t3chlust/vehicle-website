@@ -63,10 +63,11 @@ async function getLookupTables(connection) {
   const [transmission] = await connection.query('SELECT id, name FROM transmission ORDER BY id');
   const [fuel] = await connection.query('SELECT id, name FROM fuel ORDER BY id');
   const [document] = await connection.query('SELECT id, name FROM document ORDER BY id');
-  const [vehicleType] = await connection.query('SELECT id, name FROM vehicle_type ORDER BY id');
+  const [vehicleType] = await connection.query('SELECT id, name FROM advertisement_type ORDER BY id');
   const [constructionType] = await connection.query('SELECT id, name FROM construction_type ORDER BY id');
+  const [sellerTypes] = await connection.query('SELECT id, name FROM seller_type ORDER BY id');
 
-  return { chassis, transmission, fuel, document, vehicleType, constructionType };
+  return { chassis, transmission, fuel, document, vehicleType, constructionType, sellerTypes };
 }
 
 function resolveIdByName(list, value, defaultId = null) {
@@ -78,6 +79,41 @@ function resolveIdByName(list, value, defaultId = null) {
   const target = normalizeName(raw);
   const found = list.find((item) => normalizeName(item.name) === target);
   return found ? found.id : defaultId;
+}
+
+async function findUserByPhone(connection, phoneDigits) {
+  if (!phoneDigits) return null;
+  const [rows] = await connection.query(
+    'SELECT id, name, phone FROM user_personal_data WHERE phone = ? LIMIT 1',
+    [phoneDigits]
+  );
+  return rows[0] || null;
+}
+
+async function ensureUserByPhone(connection, phoneDigits, name) {
+  const existing = await findUserByPhone(connection, phoneDigits);
+  if (existing) {
+    if (name && normalizeName(name) !== normalizeName(existing.name)) {
+      await connection.query('UPDATE user_personal_data SET name = ? WHERE id = ?', [name, existing.id]);
+      return { ...existing, name };
+    }
+    return existing;
+  }
+
+  if (!name) {
+    throw new Error('Пользователь не найден. Укажите имя для регистрации.');
+  }
+
+  const [result] = await connection.query(
+    'INSERT INTO user_personal_data (name, phone) VALUES (?, ?)',
+    [name, phoneDigits]
+  );
+
+  return {
+    id: result.insertId,
+    name: name,
+    phone: phoneDigits
+  };
 }
 
 app.use(express.json());
@@ -211,6 +247,59 @@ app.post('/verify-code', (req, res) => {
   }
 });
 
+// POST /api/users/exists - проверить, есть ли пользователь по телефону
+app.post('/api/users/exists', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    const normalizedPhone = normalizePhoneDigits(phone);
+    if (!normalizedPhone) {
+      return res.status(400).json({ status: 'error', message: 'Не указан номер телефона' });
+    }
+    if (!normalizedPhone) {
+      return res.status(400).json({ success: false, error: 'Номер телефона не предоставлен' });
+    }
+
+    const connection = await pool.getConnection();
+    const user = await findUserByPhone(connection, normalizedPhone);
+    connection.release();
+
+    if (user) {
+      return res.json({ success: true, exists: true, user });
+    }
+
+    return res.json({ success: true, exists: false });
+  } catch (error) {
+    console.error('❌ Ошибка при проверке пользователя:', error);
+    res.status(500).json({ success: false, error: 'Ошибка на сервере: ' + error.message });
+  }
+});
+
+// POST /api/users/ensure - создать пользователя при необходимости
+app.post('/api/users/ensure', async (req, res) => {
+  try {
+    const { phone, name } = req.body;
+    const normalizedPhone = normalizePhoneDigits(phone);
+    if (!normalizedPhone) {
+      return res.status(400).json({ success: false, error: 'Номер телефона не предоставлен' });
+    }
+
+    const connection = await pool.getConnection();
+    let user;
+    try {
+      user = await ensureUserByPhone(connection, normalizedPhone, name);
+      connection.release();
+    } catch (err) {
+      connection.release();
+      throw err;
+    }
+
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error('❌ Ошибка при создании пользователя:', error);
+    res.status(500).json({ success: false, error: 'Ошибка на сервере: ' + error.message });
+  }
+});
+
 // ========================
 // API Endpoints для работы с объявлениями
 // ========================
@@ -223,19 +312,22 @@ app.get('/api/ads', async (req, res) => {
     // Получаем все объявления
     const [advertisements] = await connection.query(`
       SELECT 
-        a.id, a.price, a.name, a.phone, a.city, a.\`new\` AS isNew, a.sellerType, a.tender,
+        a.id, a.price, a.userId, a.city, a.\`new\` AS isNew, a.sellerType, st.name AS sellerTypeName, a.tender,
         a.chassis, c.name AS chassisName, a.color, a.mileage, a.engine, a.power,
         a.transmission, t.name AS transmissionName, a.fuel, f.name AS fuelName,
         a.wheelSize, a.amphibious, a.document, d.name AS documentName,
         a.vehicleType, vt.name AS vehicleTypeName, a.constructionType, ct.name AS constructionName,
-        a.brand, a.model, a.status, a.creationDate, a.capacity
+        a.brand, a.model, a.status, a.creationDate, a.capacity,
+        u.name AS userName, u.phone AS userPhone
       FROM advertisement a
       LEFT JOIN chassis c ON a.chassis = c.id
       LEFT JOIN transmission t ON a.transmission = t.id
       LEFT JOIN fuel f ON a.fuel = f.id
       LEFT JOIN document d ON a.document = d.id
-      LEFT JOIN vehicle_type vt ON a.vehicleType = vt.id
+      LEFT JOIN advertisement_type vt ON a.vehicleType = vt.id
       LEFT JOIN construction_type ct ON a.constructionType = ct.id
+      LEFT JOIN seller_type st ON a.sellerType = st.id
+      LEFT JOIN user_personal_data u ON a.userId = u.id
       ORDER BY a.creationDate DESC
     `);
 
@@ -255,11 +347,12 @@ app.get('/api/ads', async (req, res) => {
       return {
         rowIndex: ad.id,
         price: ad.price,
-        name: ad.name,
-        phone: formatPhoneForDisplay(ad.phone),
+        name: ad.userName,
+        phone: formatPhoneForDisplay(ad.userPhone),
         city: ad.city,
         condition: isNew ? 'new' : 'used',
-        sellerType: ad.sellerType === 1 ? 'factory' : (ad.sellerType === 2 ? 'dealer' : 'private'),
+        sellerType: ad.sellerTypeName || '',
+        sellerTypeId: ad.sellerType,
         tender: tenderFlag ? 'yes' : 'no',
         wheel: ad.chassis,
         color: ad.color,
@@ -301,8 +394,8 @@ app.get('/api/ads', async (req, res) => {
 app.post('/api/ads', async (req, res) => {
   try {
     const {
-      action, rowIndex, title, brand, model, price, desc, name, phone, photos,
-      engine, power, transmission, fuel, wheels, city, condition, sellerType,
+      action, rowIndex, title, brand, model, price, desc, name, phone, userId, photos,
+      engine, power, transmission, fuel, wheels, city, condition, sellerType, sellerTypeId,
       tender, wheelFormula, color, mileage, amphibious, docs, techType,
       constructionType, capacity
     } = req.body;
@@ -310,7 +403,11 @@ app.post('/api/ads', async (req, res) => {
     const connection = await pool.getConnection();
     const lookups = await getLookupTables(connection);
 
-    const sellerTypeId = sellerType === 'factory' ? 1 : (sellerType === 'dealer' ? 2 : 0);
+    const resolvedSellerTypeId = resolveIdByName(
+      lookups.sellerTypes || [],
+      sellerTypeId || sellerType,
+      lookups.sellerTypes && lookups.sellerTypes[0] ? lookups.sellerTypes[0].id : 1
+    );
     const conditionFlag = condition === 'new' ? 1 : 0;
     const tenderFlag = tender === 'yes' ? 1 : 0;
     const amphibiousFlag = amphibious === 'yes' ? 1 : 0;
@@ -359,18 +456,24 @@ app.post('/api/ads', async (req, res) => {
     );
 
     const normalizedPhone = normalizePhoneDigits(phone);
+    let resolvedUserId = userId ? Number(userId) : null;
 
     try {
+      const userRecord = await ensureUserByPhone(connection, normalizedPhone, name);
+      if (!resolvedUserId) {
+        resolvedUserId = userRecord.id;
+      }
+
       if (action === 'create') {
         // Вставляем новое объявление
         const [result] = await connection.query(
           `INSERT INTO advertisement 
-            (price, name, phone, city, \`new\`, sellerType, tender, chassis, 
+            (price, userId, city, \`new\`, sellerType, tender, chassis, 
              color, mileage, engine, power, transmission, fuel, wheelSize, 
              amphibious, document, vehicleType, constructionType, brand, model, status, capacity)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            price || 0, name, normalizedPhone, city, conditionFlag, sellerTypeId, tenderFlag,
+            price || 0, resolvedUserId, city, conditionFlag, resolvedSellerTypeId, tenderFlag,
             chassisId, color, mileage || 0, engine, power || 0, transmissionId, fuelId,
             wheels || '', amphibiousFlag, documentId, vehicleTypeId, constructionId,
             brand || null, model, 2, capacity || null // status = 2 (pending)
@@ -397,13 +500,13 @@ app.post('/api/ads', async (req, res) => {
         // Обновляем существующее объявление
         await connection.query(
           `UPDATE advertisement SET 
-            price = ?, name = ?, phone = ?, city = ?, \`new\` = ?, sellerType = ?,
+            price = ?, userId = ?, city = ?, \`new\` = ?, sellerType = ?,
             tender = ?, chassis = ?, color = ?, mileage = ?, engine = ?, power = ?,
             transmission = ?, fuel = ?, wheelSize = ?, amphibious = ?, document = ?,
             vehicleType = ?, constructionType = ?, brand = ?, model = ?, capacity = ?
            WHERE id = ?`,
           [
-            price || 0, name, normalizedPhone, city, conditionFlag, sellerTypeId, tenderFlag,
+            price || 0, resolvedUserId, city, conditionFlag, resolvedSellerTypeId, tenderFlag,
             chassisId, color, mileage || 0, engine, power || 0, transmissionId, fuelId,
             wheels || '', amphibiousFlag, documentId, vehicleTypeId, constructionId,
             brand || null, model, capacity || null, rowIndex
@@ -441,14 +544,17 @@ app.post('/api/ads', async (req, res) => {
 // POST /api/ads/delete - удалить объявление
 app.post('/api/ads/delete', async (req, res) => {
   try {
-    const { rowIndex, phone } = req.body;
+    const { rowIndex, phone, userId } = req.body;
 
     const connection = await pool.getConnection();
 
     try {
       // Проверяем, что объявление принадлежит пользователю
       const [ads] = await connection.query(
-        'SELECT phone FROM advertisement WHERE id = ?',
+        `SELECT a.userId, u.phone
+         FROM advertisement a
+         LEFT JOIN user_personal_data u ON a.userId = u.id
+         WHERE a.id = ?`,
         [rowIndex]
       );
 
@@ -457,9 +563,11 @@ app.post('/api/ads/delete', async (req, res) => {
         return res.status(404).json({ status: 'error', message: 'Объявление не найдено' });
       }
 
+      const storedUserId = ads[0].userId ? Number(ads[0].userId) : null;
       const storedPhone = normalizePhoneDigits(ads[0].phone);
       const requestPhone = normalizePhoneDigits(phone);
-      if (storedPhone !== requestPhone) {
+      const requestUserId = userId ? Number(userId) : null;
+      if ((requestUserId && storedUserId !== requestUserId) || (!requestUserId && storedPhone !== requestPhone)) {
         connection.release();
         return res.status(403).json({ status: 'error', message: 'Доступ запрещен' });
       }
@@ -516,6 +624,210 @@ app.post('/api/ads/reject', async (req, res) => {
     res.json({ status: 'success', message: 'Объявление отклонено и удалено' });
   } catch (error) {
     console.error('❌ Ошибка при отклонении объявления:', error);
+    res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
+  }
+});
+
+// ========================
+// API Endpoints для запчастей
+// ========================
+
+// GET /api/parts - получить все запчасти с фотографиями
+app.get('/api/parts', async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+
+    const [parts] = await connection.query(`
+      SELECT
+        p.id, p.name AS partName, p.date, p.price, p.userId, p.condition, p.sellerType,
+        st.name AS sellerTypeName, p.city,
+        u.name AS userName, u.phone AS userPhone
+      FROM part p
+      LEFT JOIN seller_type st ON p.sellerType = st.id
+      LEFT JOIN user_personal_data u ON p.userId = u.id
+      ORDER BY p.date DESC
+    `);
+
+    const payload = await Promise.all(parts.map(async (part) => {
+      const [photos] = await connection.query(
+        'SELECT photo FROM part_photo WHERE part = ?',
+        [part.id]
+      );
+
+      return {
+        rowIndex: part.id,
+        title: part.partName || 'Запчасть',
+        partName: part.partName || '',
+        date: part.date,
+        price: part.price || 0,
+        city: part.city || '',
+        condition: bitToBool(part.condition) ? 'new' : 'used',
+        sellerType: part.sellerTypeName || '',
+        sellerTypeId: part.sellerType,
+        name: part.userName || '',
+        phone: formatPhoneForDisplay(part.userPhone),
+        photos: photos.map((p) => p.photo).join(',')
+      };
+    }));
+
+    connection.release();
+    res.json(payload);
+  } catch (error) {
+    console.error('❌ Ошибка при получении запчастей:', error);
+    res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
+  }
+});
+
+// POST /api/parts - создать или отредактировать запчасть
+app.post('/api/parts', async (req, res) => {
+  try {
+    const {
+      action,
+      rowIndex,
+      partName,
+      price,
+      condition,
+      sellerTypeId,
+      city,
+      phone,
+      name,
+      userId,
+      photos
+    } = req.body;
+
+    const connection = await pool.getConnection();
+    const lookups = await getLookupTables(connection);
+
+    const normalizedPhone = normalizePhoneDigits(phone);
+    if (!normalizedPhone) {
+      connection.release();
+      return res.status(400).json({ status: 'error', message: 'Не указан номер телефона' });
+    }
+
+    const resolvedSellerTypeId = resolveIdByName(
+      lookups.sellerTypes || [],
+      sellerTypeId,
+      lookups.sellerTypes && lookups.sellerTypes[0] ? lookups.sellerTypes[0].id : 1
+    );
+    const conditionFlag = condition === 'new' ? 1 : 0;
+    let resolvedUserId = userId ? Number(userId) : null;
+
+    try {
+      const userRecord = await ensureUserByPhone(connection, normalizedPhone, name);
+      if (!resolvedUserId) {
+        resolvedUserId = userRecord.id;
+      }
+
+      if (action === 'create') {
+        const [result] = await connection.query(
+          `INSERT INTO part
+            (name, date, price, userId, condition, sellerType, city)
+           VALUES (?, NOW(), ?, ?, ?, ?, ?)`,
+          [
+            partName || 'Запчасть',
+            price || 0,
+            resolvedUserId,
+            conditionFlag,
+            resolvedSellerTypeId,
+            city || null
+          ]
+        );
+
+        const partId = result.insertId;
+
+        if (photos && photos.length > 0) {
+          const photoUrls = photos.split(',').filter((p) => p.trim());
+          for (const photoUrl of photoUrls) {
+            await connection.query(
+              'INSERT INTO part_photo (part, photo) VALUES (?, ?)',
+              [partId, photoUrl.trim()]
+            );
+          }
+        }
+
+        connection.release();
+        res.json({ status: 'success', message: 'Запчасть создана', id: partId });
+      } else if (action === 'edit') {
+        await connection.query(
+          `UPDATE part SET
+            name = ?, price = ?, userId = ?, condition = ?, sellerType = ?, city = ?
+           WHERE id = ?`,
+          [
+            partName || 'Запчасть',
+            price || 0,
+            resolvedUserId,
+            conditionFlag,
+            resolvedSellerTypeId,
+            city || null,
+            rowIndex
+          ]
+        );
+
+        await connection.query('DELETE FROM part_photo WHERE part = ?', [rowIndex]);
+        if (photos && photos.length > 0) {
+          const photoUrls = photos.split(',').filter((p) => p.trim());
+          for (const photoUrl of photoUrls) {
+            await connection.query(
+              'INSERT INTO part_photo (part, photo) VALUES (?, ?)',
+              [rowIndex, photoUrl.trim()]
+            );
+          }
+        }
+
+        connection.release();
+        res.json({ status: 'success', message: 'Запчасть обновлена' });
+      }
+    } catch (err) {
+      connection.release();
+      throw err;
+    }
+  } catch (error) {
+    console.error('❌ Ошибка при создании/редактировании запчасти:', error);
+    res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
+  }
+});
+
+// POST /api/parts/delete - удалить запчасть
+app.post('/api/parts/delete', async (req, res) => {
+  try {
+    const { rowIndex, phone, userId } = req.body;
+
+    const connection = await pool.getConnection();
+
+    try {
+      const [parts] = await connection.query(
+        `SELECT p.userId, u.phone
+         FROM part p
+         LEFT JOIN user_personal_data u ON p.userId = u.id
+         WHERE p.id = ?`,
+        [rowIndex]
+      );
+
+      if (parts.length === 0) {
+        connection.release();
+        return res.status(404).json({ status: 'error', message: 'Запчасть не найдена' });
+      }
+
+      const storedUserId = parts[0].userId ? Number(parts[0].userId) : null;
+      const storedPhone = normalizePhoneDigits(parts[0].phone);
+      const requestPhone = normalizePhoneDigits(phone);
+      const requestUserId = userId ? Number(userId) : null;
+      if ((requestUserId && storedUserId !== requestUserId) || (!requestUserId && storedPhone !== requestPhone)) {
+        connection.release();
+        return res.status(403).json({ status: 'error', message: 'Доступ запрещен' });
+      }
+
+      await connection.query('DELETE FROM part_photo WHERE part = ?', [rowIndex]);
+      await connection.query('DELETE FROM part WHERE id = ?', [rowIndex]);
+
+      connection.release();
+      res.json({ status: 'success', message: 'Запчасть удалена' });
+    } catch (err) {
+      connection.release();
+      throw err;
+    }
+  } catch (error) {
+    console.error('❌ Ошибка при удалении запчасти:', error);
     res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
   }
 });
@@ -617,7 +929,8 @@ app.get('/api/filters', async (req, res) => {
       fuel: lookups.fuel,
       document: lookups.document,
       vehicleType: lookups.vehicleType,
-      constructionType: lookups.constructionType
+      constructionType: lookups.constructionType,
+      sellerType: lookups.sellerTypes
     });
   } catch (error) {
     console.error('❌ Ошибка при получении фильтров:', error);
