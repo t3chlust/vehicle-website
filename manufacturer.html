@@ -724,6 +724,7 @@
             let sp = [
                 { l: 'Тип', v: 'Запчасть' },
                 { l: 'Название', v: part.partName || part.title },
+                { l: 'Бренд', v: part.brand || '' },
                 { l: 'Состояние', v: part.condition === 'new' ? 'Новая' : 'Б/У' },
                 { l: 'Тип продавца', v: sellerLabel },
                 { l: 'Город', v: part.city }
@@ -910,7 +911,7 @@
             const approvedParts = manufacturerParts.filter(part => {
                 const sellerTypeOk = isFactorySellerLabel(getSellerTypeLabel(part));
                 if (!sellerTypeOk) return false;
-                const candidate = [part.name, part.partName, part.title].filter(Boolean).join(' ');
+                const candidate = [part.brand, part.name, part.partName, part.title].filter(Boolean).join(' ');
                 return matchesManufacturer(candidate, altNamesLower);
             });
 

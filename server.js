@@ -639,7 +639,7 @@ app.get('/api/parts', async (req, res) => {
 
     const [parts] = await connection.query(`
       SELECT
-        p.id, p.name AS partName, p.date, p.price, p.userId, p.condition, p.sellerType,
+        p.id, p.name AS partName, p.brand, p.date, p.price, p.userId, p.condition, p.sellerType,
         st.name AS sellerTypeName, p.city,
         u.name AS userName, u.phone AS userPhone
       FROM part p
@@ -658,6 +658,7 @@ app.get('/api/parts', async (req, res) => {
         rowIndex: part.id,
         title: part.partName || 'Запчасть',
         partName: part.partName || '',
+        brand: part.brand || '',
         date: part.date,
         price: part.price || 0,
         city: part.city || '',
@@ -685,6 +686,7 @@ app.post('/api/parts', async (req, res) => {
       action,
       rowIndex,
       partName,
+      brand,
       price,
       condition,
       sellerTypeId,
@@ -721,10 +723,11 @@ app.post('/api/parts', async (req, res) => {
       if (action === 'create') {
         const [result] = await connection.query(
           `INSERT INTO part
-            (name, date, price, userId, condition, sellerType, city)
-           VALUES (?, NOW(), ?, ?, ?, ?, ?)`,
+            (name, brand, date, price, userId, condition, sellerType, city)
+           VALUES (?, ?, NOW(), ?, ?, ?, ?, ?)`,
           [
             partName || 'Запчасть',
+            brand || null,
             price || 0,
             resolvedUserId,
             conditionFlag,
@@ -750,10 +753,11 @@ app.post('/api/parts', async (req, res) => {
       } else if (action === 'edit') {
         await connection.query(
           `UPDATE part SET
-            name = ?, price = ?, userId = ?, condition = ?, sellerType = ?, city = ?
+            name = ?, brand = ?, price = ?, userId = ?, condition = ?, sellerType = ?, city = ?
            WHERE id = ?`,
           [
             partName || 'Запчасть',
+            brand || null,
             price || 0,
             resolvedUserId,
             conditionFlag,

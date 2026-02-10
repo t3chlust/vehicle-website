@@ -2043,6 +2043,7 @@
                                     </select> 
                                     <div id="div-part-only" class="hidden">
                                         <div class="form-section-title">Данные запчасти</div>
+                                        <input class="form-input" id="inp-part-brand" placeholder="Бренд" />
                                         <input class="form-input" id="inp-part-title" placeholder="Название запчасти" />
                                     </div>
                                     <div id="div-brand-model"
@@ -3209,6 +3210,7 @@
                                     const payload = {
                                         action: 'create',
                                         rowIndex: '',
+                                        brand: safeVal('inp-part-brand'),
                                         partName: safeVal('inp-part-title'),
                                         price: priceVal,
                                         condition: safeVal('inp-condition'),
