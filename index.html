@@ -1719,6 +1719,12 @@
                                     </div>
                                 </div>
                                 <div id="tab-content-parts" class="tab-content">
+                                    <div style="margin-bottom: 25px; max-width: 500px;">
+                                        <div class="search-container">
+                                            <input type="text" id="partsSearchInput" class="form-input filter-input" placeholder="Поиск запчастей" autocomplete="off">
+                                        </div>
+                                        <div id="partsSearchList" style="display:none; margin-top:8px;"></div>
+                                    </div>
                                     <div id="view-parts-list" style="min-height: 400px;">
                                         <div id="loading-parts" style="text-align:center; padding: 60px; color:#888;">
                                             <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
@@ -2235,7 +2241,7 @@
                         const FILTERS_API_URL = "/api/filters";
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
-                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [];
+                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [];
                         let currentItemType = 'ad';
                         let currentPhotoIndex = 0; let currentPhotos = [];
 
@@ -2746,6 +2752,118 @@
                                 }
                             });
                         }
+                        function buildPartSearchIndex(parts) {
+                            partSearchIndex = (parts || [])
+                                .map(part => {
+                                    const title = (part.partName || part.title || '').trim();
+                                    return {
+                                        id: part.rowIndex,
+                                        title: title,
+                                        titleLower: title.toLowerCase()
+                                    };
+                                })
+                                .filter(item => item.title);
+                        }
+                        function findPartAndScroll(value) {
+                            const input = document.getElementById('partsSearchInput');
+                            const listDiv = document.getElementById('partsSearchList');
+                            let val = value ? String(value).trim() : (input ? input.value.trim() : '');
+                            if (!val) return;
+
+                            const lower = val.toLowerCase();
+                            let match = partSearchIndex.find(item => item.titleLower === lower);
+                            if (!match) {
+                                match = partSearchIndex.find(item => item.titleLower.includes(lower));
+                            }
+
+                            if (match) {
+                                if (input) input.value = match.title;
+                                const card = document.getElementById(`part-${match.id}`);
+                                if (card) {
+                                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    card.style.transition = 'background 1.2s';
+                                    card.style.background = 'rgba(171, 71, 188, 0.35)';
+                                    setTimeout(() => { card.style.background = ''; }, 1600);
+                                }
+                            }
+                            if (listDiv) listDiv.style.display = 'none';
+                        }
+                        function initPartsSearch() {
+                            if (partsSearchInitialized) return;
+                            const input = document.getElementById('partsSearchInput');
+                            const listDiv = document.getElementById('partsSearchList');
+                            if (!input || !listDiv) return;
+                            partsSearchInitialized = true;
+
+                            input.addEventListener('change', () => findPartAndScroll());
+                            input.addEventListener('keypress', e => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    findPartAndScroll();
+                                }
+                            });
+
+                            input.addEventListener('input', function () {
+                                let typed = this.value.trim();
+                                if (!typed) {
+                                    listDiv.style.display = 'none';
+                                    return;
+                                }
+
+                                typed = typed.toLowerCase();
+                                const found = [];
+                                for (const item of partSearchIndex) {
+                                    if (item.titleLower.startsWith(typed)) {
+                                        found.push(item);
+                                    }
+                                }
+                                if (found.length === 0 && typed.length >= 2) {
+                                    for (const item of partSearchIndex) {
+                                        if (item.titleLower.includes(typed)) {
+                                            found.push(item);
+                                        }
+                                    }
+                                }
+
+                                listDiv.innerHTML = '';
+                                const uniq = new Set();
+                                const arr = [];
+                                for (const item of found) {
+                                    if (!uniq.has(item.titleLower)) {
+                                        uniq.add(item.titleLower);
+                                        arr.push(item);
+                                    }
+                                    if (arr.length >= 5) break;
+                                }
+
+                                if (arr.length === 0) {
+                                    listDiv.style.display = 'none';
+                                } else {
+                                    arr.forEach(item => {
+                                        const el = document.createElement('div');
+                                        el.className = 'manufacturer';
+                                        el.setAttribute('data-target', String(item.id));
+                                        el.textContent = item.title;
+                                        el.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            input.value = item.title;
+                                            listDiv.style.display = 'none';
+                                            findPartAndScroll(item.title);
+                                        });
+                                        listDiv.appendChild(el);
+                                    });
+                                    listDiv.style.display = 'block';
+                                }
+                            });
+
+                            document.addEventListener('click', function (e) {
+                                const inputEl = document.getElementById('partsSearchInput');
+                                if (!listDiv || !inputEl) return;
+                                if (!listDiv.contains(e.target) && e.target !== inputEl) {
+                                    listDiv.style.display = 'none';
+                                }
+                            });
+                        }
                         function renderGrid(ads) {
                             const c = document.getElementById('ads-container');
                             c.innerHTML = '';
@@ -2802,6 +2920,7 @@
 
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
+                                d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
                                 d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge placeholder">В РЕЕСТРЕ МИНПРОМТОРГА</div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
@@ -3333,6 +3452,8 @@
                                 const raw = await r.json();
                                 allParts = Array.isArray(raw) ? raw : [];
                                 renderPartsGrid(allParts);
+                                buildPartSearchIndex(allParts);
+                                initPartsSearch();
                             } catch (e) {
                                 console.log(e);
                             } finally {
@@ -3367,8 +3488,8 @@
                             showTab(document.querySelector('.tab-link[onclick*="ads"]'), 'ads');
                         }
                         function editCurrentAd() { closeModalDirect(); openEditMode(currentAd) }
-                        function deleteCurrentAd() { if (confirm("Удалить?")) { closeModalDirect(); sendDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); } }
-                        function deleteCurrentPart() { if (confirm("Удалить?")) { closeModalDirect(); sendPartDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); } }
+                        function deleteCurrentAd() {  closeModalDirect(); sendDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); } 
+                        function deleteCurrentPart() {  closeModalDirect(); sendPartDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); } 
                         async function sendDelete(r, p, uId) { 
                             showLoader("Удаление..."); 
                             try { 
