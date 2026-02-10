@@ -2588,7 +2588,7 @@
                             checkConditionVisibility();
                         }
                         function applyFilters() {
-                            let approvedAds = allAds.filter(ad => ad.confirmed === true);
+                            let approvedAds = isAdmin ? allAds : allAds.filter(ad => ad.confirmed === true);
 
                             const minStr = getPriceValue('f-price-min');
                             const maxStr = getPriceValue('f-price-max');
@@ -2640,7 +2640,7 @@
                             }
                         }
                         function buildAdSearchIndex(ads) {
-                            const approved = (ads || []).filter(ad => ad.confirmed === true);
+                            const approved = isAdmin ? (ads || []) : (ads || []).filter(ad => ad.confirmed === true);
                             adSearchIndex = approved
                                 .map(ad => {
                                     const title = (ad.title || '').trim();
@@ -3296,12 +3296,7 @@
                                 if (uPhone === aPhone) {
                                     isAdmin = true;
                                     adminTab.classList.remove('hidden');
-                                    if (typeof allAds !== 'undefined') {
-                                        const pendingAds = (allAds || []).filter(a => a.confirmed !== true).length;
-                                        const pendingParts = (allParts || []).filter(p => p.confirmed !== true).length;
-                                        const pCount = pendingAds + pendingParts;
-                                        adminTab.innerText = `Админка (${pCount})`;
-                                    } else { adminTab.innerText = `Админка`; }
+                                    updateAdminCount();
                                 }
                             } else {
                                 btnLogin.classList.remove('hidden');
@@ -3435,13 +3430,14 @@
                                 initAdsSearch();
                                 if (isAdmin) {
                                     renderModerationGrid(getPendingModerationItems());
+                                    updateAdminCount();
                                 }
 
                                 const urlParams = new URLSearchParams(window.location.search);
                                 const adId = urlParams.get('id');
                                 if (adId) {
                                     const found = allAds.find(a => String(a.rowIndex) === String(adId));
-                                    if (found && found.confirmed === true) {
+                                    if (found && (found.confirmed === true || isAdmin)) {
                                         openAd(found);
                                     }
                                 }
@@ -3462,12 +3458,13 @@
                                 const r = await fetch('/api/parts?t=' + new Date().getTime());
                                 const raw = await r.json();
                                 allParts = Array.isArray(raw) ? raw : [];
-                                const confirmedParts = allParts.filter(p => p.confirmed === true);
-                                renderPartsGrid(confirmedParts);
-                                buildPartSearchIndex(confirmedParts);
+                                const displayParts = isAdmin ? allParts : allParts.filter(p => p.confirmed === true);
+                                renderPartsGrid(displayParts);
+                                buildPartSearchIndex(displayParts);
                                 initPartsSearch();
                                 if (isAdmin) {
                                     renderModerationGrid(getPendingModerationItems());
+                                    updateAdminCount();
                                 }
                             } catch (e) {
                                 console.log(e);
@@ -3596,6 +3593,13 @@
                             ];
                             merged.sort((a, b) => Number(b.item.rowIndex || 0) - Number(a.item.rowIndex || 0));
                             return merged;
+                        }
+                        function updateAdminCount() {
+                            const adminTab = document.getElementById('admin-tab-link');
+                            if (!adminTab || !isAdmin) return;
+                            const pendingAds = (allAds || []).filter(a => a.confirmed !== true).length;
+                            const pendingParts = (allParts || []).filter(p => p.confirmed !== true).length;
+                            adminTab.innerText = `Админка (${pendingAds + pendingParts})`;
                         }
                         function renderModerationGrid(items) {
                             const container = document.getElementById('moderation-grid');
