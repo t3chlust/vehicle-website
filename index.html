@@ -2017,18 +2017,6 @@
                                         <option value="dealer">Дилер</option>
                                         <option value="private">Владелец</option>
                                     </select>
-                                    <div id="div-tender" class="hidden"
-                                        style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e1bee7;">
-                                        <label
-                                            style="font-weight:bold; color:#ab47bc; font-size:14px; display:block; margin-bottom:10px;">Состоит
-                                            в реестре МинПромТорга?</label><select class="form-select" id="inp-tender"
-                                            style="margin-bottom:0">
-                                            <option value="no">Нет</option>
-                                            <option value="yes">Да</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-section-title">Где находится техника</div> <input
-                                        class="form-input" id="inp-city" placeholder="Город" />
                                     <div class="form-section-title">Основное</div> <select class="form-select"
                                         id="inp-tech-type" onchange="checkTechTypeVisibility()">
                                         <option value="Вездеход" selected>Вездеход</option>
@@ -2053,6 +2041,18 @@
                                             <input class="form-input" id="inp-model" placeholder="Модель" />
                                         </div>
                                     </div>
+                                    <div id="div-tender" class="hidden"
+                                        style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e1bee7;">
+                                        <label
+                                            style="font-weight:bold; color:#ab47bc; font-size:14px; display:block; margin-bottom:10px;">Состоит
+                                            в реестре МинПромТорга?</label><select class="form-select" id="inp-tender"
+                                            style="margin-bottom:0">
+                                            <option value="no">Нет</option>
+                                            <option value="yes">Да</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-section-title">Где находится техника</div> <input
+                                        class="form-input" id="inp-city" placeholder="Город" />
                                     <input type="text" class="form-input" id="inp-price" placeholder="Цена (₽)"
                                         list="price-list" oninput="formatPriceInput(this)" />
                                     <div class="form-section-title">Состояние</div> <select class="form-select"
@@ -2511,10 +2511,13 @@
                         function checkTenderVisibility() {
                             const select = document.getElementById('inp-seller-type');
                             const tenderDiv = document.getElementById('div-tender');
-                            if (!select || !tenderDiv) return;
+                            const techType = document.getElementById('inp-tech-type');
+                            if (!select || !tenderDiv || !techType) return;
                             const selected = select.options[select.selectedIndex];
                             const label = selected ? selected.textContent : '';
-                            if (isTenderSellerLabel(label)) {
+                            const isTenderSeller = isTenderSellerLabel(label);
+                            const isAllTerrain = techType.value === 'Вездеход';
+                            if (isTenderSeller && isAllTerrain) {
                                 tenderDiv.classList.remove('hidden');
                             } else {
                                 tenderDiv.classList.add('hidden');
@@ -2547,7 +2550,6 @@
                             const colorDocsDiv = document.getElementById('div-color-docs');
                             const partOnlyDiv = document.getElementById('div-part-only');
                             const specsTitle = document.getElementById('specs-title');
-                            const tenderDiv = document.getElementById('div-tender');
                             constrInp.classList.add('hidden');
                             mainSpecs.classList.remove('hidden');
                             capDiv.classList.add('hidden');
@@ -2556,7 +2558,6 @@
                             colorDocsDiv.classList.remove('hidden');
                             partOnlyDiv.classList.add('hidden');
                             specsTitle.classList.remove('hidden');
-                            if (tenderDiv) tenderDiv.classList.remove('hidden');
                             if (type === 'Вездеход') {
                                 constrInp.classList.remove('hidden');
                             } else if (type === 'Прицеп') {
@@ -2572,14 +2573,11 @@
                                 colorDocsDiv.classList.add('hidden');
                                 partOnlyDiv.classList.remove('hidden');
                                 specsTitle.classList.add('hidden');
-                                if (tenderDiv) {
-                                    tenderDiv.classList.add('hidden');
-                                    document.getElementById('inp-tender').value = 'no';
-                                }
                             }
                             if (type !== 'Запчасть') {
                                 setVal('inp-part-title', '');
                             }
+                            checkTenderVisibility();
                             checkConditionVisibility();
                         }
                         function applyFilters() {
