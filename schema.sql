@@ -22,10 +22,39 @@ USE `vehicle_website`;
 -- Дамп структуры для таблица vehicle_website.advertisement
 CREATE TABLE IF NOT EXISTS `advertisement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `price` decimal(20,2) NOT NULL DEFAULT 0.00,
-  `userId` int(11) NOT NULL DEFAULT 0,
-  `new` bit(1) NOT NULL,
-  `sellerType` int(11) NOT NULL DEFAULT 0,
+  `brand` varchar(100) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `type` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `price` decimal(20,2) NOT NULL,
+  `date` datetime NOT NULL,
+  `city` varchar(100) NOT NULL,
+  `condition` bit(1) NOT NULL,
+  `sellerType` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_advertisement_base_user_personal_data` (`userId`),
+  KEY `FK_advertisement_seller_type` (`sellerType`),
+  KEY `FK_advertisement_advertisement_type` (`type`),
+  CONSTRAINT `FK_advertisement_advertisement_type` FOREIGN KEY (`type`) REFERENCES `advertisement_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_advertisement_base_user_personal_data` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_advertisement_seller_type` FOREIGN KEY (`sellerType`) REFERENCES `seller_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Дамп данных таблицы vehicle_website.advertisement: ~0 rows (приблизительно)
+
+-- Дамп структуры для таблица vehicle_website.advertisement_photo
+CREATE TABLE IF NOT EXISTS `advertisement_photo` (
+  `advertisement` int(11) NOT NULL,
+  `photo` varchar(400) NOT NULL DEFAULT '',
+  PRIMARY KEY (`advertisement`,`photo`),
+  CONSTRAINT `FK_advertisement_photo_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Дамп данных таблицы vehicle_website.advertisement_photo: ~0 rows (приблизительно)
+
+-- Дамп структуры для таблица vehicle_website.advertisement_technic
+CREATE TABLE IF NOT EXISTS `advertisement_technic` (
+  `advertisement` int(11) NOT NULL,
   `tender` bit(1) NOT NULL DEFAULT b'0',
   `chassis` int(11) NOT NULL,
   `color` varchar(50) NOT NULL,
@@ -37,67 +66,25 @@ CREATE TABLE IF NOT EXISTS `advertisement` (
   `wheelSize` varchar(50) DEFAULT '0',
   `amphibious` bit(1) NOT NULL DEFAULT b'0',
   `document` int(11) NOT NULL DEFAULT 0,
-  `vehicleType` int(11) NOT NULL DEFAULT 0,
   `constructionType` int(11) NOT NULL DEFAULT 0,
-  `brand` varchar(50) NOT NULL,
-  `model` varchar(50) DEFAULT '0',
-  `status` int(11) NOT NULL DEFAULT 0,
-  `creationDate` datetime NOT NULL DEFAULT current_timestamp(),
   `capacity` int(11) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`advertisement`) USING BTREE,
   KEY `FK_advertisement_wheel` (`chassis`),
   KEY `FK_advertisement_fuel` (`fuel`),
   KEY `FK_advertisement_transmission` (`transmission`),
-  KEY `FK_advertisement_advertisement_status` (`status`),
   KEY `FK_advertisement_construction` (`constructionType`),
-  KEY `FK_advertisement_technical` (`vehicleType`),
   KEY `FK_advertisement_document` (`document`),
-  KEY `advertisement_relation_8` (`sellerType`),
-  KEY `advertisement_relation_9` (`userId`),
-  CONSTRAINT `FK_advertisement_advertisement_status` FOREIGN KEY (`status`) REFERENCES `advertisement_status` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_construction` FOREIGN KEY (`constructionType`) REFERENCES `construction_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_document` FOREIGN KEY (`document`) REFERENCES `document` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_fuel` FOREIGN KEY (`fuel`) REFERENCES `fuel` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `FK_advertisement_technical` FOREIGN KEY (`vehicleType`) REFERENCES `advertisement_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_transmission` FOREIGN KEY (`transmission`) REFERENCES `transmission` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `FK_advertisement_wheel` FOREIGN KEY (`chassis`) REFERENCES `chassis` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `advertisement_relation_8` FOREIGN KEY (`sellerType`) REFERENCES `seller_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `advertisement_relation_9` FOREIGN KEY (`userId`) REFERENCES `user_personal_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Дамп данных таблицы vehicle_website.advertisement: ~2 rows (приблизительно)
-INSERT INTO `advertisement` (`id`, `price`, `userId`, `new`, `sellerType`, `tender`, `chassis`, `color`, `mileage`, `engine`, `power`, `transmission`, `fuel`, `wheelSize`, `amphibious`, `document`, `vehicleType`, `constructionType`, `brand`, `model`, `status`, `creationDate`, `capacity`, `city`) VALUES
-	(1, 2500000.00, 1, b'0', 1, b'0', 1, 'Фиолетовый', 239, 'Toyota 1nz fe', 110, 1, 1, '1300x500', b'1', 1, 1, 1, 'Тундра', 'Восток', 1, '2026-01-14 16:33:41', NULL, NULL),
-	(2, 5000000.00, 1, b'1', 2, b'1', 2, 'Зеленый', NULL, 'ВАЗ 2111', 398, 2, 1, '1400x650', b'1', 1, 1, 2, 'Тингер', 'ТФ4 ПРО', 1, '2026-01-14 16:40:31', NULL, NULL);
-
--- Дамп структуры для таблица vehicle_website.advertisement_photo
-CREATE TABLE IF NOT EXISTS `advertisement_photo` (
-  `advertisement` int(11) NOT NULL,
-  `photo` varchar(400) NOT NULL DEFAULT '',
-  PRIMARY KEY (`advertisement`,`photo`),
-  CONSTRAINT `FK_advertisement_photo_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `FK_advertisement_wheel` FOREIGN KEY (`chassis`) REFERENCES `chassis` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement_photo: ~5 rows (приблизительно)
-INSERT INTO `advertisement_photo` (`advertisement`, `photo`) VALUES
-	(1, 'https://res.cloudinary.com/duystfz2v/image/upload/v1768386817/xir0ew0njtzoosjvpre0.jpg'),
-	(1, 'https://res.cloudinary.com/duystfz2v/image/upload/v1768386818/kiin8c6fx0el3npqeoqu.jpg'),
-	(2, 'https://res.cloudinary.com/duystfz2v/image/upload/v1768387227/ad6etxbkmuslnbzxtkrw.png'),
-	(2, 'https://res.cloudinary.com/duystfz2v/image/upload/v1768387228/bxpeim8kcb7uazp9o5uf.png'),
-	(2, 'https://res.cloudinary.com/duystfz2v/image/upload/v1768387229/slnalx1ruorviitvsste.png');
-
--- Дамп структуры для таблица vehicle_website.advertisement_status
-CREATE TABLE IF NOT EXISTS `advertisement_status` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
--- Дамп данных таблицы vehicle_website.advertisement_status: ~2 rows (приблизительно)
-INSERT INTO `advertisement_status` (`id`, `name`) VALUES
-	(1, 'Принято'),
-	(2, 'В ожидании');
+-- Дамп данных таблицы vehicle_website.advertisement_technic: ~2 rows (приблизительно)
+INSERT INTO `advertisement_technic` (`advertisement`, `tender`, `chassis`, `color`, `mileage`, `engine`, `power`, `transmission`, `fuel`, `wheelSize`, `amphibious`, `document`, `constructionType`, `capacity`) VALUES
+	(1, b'0', 1, 'Фиолетовый', 239, 'Toyota 1nz fe', 110, 1, 1, '1300x500', b'1', 1, 1, NULL),
+	(2, b'1', 2, 'Зеленый', NULL, 'ВАЗ 2111', 398, 2, 1, '1400x650', b'1', 1, 2, NULL);
 
 -- Дамп структуры для таблица vehicle_website.advertisement_type
 CREATE TABLE IF NOT EXISTS `advertisement_type` (
@@ -165,8 +152,8 @@ INSERT INTO `fuel` (`id`, `name`) VALUES
 	(3, 'Газ'),
 	(4, 'Электричество');
 
--- Дамп структуры для таблица vehicle_website.manufacturer_cards
-CREATE TABLE IF NOT EXISTS `manufacturer_cards` (
+-- Дамп структуры для таблица vehicle_website.manufacturer
+CREATE TABLE IF NOT EXISTS `manufacturer` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `city` varchar(50) NOT NULL,
@@ -179,8 +166,8 @@ CREATE TABLE IF NOT EXISTS `manufacturer_cards` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=136 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.manufacturer_cards: ~134 rows (приблизительно)
-INSERT INTO `manufacturer_cards` (`id`, `name`, `city`, `logo`, `vk`, `youtube`, `website`, `rutube`, `telegram`) VALUES
+-- Дамп данных таблицы vehicle_website.manufacturer: ~134 rows (приблизительно)
+INSERT INTO `manufacturer` (`id`, `name`, `city`, `logo`, `vk`, `youtube`, `website`, `rutube`, `telegram`) VALUES
 	(1, 'TINGER', 'Череповец', 'https://res.cloudinary.com/duystfz2v/image/upload/v1768922599/%D0%BB%D0%BE%D0%B3%D0%BE_%D1%82%D0%B8%D0%BD%D0%B3%D0%B5%D1%80_axempn.jpg', 'https://vk.com/predel.prochnosti', 'https://www.youtube.com/@predel_prochnosti', 'https://tinger.ru/', NULL, NULL),
 	(2, 'TUNDRA', 'Тюмень', 'https://res.cloudinary.com/duystfz2v/image/upload/v1768934395/%D1%82%D1%83%D0%BD%D0%B4%D1%80%D0%B0_%D0%BB%D0%BE%D0%B3%D0%BE_t6df2e.jpg', 'https://vk.com/vezdehodtundra', 'https://www.youtube.com/@vezdehodtundra', 'https://вездеходтундра.рф/', NULL, NULL),
 	(3, 'КАПРАЛ', 'Томск', 'https://res.cloudinary.com/duystfz2v/image/upload/v1768922672/%D0%BB%D0%BE%D0%B3%D0%BE_%D0%BA%D0%B0%D0%BF%D1%80%D0%B0%D0%BB_2_dli5h7.jpg', 'https://vk.com/dimaxworkshop', 'https://www.youtube.com/@dimax2225', 'https://dimax4x4.ru/', NULL, NULL),
@@ -321,7 +308,7 @@ CREATE TABLE IF NOT EXISTS `manufacturer_synonym` (
   `manufacturer` int(11) NOT NULL,
   `name` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`manufacturer`,`name`),
-  CONSTRAINT `FK_manufacturer_synonym_manufacturer_2` FOREIGN KEY (`manufacturer`) REFERENCES `manufacturer_cards` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `FK_manufacturer_synonym_manufacturer_2` FOREIGN KEY (`manufacturer`) REFERENCES `manufacturer` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Дамп данных таблицы vehicle_website.manufacturer_synonym: ~31 rows (приблизительно)
@@ -358,36 +345,6 @@ INSERT INTO `manufacturer_synonym` (`manufacturer`, `name`) VALUES
 	(108, 'лось бв'),
 	(119, 'вне дорог');
 
--- Дамп структуры для таблица vehicle_website.part
-CREATE TABLE IF NOT EXISTS `part` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(200) NOT NULL DEFAULT '0',
-  `date` datetime NOT NULL,
-  `price` decimal(20,2) NOT NULL DEFAULT 0.00,
-  `userId` int(11) NOT NULL DEFAULT 0,
-  `condition` bit(1) NOT NULL,
-  `sellerType` int(11) NOT NULL,
-  `city` varchar(100) NOT NULL,
-  `brand` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_part_seller_type` (`sellerType`),
-  KEY `FK_part_user_personal_data` (`userId`),
-  CONSTRAINT `FK_part_seller_type` FOREIGN KEY (`sellerType`) REFERENCES `seller_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `FK_part_user_personal_data` FOREIGN KEY (`userId`) REFERENCES `user_personal_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Дамп данных таблицы vehicle_website.part: ~0 rows (приблизительно)
-
--- Дамп структуры для таблица vehicle_website.part_photo
-CREATE TABLE IF NOT EXISTS `part_photo` (
-  `part` int(11) NOT NULL,
-  `photo` int(11) NOT NULL,
-  PRIMARY KEY (`part`,`photo`),
-  CONSTRAINT `FK__part` FOREIGN KEY (`part`) REFERENCES `part` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Дамп данных таблицы vehicle_website.part_photo: ~0 rows (приблизительно)
-
 -- Дамп структуры для таблица vehicle_website.seller_type
 CREATE TABLE IF NOT EXISTS `seller_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -414,29 +371,30 @@ INSERT INTO `transmission` (`id`, `name`) VALUES
 	(2, 'МКПП'),
 	(3, 'Вариатор');
 
--- Дамп структуры для таблица vehicle_website.user_favorite_ad
-CREATE TABLE IF NOT EXISTS `user_favorite_ad` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ad` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_user_favorite_ad_advertisement` (`ad`),
-  CONSTRAINT `FK_user_favorite_ad_advertisement` FOREIGN KEY (`ad`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Дамп данных таблицы vehicle_website.user_favorite_ad: ~0 rows (приблизительно)
-
--- Дамп структуры для таблица vehicle_website.user_personal_data
-CREATE TABLE IF NOT EXISTS `user_personal_data` (
+-- Дамп структуры для таблица vehicle_website.user
+CREATE TABLE IF NOT EXISTS `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `phone` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп данных таблицы vehicle_website.user_personal_data: ~2 rows (приблизительно)
-INSERT INTO `user_personal_data` (`id`, `name`, `phone`) VALUES
+-- Дамп данных таблицы vehicle_website.user: ~1 rows (приблизительно)
+INSERT INTO `user` (`id`, `name`, `phone`) VALUES
 	(1, 'Админ', '79829817369'),
 	(3, 'Павел', '79129260707');
+
+-- Дамп структуры для таблица vehicle_website.user_favorite_advertisement
+CREATE TABLE IF NOT EXISTS `user_favorite_advertisement` (
+  `user` int(11) NOT NULL,
+  `advertisement` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`user`,`advertisement`),
+  KEY `FK_user_favorite_advertisement_advertisement` (`advertisement`),
+  CONSTRAINT `FK_user_favorite_advertisement_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_user_favorite_advertisement_user` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Дамп данных таблицы vehicle_website.user_favorite_advertisement: ~0 rows (приблизительно)
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
