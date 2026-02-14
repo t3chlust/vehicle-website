@@ -2871,45 +2871,7 @@
                         window.addEventListener('pageshow', () => {
                             setTimeout(enforceCleanFiltersState, 0);
                         });
-                        let startY = 0; let ptrDist = 0; const ptrThreshold = 80;
                         const ptrIndicator = document.getElementById('ptr-indicator');
-                        const wrapper = document.getElementById('main-wrapper');
-                        window.addEventListener('touchstart', (e) => {
-                            if (window.scrollY === 0) { startY = e.touches[0].clientY; }
-                        }, { passive: true });
-                        window.addEventListener('touchmove', (e) => {
-                            const y = e.touches[0].clientY;
-                            if (window.scrollY === 0 && y > startY) {
-                                ptrDist = y - startY;
-                                if (ptrDist > 0) {
-                                    wrapper.style.transition = 'none';
-                                    const elastic = Math.pow(ptrDist, 0.8);
-                                    wrapper.style.transform = `translateY(${elastic}px)`;
-                                    if (elastic > 60) ptrIndicator.style.opacity = '1';
-                                }
-                            }
-                        }, { passive: false });
-                        window.addEventListener('touchend', () => {
-                            if (ptrDist > 0) {
-                                wrapper.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
-                                if (ptrDist > ptrThreshold) {
-                                    ptrIndicator.style.opacity = '1';
-                                    wrapper.style.transform = 'translateY(50px)';
-                                    loadAds().then(() => {
-                                        setTimeout(() => {
-                                            ptrIndicator.style.opacity = '0';
-                                            wrapper.style.transform = 'translateY(0)';
-                                            setTimeout(() => wrapper.style.transform = '', 300);
-                                        }, 500);
-                                    });
-                                } else {
-                                    wrapper.style.transform = 'translateY(0)';
-                                    ptrIndicator.style.opacity = '0';
-                                    setTimeout(() => wrapper.style.transform = '', 300);
-                                }
-                                ptrDist = 0;
-                            }
-                        });
                         function toggleFilters() { const fw = document.getElementById('filters-wrapper'); if (fw.classList.contains('open')) { fw.classList.remove('open'); } else { fw.classList.add('open'); } }
                         function checkIsNew(ad) { if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true; if (ad.condition === 'new') return true; return false; }
                         function handlePhoneInput(input) { 
