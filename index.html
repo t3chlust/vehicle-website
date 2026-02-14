@@ -3337,6 +3337,16 @@
                             const c = document.getElementById('ads-container');
                             console.log('🔍 renderGrid: DOM элемент ads-container:', c);
                             
+                            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox
+                            if (c) {
+                                c.style.display = 'grid';
+                                c.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
+                                c.style.gap = '20px';
+                                c.style.marginTop = '30px';
+                                c.style.opacity = '1';
+                                console.log('✅ renderGrid: Установил inline styles для display:grid');
+                            }
+                            
                             // Смотрим на стили контейнера ПЕРЕД рендерингом
                             if (c) {
                                 const styles = window.getComputedStyle(c);
@@ -3421,6 +3431,14 @@
                         }
                         function renderPartsGrid(parts) {
                             const c = document.getElementById('parts-container');
+                            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox
+                            if (c) {
+                                c.style.display = 'grid';
+                                c.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
+                                c.style.gap = '20px';
+                                c.style.marginTop = '30px';
+                                c.style.opacity = '1';
+                            }
                             c.innerHTML = '';
                             c.classList.remove('loaded');
                             if (!parts || parts.length === 0) {
