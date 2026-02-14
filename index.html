@@ -3351,18 +3351,18 @@
                                 console.log('📊 renderGrid: tab-content-ads display:', tabStyles.display, 'class:', tabContentAds.className);
                             }
                             
-                            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox
+                            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox с !important
                             if (c) {
-                                c.style.display = 'grid';
-                                c.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
-                                c.style.gap = '20px';
-                                c.style.marginTop = '30px';
-                                c.style.opacity = '1';
-                                console.log('✅ renderGrid: Установил inline styles для display:grid');
+                                c.style.setProperty('display', 'grid', 'important');
+                                c.style.setProperty('gridTemplateColumns', 'repeat(auto-fill, minmax(260px, 1fr))', 'important');
+                                c.style.setProperty('gap', '20px', 'important');
+                                c.style.setProperty('marginTop', '30px', 'important');
+                                c.style.setProperty('opacity', '1', 'important');
+                                console.log('✅ renderGrid: Установил inline styles с !important для display:grid');
                                 
                                 // Убеждаемся что родители тоже видимы
-                                if (viewList) viewList.style.display = 'block';
-                                if (tabContentAds) tabContentAds.style.display = 'block';
+                                if (viewList) viewList.style.setProperty('display', 'block', 'important');
+                                if (tabContentAds) tabContentAds.style.setProperty('display', 'block', 'important');
                             }
                             
                             // Смотрим на стили контейнера ПЕРЕД рендерингом
@@ -3449,13 +3449,13 @@
                         }
                         function renderPartsGrid(parts) {
                             const c = document.getElementById('parts-container');
-                            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox
+                            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox с !important
                             if (c) {
-                                c.style.display = 'grid';
-                                c.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
-                                c.style.gap = '20px';
-                                c.style.marginTop = '30px';
-                                c.style.opacity = '1';
+                                c.style.setProperty('display', 'grid', 'important');
+                                c.style.setProperty('gridTemplateColumns', 'repeat(auto-fill, minmax(260px, 1fr))', 'important');
+                                c.style.setProperty('gap', '20px', 'important');
+                                c.style.setProperty('marginTop', '30px', 'important');
+                                c.style.setProperty('opacity', '1', 'important');
                             }
                             c.innerHTML = '';
                             c.classList.remove('loaded');
