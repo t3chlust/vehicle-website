@@ -2946,6 +2946,38 @@
                                 renderModerationGrid(getPendingModerationItems());
                             }
                         }
+
+                        async function fetchJsonNoCacheWithRetry(endpoint, retryOnEmptyArray = false) {
+                            let lastError = null;
+
+                            for (let attempt = 0; attempt < 2; attempt++) {
+                                try {
+                                    const separator = endpoint.includes('?') ? '&' : '?';
+                                    const cacheBust = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                                    const url = `${endpoint}${separator}_=${cacheBust}`;
+                                    const response = await fetch(url, {
+                                        cache: 'no-store',
+                                        headers: {
+                                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                            'Pragma': 'no-cache',
+                                            'Expires': '0'
+                                        }
+                                    });
+
+                                    const json = await response.json();
+
+                                    if (retryOnEmptyArray && Array.isArray(json) && json.length === 0 && attempt === 0) {
+                                        continue;
+                                    }
+
+                                    return json;
+                                } catch (e) {
+                                    lastError = e;
+                                }
+                            }
+
+                            throw lastError || new Error('Не удалось получить данные');
+                        }
                         function buildAdSearchIndex(ads) {
                             const approved = ads || [];
                             adSearchIndex = approved
@@ -3817,8 +3849,7 @@
                         });
                         async function loadAds() {
                             try {
-                                const r = await fetch('/api/ads?t=' + new Date().getTime());
-                                const raw = await r.json();
+                                const raw = await fetchJsonNoCacheWithRetry('/api/ads', true);
 
                                 // Преобразуем записи: если есть Brand и Model, комбинируем их в title
                                 allAds = (Array.isArray(raw) ? raw : []).map(ad => {
@@ -3870,8 +3901,7 @@
                         }
                         async function loadParts() {
                             try {
-                                const r = await fetch('/api/parts?t=' + new Date().getTime());
-                                const raw = await r.json();
+                                const raw = await fetchJsonNoCacheWithRetry('/api/parts', true);
                                 allParts = Array.isArray(raw) ? raw : [];
                                 const displayParts = allParts;
                                 renderPartsGrid(displayParts);
