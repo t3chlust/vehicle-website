@@ -318,12 +318,9 @@ app.post('/api/users/ensure', async (req, res) => {
 // API Endpoints для работы с объявлениями
 // ========================
 
-// GET /api/ads - получить все объявления с фотографиями
-app.get('/api/ads', async (req, res) => {
+async function fetchAdsPayload() {
+  const connection = await pool.getConnection();
   try {
-    const connection = await pool.getConnection();
-    
-    // Получаем все объявления (техника)
     const [advertisements] = await connection.query(`
       SELECT 
         a.id, a.brand, a.name, a.type, a.userId, a.price, a.date, a.city, 
@@ -349,13 +346,12 @@ app.get('/api/ads', async (req, res) => {
       ORDER BY a.date DESC
     `);
 
-    // Получаем фотографии для каждого объявления
     const ads = await Promise.all(advertisements.map(async (ad) => {
       const [photos] = await connection.query(
         'SELECT photo FROM advertisement_photo WHERE advertisement = ?',
         [ad.id]
       );
-      
+
       const title = [ad.brand, ad.name].filter(Boolean).join(' ').trim();
       const isNew = bitToBool(ad.condition);
       const tenderFlag = bitToBool(ad.tender);
@@ -402,10 +398,76 @@ app.get('/api/ads', async (req, res) => {
       };
     }));
 
+    return ads;
+  } finally {
     connection.release();
+  }
+}
+
+async function fetchPartsPayload() {
+  const connection = await pool.getConnection();
+  try {
+    const [parts] = await connection.query(`
+      SELECT
+        a.id, a.name AS partName, a.brand, a.date, a.price, a.userId, 
+        a.\`condition\`, a.sellerType, st.name AS sellerTypeName, a.city,
+        u.name AS userName, u.phone AS userPhone
+      FROM advertisement a
+      LEFT JOIN seller_type st ON a.sellerType = st.id
+      LEFT JOIN user u ON a.userId = u.id
+      WHERE a.type = 4
+      ORDER BY a.date DESC
+    `);
+
+    const payload = await Promise.all(parts.map(async (part) => {
+      const [photos] = await connection.query(
+        'SELECT photo FROM advertisement_photo WHERE advertisement = ?',
+        [part.id]
+      );
+
+      return {
+        rowIndex: part.id,
+        userId: part.userId,
+        title: part.partName || 'Запчасть',
+        partName: part.partName || '',
+        brand: part.brand || '',
+        date: part.date,
+        price: part.price || 0,
+        city: part.city || '',
+        condition: bitToBool(part.condition) ? 'new' : 'used',
+        confirmed: true,
+        sellerType: part.sellerTypeName || '',
+        sellerTypeId: part.sellerType,
+        name: part.userName || '',
+        phone: formatPhoneForDisplay(part.userPhone),
+        photos: photos.map((p) => p.photo).join(',')
+      };
+    }));
+
+    return payload;
+  } finally {
+    connection.release();
+  }
+}
+
+// GET /api/ads - получить все объявления с фотографиями
+app.get('/api/ads', async (req, res) => {
+  try {
+    const ads = await fetchAdsPayload();
     res.json(ads);
   } catch (error) {
     console.error('❌ Ошибка при получении объявлений:', error);
+    res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
+  }
+});
+
+// POST /api/ads/query - получить все объявления (fallback для проблемных GET-кэшей)
+app.post('/api/ads/query', async (req, res) => {
+  try {
+    const ads = await fetchAdsPayload();
+    res.json(ads);
+  } catch (error) {
+    console.error('❌ Ошибка при POST получении объявлений:', error);
     res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
   }
 });
@@ -707,50 +769,21 @@ app.post('/api/ads/delete', async (req, res) => {
 // GET /api/parts - получить все запчасти с фотографиями
 app.get('/api/parts', async (req, res) => {
   try {
-    const connection = await pool.getConnection();
-
-    // Получаем запчасти (type = 4)
-    const [parts] = await connection.query(`
-      SELECT
-        a.id, a.name AS partName, a.brand, a.date, a.price, a.userId, 
-        a.\`condition\`, a.sellerType, st.name AS sellerTypeName, a.city,
-        u.name AS userName, u.phone AS userPhone
-      FROM advertisement a
-      LEFT JOIN seller_type st ON a.sellerType = st.id
-      LEFT JOIN user u ON a.userId = u.id
-      WHERE a.type = 4
-      ORDER BY a.date DESC
-    `);
-
-    const payload = await Promise.all(parts.map(async (part) => {
-      const [photos] = await connection.query(
-        'SELECT photo FROM advertisement_photo WHERE advertisement = ?',
-        [part.id]
-      );
-
-      return {
-        rowIndex: part.id,
-        userId: part.userId,
-        title: part.partName || 'Запчасть',
-        partName: part.partName || '',
-        brand: part.brand || '',
-        date: part.date,
-        price: part.price || 0,
-        city: part.city || '',
-        condition: bitToBool(part.condition) ? 'new' : 'used',
-        confirmed: true,
-        sellerType: part.sellerTypeName || '',
-        sellerTypeId: part.sellerType,
-        name: part.userName || '',
-        phone: formatPhoneForDisplay(part.userPhone),
-        photos: photos.map((p) => p.photo).join(',')
-      };
-    }));
-
-    connection.release();
+    const payload = await fetchPartsPayload();
     res.json(payload);
   } catch (error) {
     console.error('❌ Ошибка при получении запчастей:', error);
+    res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
+  }
+});
+
+// POST /api/parts/query - получить все запчасти (fallback для проблемных GET-кэшей)
+app.post('/api/parts/query', async (req, res) => {
+  try {
+    const payload = await fetchPartsPayload();
+    res.json(payload);
+  } catch (error) {
+    console.error('❌ Ошибка при POST получении запчастей:', error);
     res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
   }
 });

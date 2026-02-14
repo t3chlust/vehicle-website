@@ -3040,6 +3040,35 @@
                                 console.error(`XHR fallback failed for ${endpoint}:`, e);
                             }
 
+                            try {
+                                const queryEndpoint = endpoint === '/api/ads'
+                                    ? '/api/ads/query'
+                                    : endpoint === '/api/parts'
+                                        ? '/api/parts/query'
+                                        : null;
+
+                                if (queryEndpoint) {
+                                    const postResponse = await fetch(queryEndpoint, {
+                                        method: 'POST',
+                                        cache: 'no-store',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                            'Pragma': 'no-cache',
+                                            'Expires': '0'
+                                        },
+                                        body: JSON.stringify({ _ts: Date.now() })
+                                    });
+
+                                    const postJson = await postResponse.json();
+                                    if (Array.isArray(postJson)) {
+                                        return postJson;
+                                    }
+                                }
+                            } catch (e) {
+                                console.error(`POST fallback failed for ${endpoint}:`, e);
+                            }
+
                             return Array.isArray(primary) ? primary : [];
                         }
                         function buildAdSearchIndex(ads) {
