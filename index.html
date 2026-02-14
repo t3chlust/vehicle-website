@@ -457,6 +457,14 @@
                                 background: #0052a3;
                             }
 
+                            /* Make profile button black specifically */
+                            #btn-profile {
+                                background: #222 !important;
+                                color: #fff !important;
+                                border-color: transparent !important;
+                            }
+                            #btn-profile:hover { background: #000 !important; }
+
                             .btn-red {
                                 background: #222;
                                 color: #fff;
@@ -611,7 +619,7 @@
                             .search-container::before {
                                 content: '';
                                 position: absolute;
-                                left: 14px;
+                                right: 14px;
                                 top: 50%;
                                 width: 18px;
                                 height: 18px;
@@ -626,7 +634,7 @@
                             .search-container .filter-input {
                                 height: 46px;
                                 margin-bottom: 0;
-                                padding: 0 14px 0 42px;
+                                padding: 0 42px 0 14px;
                                 border: 1px solid #e2d8ee;
                                 border-radius: 12px;
                                 background: linear-gradient(180deg, #ffffff 0%, #fbf9fe 100%);
