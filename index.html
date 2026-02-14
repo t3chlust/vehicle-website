@@ -485,9 +485,11 @@
                                 flex-wrap: wrap;
                             }
 
-                            .site-header { display:flex; align-items:center; gap:15px; flex-wrap:nowrap; }
-                            .site-header .header-title { flex: 1 1 0; min-width: 0; margin-right: 12px; }
-                            .site-header .header-actions { flex: 0 0 auto; }
+                            .header-actions {
+                                display: flex;
+                                gap: 10px;
+                                flex-wrap: wrap;
+                            }
 
                             .header-title {
                                 margin-right: 20px;
@@ -517,7 +519,7 @@
                                     white-space: nowrap;
                                 }
 
-                                .header-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1 1 0; min-width: 0; }
+                                .header-title { margin-right: 20px; }
 
                                 .header-actions .btn {
                                     padding: 0 12px;
@@ -534,12 +536,7 @@
                                     .header-title h2 { font-size:16px; }
                                 }
 
-                                /* Allow header to wrap on very small screens so title keeps visible */
-                                @media (max-width: 520px) {
-                                    .site-header { flex-wrap: wrap; align-items: center; }
-                                    .site-header .header-actions { width: 100%; display:flex; justify-content: flex-end; gap:8px; margin-top:8px; }
-                                    .site-header .header-title { order: 0; }
-                                }
+                                
 
                                 .tab-link {
                                     padding: 8px 12px;
@@ -1713,12 +1710,12 @@
                             <div class="spinner" style="width:20px;height:20px;"></div>
                         </div>
                         <div class="tm-wrapper fade-in" id="main-wrapper">
-                            <div class="site-header"
-                                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:20px; margin-bottom:20px; flex-wrap: nowrap; gap: 15px;">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:20px; margin-bottom:20px; flex-wrap: wrap; gap: 15px;">
                                 <div class="header-title">
                                     <h2 style="margin:0; font-size: 22px;">КупитьВездеход.рф</h2>
                                 </div>
-                                <div class="header-actions"> <button id="btn-login" class="btn btn-purple"
+                                <div class="header-actions"> <button id="btn-login" class="btn btn-black"
                                     onclick="openAuthModal()">Войти</button> <button id="btn-create-ad"
                                     class="btn btn-purple hidden" onclick="openCreateMode()">Подать объявление</button>
                                     <button id="btn-profile"
@@ -1892,7 +1889,7 @@
                                             <circle cx="12" cy="7" r="4"></circle>
                                         </svg>
                                         <h3 style="color:#666; margin-bottom:15px;">Войдите, чтобы увидеть личный кабинет</h3>
-                                        <button class="btn btn-purple" onclick="openAuthModal()">Войти</button>
+                                        <button class="btn btn-primary" onclick="openAuthModal()">Войти</button>
                                     </div>
                                     <div id="profile-content" style="display:block;">
                                         <!-- Информация о пользователе -->
