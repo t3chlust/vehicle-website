@@ -4490,8 +4490,8 @@
                         function updateAdminCount() {
                             const adminTab = document.getElementById('admin-tab-link');
                             if (!adminTab || !isAdmin) return;
-                            // Модерации больше нет
-                            adminTab.innerText = `Админка`;
+                            const pendingCount = getPendingModerationItems().length;
+                            adminTab.innerText = `Админка (${pendingCount})`;
                         }
                         function renderModerationGrid(items) {
                             const container = document.getElementById('moderation-grid');
