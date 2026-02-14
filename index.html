@@ -2551,16 +2551,30 @@
                         }
 
                         function setupFilterInteractionTracking() {
-                            const markAsAdjusted = (event) => {
-                                const target = event.target;
-                                if (!target || !target.id) return;
-                                if (target.id.startsWith('f-')) {
-                                    hasUserAdjustedFilters = true;
-                                }
+                            const markAsAdjusted = () => {
+                                hasUserAdjustedFilters = true;
                             };
 
-                            document.addEventListener('input', markAsAdjusted, true);
-                            document.addEventListener('change', markAsAdjusted, true);
+                            document.addEventListener('pointerdown', (event) => {
+                                const target = event.target;
+                                if (target && target.closest && target.closest('#view-filters')) {
+                                    markAsAdjusted();
+                                }
+                            }, true);
+
+                            document.addEventListener('touchstart', (event) => {
+                                const target = event.target;
+                                if (target && target.closest && target.closest('#view-filters')) {
+                                    markAsAdjusted();
+                                }
+                            }, { capture: true, passive: true });
+
+                            document.addEventListener('keydown', (event) => {
+                                const target = event.target;
+                                if (target && target.closest && target.closest('#view-filters')) {
+                                    markAsAdjusted();
+                                }
+                            }, true);
                         }
 
                         function goToMainFromProfile() {
