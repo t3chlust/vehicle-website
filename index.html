@@ -1757,7 +1757,7 @@
                                     <div class="header-login"><button id="btn-login" class="btn btn-black" onclick="openAuthModal()">Войти</button></div>
                                 </div>
                                 <div class="header-bottom">
-                                    <button id="btn-create-ad" class="btn btn-purple hidden" onclick="openCreateMode()">Подать объявление</button>
+                                    <button id="btn-create-ad" class="btn btn-purple" onclick="openCreateMode()">Подать объявление</button>
                                     <button id="btn-profile" class="btn btn-blue hidden" onclick="openProfile()">Личный кабинет</button>
                                 </div>
                             </div>
@@ -2699,7 +2699,7 @@
                                 renderPartsGrid(allParts);
                             }
 
-                            // Кнопка по умолчанию скрыта, появляется только в личном кабинете
+                            // Кнопка по умолчанию видна, скрывается только в личном кабинете
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) {
                                 if (tabName === 'profile') {
