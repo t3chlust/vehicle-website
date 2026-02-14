@@ -2535,8 +2535,18 @@
 
                             Object.entries(defaults).forEach(([id, value]) => {
                                 const el = document.getElementById(id);
-                                if (el) el.value = value;
+                                if (el) {
+                                    el.value = value;
+                                    el.setAttribute('autocomplete', 'off');
+                                }
                             });
+                        }
+
+                        function enforceCleanFiltersState() {
+                            resetAdsFiltersOnStartup();
+                            if (Array.isArray(allAds) && allAds.length > 0 && typeof applyFilters === 'function') {
+                                applyFilters();
+                            }
                         }
 
                         function goToMainFromProfile() {
@@ -2679,13 +2689,22 @@
                                 allRecords.style.opacity = '1';
                                 allRecords.classList.add('t-records_visible');
                             }
-                            resetAdsFiltersOnStartup();
+                            enforceCleanFiltersState();
                             tryAutoLogin();
                             loadFilters()
-                                .then(() => resetAdsFiltersOnStartup())
+                                .then(() => enforceCleanFiltersState())
                                 .catch((e) => console.error('Ошибка загрузки фильтров:', e));
                             loadAds();
                             loadParts();
+
+                            // Firefox может восстанавливать значения полей с задержкой (особенно на проде)
+                            setTimeout(enforceCleanFiltersState, 100);
+                            setTimeout(enforceCleanFiltersState, 600);
+                            setTimeout(enforceCleanFiltersState, 1500);
+                        });
+
+                        window.addEventListener('pageshow', () => {
+                            setTimeout(enforceCleanFiltersState, 0);
                         });
                         let startY = 0; let ptrDist = 0; const ptrThreshold = 80;
                         const ptrIndicator = document.getElementById('ptr-indicator');
