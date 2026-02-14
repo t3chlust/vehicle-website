@@ -19,6 +19,7 @@
 </head>
 
 <body class="t-body" style="margin:0;"> <!--allrecords-->
+    <div id="debug-panel" style="position: fixed; top: 0; left: 0; right: 0; background: #ffc107; color: black; padding: 8px; z-index: 9999; font-family: monospace; font-size: 11px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
     <div id="allrecords" data-tilda-export="yes" class="t-records" data-hook="blocks-collection-content-node"
         data-tilda-project-id="19128256" data-tilda-page-id="102478216"
         data-tilda-formskey="9584bca1a247ffc811b18d5819128256" data-tilda-cookie="no" data-tilda-lazy="yes"
@@ -2446,6 +2447,12 @@
                         let currentItemType = 'ad';
                         let currentPhotoIndex = 0; let currentPhotos = [];
                         let userFavorites = []; // Массив ID избранных объявлений
+                        
+                        function updateDebugPanel(source, rawCount, filteredCount, userAdjusted) {
+                            const panel = document.getElementById('debug-panel');
+                            if (!panel) return;
+                            panel.innerHTML = `📊 Источник: ${source} | Получено: ${rawCount} | Отображено: ${filteredCount} | Фильтр: ${userAdjusted}`;
+                        }
 
                         function rebuildSelect(selectId, options, getValue, getLabel) {
                             const select = document.getElementById(selectId);
@@ -2955,6 +2962,7 @@
                             }
 
                             renderGrid(filtered);
+                            updateDebugPanel('OK (ApplyFilters)', allAds.length, filtered.length, hasUserAdjustedFilters);
 
                             if (isAdmin) {
                                 renderModerationGrid(getPendingModerationItems());
@@ -3942,7 +3950,9 @@
                         });
                         async function loadAds() {
                             try {
+                                updateDebugPanel('Загружаю...', '...', '...', hasUserAdjustedFilters);
                                 const raw = await fetchDatasetWithFallback('/api/listings');
+                                updateDebugPanel('Получено', raw.length || 0, '...', hasUserAdjustedFilters);
 
                                 // Преобразуем записи: если есть Brand и Model, комбинируем их в title
                                 allAds = (Array.isArray(raw) ? raw : []).map(ad => {
@@ -3981,7 +3991,8 @@
 
                                 ptrIndicator.style.opacity = '0';
                             } catch (e) {
-                                console.log(e)
+                                console.log(e);
+                                updateDebugPanel('ОШИБКА', 'X', 'X', 'X');
                                 const adsContainer = document.getElementById('ads-container');
                                 if (adsContainer) {
                                     adsContainer.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Не удалось загрузить объявления. Обновите страницу.</div>';
@@ -3994,8 +4005,10 @@
                         }
                         async function loadParts() {
                             try {
+                                updateDebugPanel('Загружаю запчасти...', '...', '...', hasUserAdjustedFilters);
                                 const raw = await fetchDatasetWithFallback('/api/spares');
                                 allParts = Array.isArray(raw) ? raw : [];
+                                updateDebugPanel('Запчасти OK', allParts.length, allParts.length, hasUserAdjustedFilters);
                                 const displayParts = allParts;
                                 renderPartsGrid(displayParts);
                                 buildPartSearchIndex(displayParts);
@@ -4006,6 +4019,7 @@
                                 }
                             } catch (e) {
                                 console.log(e);
+                                updateDebugPanel('Запчасти ОШИБКА', 'X', 'X', 'X');
                                 const partsContainer = document.getElementById('parts-container');
                                 if (partsContainer) {
                                     partsContainer.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Не удалось загрузить запчасти. Обновите страницу.</div>';
