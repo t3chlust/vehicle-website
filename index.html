@@ -3667,7 +3667,9 @@
                                 sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
                             }
 
-                            sp.push({ l: "Документы", v: ad.docs || 'Без документов' });
+                            if (ad.techType !== 'Прицеп') {
+                                sp.push({ l: "Документы", v: ad.docs || 'Без документов' });
+                            }
                             sp.push({ l: "Цвет", v: ad.color });
                             document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
                             const acts = document.getElementById('modal-owner-actions'); const norm = p => String(p).replace(/[^0-9]/g, '');
