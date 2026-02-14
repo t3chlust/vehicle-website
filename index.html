@@ -380,7 +380,7 @@
                                 max-width: 1440px;
                                 margin: 40px auto;
                                 background: #fff;
-                                padding: 20px;
+                                padding: 14px;
                                 border-radius: 16px;
                                 box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
                                 color: #222;
@@ -390,10 +390,18 @@
                             }
 
                             /* Keep the main title and login button on the same line for normal screens */
-                            #main-header { flex-wrap: nowrap; }
-                            #main-header .header-title { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-                            #main-header .header-actions { flex: 0 0 auto; display:flex; gap:10px; }
-                            #main-header .header-actions .btn { flex: 0 0 auto; }
+                            #main-header { flex-wrap: nowrap; align-items: center; }
+                            #main-header .header-title { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
+                            #main-header .header-title h2 { margin: 0; font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                            #main-header .header-actions { flex: 0 0 auto; display:flex; gap:8px; align-items:center; }
+                            #main-header .header-actions .btn { flex: 0 0 auto; height: 34px; line-height: 34px; padding: 0 10px; white-space: nowrap; }
+
+                            /* Make secondary buttons hide on very small screens to avoid crowding */
+                            @media (max-width: 420px) {
+                                #main-header { flex-wrap: wrap; }
+                                #main-header .header-actions { width: 100%; justify-content: flex-end; margin-top:8px; }
+                                #btn-create-ad, #btn-profile { display: none !important; }
+                            }
 
                             @media (max-width: 420px) {
                                 #main-header { flex-wrap: wrap; }
