@@ -469,7 +469,24 @@
             }
 
             .ad-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .ad-card-img {
+                height: 140px;
+            }
+
+            .ad-card-title {
+                font-size: 14px;
+            }
+
+            .ad-card-price {
+                font-size: 15px;
+            }
+
+            .ad-card-info {
+                font-size: 11px;
             }
 
             .modal-window {
