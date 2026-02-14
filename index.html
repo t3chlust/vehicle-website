@@ -4924,7 +4924,15 @@
                                 if (result.status !== 'success') {
                                     throw new Error(result.message || 'Ошибка');
                                 }
-                                await loadAds();
+                                const idx = Array.isArray(allAds)
+                                    ? allAds.findIndex(ad => Number(ad.rowIndex) === Number(rowIndex))
+                                    : -1;
+                                if (idx >= 0) {
+                                    allAds[idx].verified = 1;
+                                }
+                                if (typeof applyFilters === 'function') {
+                                    applyFilters();
+                                }
                                 if (isAdmin) {
                                     renderModerationGrid(getPendingModerationItems());
                                     updateAdminCount();
@@ -4948,7 +4956,12 @@
                                 if (result.status !== 'success') {
                                     throw new Error(result.message || 'Ошибка');
                                 }
-                                await loadAds();
+                                if (Array.isArray(allAds)) {
+                                    allAds = allAds.filter(ad => Number(ad.rowIndex) !== Number(rowIndex));
+                                }
+                                if (typeof applyFilters === 'function') {
+                                    applyFilters();
+                                }
                                 if (isAdmin) {
                                     renderModerationGrid(getPendingModerationItems());
                                     updateAdminCount();
