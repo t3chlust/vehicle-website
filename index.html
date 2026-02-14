@@ -2699,17 +2699,8 @@
                                 renderPartsGrid(allParts);
                             }
 
-                            // Control visibility of create button: only available when viewing profile and logged in
-                            try {
-                                const btnCreate = document.getElementById('btn-create-ad');
-                                if (btnCreate) {
-                                    if (tabName === 'profile' && typeof currentUser !== 'undefined' && currentUser) {
-                                        btnCreate.classList.remove('hidden');
-                                    } else {
-                                        btnCreate.classList.add('hidden');
-                                    }
-                                }
-                            } catch (e) { }
+                            // Create button visibility is controlled by updateAuthUI (shown when user logged in)
+                            // No need to hide it when switching tabs
                         }
                         function formatPriceInput(input) {
                             let val = input.value.replace(/\s/g, '');
@@ -3876,7 +3867,8 @@
                                 const isFormOpen = formView && !formView.classList.contains('hidden');
                                 if (tabs && tabs.style.display !== 'none' && !isModalOpen && !isFormOpen) {
                                     if (btnProfile) btnProfile.classList.remove('hidden');
-                                    // btnCreate visibility is handled by showTab/openProfile logic (only in profile)
+                                    // Show create button when user is logged in
+                                    if (btnCreate) btnCreate.classList.remove('hidden');
                                 } else {
                                     if (btnCreate) btnCreate.classList.add('hidden');
                                     if (btnProfile) btnProfile.classList.add('hidden');
