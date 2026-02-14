@@ -314,7 +314,7 @@ async function fetchAdsPayload() {
   try {
     const [advertisements] = await connection.query(`
       SELECT 
-        a.id, a.brand, a.name, a.type, a.userId, a.price, a.date, a.city, a.verified,
+        a.id, a.brand, a.name, a.type, a.userId, a.price, a.date, a.city, a.verified, a.description,
         a.\`condition\`, a.sellerType, st.name AS sellerTypeName,
         at.tender, at.chassis, c.name AS chassisName, at.color, at.mileage, 
         at.engine, at.power, at.transmission, t.name AS transmissionName, 
@@ -382,7 +382,7 @@ async function fetchAdsPayload() {
         wheelFormula: ad.chassisName || '',
         title: title,
         brand: ad.brand || '',
-        desc: '',
+        desc: ad.description || '',
         region: '',
         docs: ad.documentName || 'Без документов',
         capacity: ad.capacity || 0,
@@ -561,8 +561,8 @@ app.post('/api/ads', async (req, res) => {
         // Вставляем новое объявление в advertisement
         const [result] = await connection.query(
           `INSERT INTO advertisement 
-            (brand, name, type, userId, price, date, city, \`condition\`, sellerType, verified)
-           VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?)`,
+            (brand, name, type, userId, price, date, city, \`condition\`, sellerType, verified, description)
+           VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)`,
           [
             brand || null, 
             model || '', 
@@ -572,7 +572,8 @@ app.post('/api/ads', async (req, res) => {
             city, 
             conditionFlag, 
             resolvedSellerTypeId,
-            0
+            0,
+            desc || null
           ]
         );
 
@@ -615,7 +616,7 @@ app.post('/api/ads', async (req, res) => {
         await connection.query(
           `UPDATE advertisement SET 
             brand = ?, name = ?, type = ?, userId = ?, price = ?, city = ?, 
-            \`condition\` = ?, sellerType = ?
+            \`condition\` = ?, sellerType = ?, description = ?
            WHERE id = ?`,
           [
             brand || null, 
@@ -625,7 +626,8 @@ app.post('/api/ads', async (req, res) => {
             price || 0, 
             city, 
             conditionFlag, 
-            resolvedSellerTypeId, 
+            resolvedSellerTypeId,
+            desc || null,
             rowIndex
           ]
         );

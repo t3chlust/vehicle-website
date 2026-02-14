@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS `advertisement` (
   `city` varchar(100) NOT NULL,
   `condition` bit(1) NOT NULL,
   `sellerType` int(11) NOT NULL,
-  `verified` bit(1) NOT NULL,
+  `verified` tinyint(1) NOT NULL DEFAULT 0,
+  `description` varchar(10000) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_advertisement_base_user_personal_data` (`userId`),
   KEY `FK_advertisement_seller_type` (`sellerType`),
@@ -39,14 +40,17 @@ CREATE TABLE IF NOT EXISTS `advertisement` (
   CONSTRAINT `FK_advertisement_advertisement_type` FOREIGN KEY (`type`) REFERENCES `advertisement_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_base_user_personal_data` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_seller_type` FOREIGN KEY (`sellerType`) REFERENCES `seller_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement: ~4 rows (приблизительно)
-INSERT INTO `advertisement` (`id`, `brand`, `name`, `type`, `userId`, `price`, `date`, `city`, `condition`, `sellerType`, `verified`) VALUES
-	(3, 'Тингер', 'фыва', 1, 1, 1000000.00, '2026-02-13 10:12:31', 'Ишим', b'1', 1, b'0'),
-	(4, 'Тингер ', 'ТФ4', 1, 1, 2000000.00, '2026-02-14 17:48:18', 'Ишим ', b'0', 2, b'0'),
-	(5, 'Яр ', 'Профи ', 3, 1, 19199.00, '2026-02-14 17:55:17', 'Ишим ', b'0', 1, b'0'),
-	(6, 'Туда ', 'Сюда ', 1, 1, 1000000.00, '2026-02-14 18:01:20', 'Суп Чупино', b'1', 2, b'0');
+-- Дамп данных таблицы vehicle_website.advertisement: ~7 rows (приблизительно)
+INSERT INTO `advertisement` (`id`, `brand`, `name`, `type`, `userId`, `price`, `date`, `city`, `condition`, `sellerType`, `verified`, `description`) VALUES
+	(11, 'Тундра ', 'Восток ', 1, 1, 3000000.00, '2026-02-14 19:34:46', 'Тюмень', b'1', 1, 0, NULL),
+	(12, 'Яр', 'Профи', 3, 1, 300000.00, '2026-02-14 19:36:09', 'Красноярск', b'1', 1, 0, NULL),
+	(13, 'Тингер', 'Трек', 1, 1, 2500000.00, '2026-02-14 19:38:31', 'Череповец', b'1', 2, 1, NULL),
+	(14, 'Севертрак', 'Егерь', 1, 1, 5000000.00, '2026-02-14 19:39:56', 'Красноярск', b'1', 1, 1, NULL),
+	(15, 'Тундра', 'Ободрыши ОИ-25', 4, 1, 250000.00, '2026-02-14 19:40:45', 'Тюмень', b'1', 1, 1, NULL),
+	(16, 'Севертрак', 'Шины Севертрак', 4, 1, 500000.00, '2026-02-14 19:42:11', 'Красноярск', b'1', 1, 1, NULL),
+	(18, 'Тингер', 'Армор', 1, 1, 3000000.00, '2026-02-14 19:54:41', 'Череповец', b'1', 1, 0, NULL);
 
 -- Дамп структуры для таблица vehicle_website.advertisement_photo
 CREATE TABLE IF NOT EXISTS `advertisement_photo` (
@@ -56,13 +60,19 @@ CREATE TABLE IF NOT EXISTS `advertisement_photo` (
   CONSTRAINT `FK_advertisement_photo_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement_photo: ~4 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement_photo: ~11 rows (приблизительно)
 INSERT INTO `advertisement_photo` (`advertisement`, `photo`) VALUES
-	(3, 'https://res.cloudinary.com/duystfz2v/image/upload/v1770977698/qfhmkkr4czdcxvieufjc.png'),
-	(4, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771091296/dnxu0orphvgbpfvbmkbb.jpg'),
-	(4, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771091297/bypwgcmcorslhfojakb5.jpg'),
-	(5, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771091716/rqzg4xdsracbeseorbys.png'),
-	(6, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771092078/vc7jvsmr0hdafthpqndb.png');
+	(11, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097683/vu6mslttcbjg8pm5w1xz.jpg'),
+	(11, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097684/vxp4vnjdl1bjlyu9zwgt.jpg'),
+	(12, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097768/ypoofxf2vkyxghsyyzge.jpg'),
+	(12, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097769/cw0ilu2vh7yzsfbctlrf.webp'),
+	(13, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097908/jgb0ru80iudzsn8ojbnm.webp'),
+	(13, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097910/hmeonhoaeu1cpvochwfi.png'),
+	(14, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097995/qw1pzxo0xe6u6uqibaoa.jpg'),
+	(15, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771098044/ywrbozui9tkobmts9yzg.png'),
+	(16, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771098130/mc1do0kq8gxxy5ny5m9j.png'),
+	(18, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771098876/mknzr17o07bgpponioit.png'),
+	(18, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771098878/zyay9zt2fq66j0kil6qq.png');
 
 -- Дамп структуры для таблица vehicle_website.advertisement_technic
 CREATE TABLE IF NOT EXISTS `advertisement_technic` (
@@ -93,12 +103,15 @@ CREATE TABLE IF NOT EXISTS `advertisement_technic` (
   CONSTRAINT `FK_advertisement_wheel` FOREIGN KEY (`chassis`) REFERENCES `chassis` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement_technic: ~3 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement_technic: ~7 rows (приблизительно)
 INSERT INTO `advertisement_technic` (`advertisement`, `tender`, `chassis`, `color`, `mileage`, `engine`, `power`, `transmission`, `fuel`, `wheelSize`, `amphibious`, `document`, `constructionType`, `capacity`) VALUES
-	(3, b'0', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 1, NULL),
-	(4, b'1', 1, 'Оранжевый', 513, 'Ваз 21113', 90, 2, 1, '1400x650', b'1', 1, 2, NULL),
 	(5, b'0', 1, 'Черный', 0, '', 0, 1, 1, '', b'0', 3, 1, 1700),
-	(6, b'1', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 3, NULL);
+	(6, b'1', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 3, NULL),
+	(11, b'0', 1, 'Зеленый', 0, 'Тойота 1нз фе', 110, 1, 1, '1300x500', b'1', 1, 1, NULL),
+	(12, b'0', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 1, 1800),
+	(13, b'1', 2, 'Желтый', 0, 'Черри 0,7', 52, 2, 1, '', b'1', 1, 1, NULL),
+	(14, b'0', 1, 'Зеленый', 0, 'Тойота 1нз фе', 110, 1, 1, '1600x650', b'1', 1, 1, NULL),
+	(18, b'1', 1, 'Красный', 0, 'Черри 0,7', 52, 2, 1, '400x300', b'1', 1, 3, NULL);
 
 -- Дамп структуры для таблица vehicle_website.advertisement_type
 CREATE TABLE IF NOT EXISTS `advertisement_type` (
@@ -410,8 +423,7 @@ CREATE TABLE IF NOT EXISTS `user_favorite_advertisement` (
 
 -- Дамп данных таблицы vehicle_website.user_favorite_advertisement: ~1 rows (приблизительно)
 INSERT INTO `user_favorite_advertisement` (`user`, `advertisement`) VALUES
-	(1, 4),
-	(3, 5);
+	(1, 14);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
