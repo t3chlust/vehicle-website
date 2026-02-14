@@ -512,6 +512,20 @@
                                 fill: none;
                             }
 
+                            .modal-favorite {
+                                cursor: pointer;
+                                padding: 8px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex-shrink: 0;
+                            }
+
+                            .modal-favorite svg {
+                                width: 24px;
+                                height: 24px;
+                            }
+
                             .header-actions {
                                 display: flex;
                                 gap: 10px;
@@ -895,21 +909,21 @@
                                 right: 10px;
                                 z-index: 10;
                                 cursor: pointer;
-                                background: rgba(255, 255, 255, 0.9);
-                                border-radius: 50%;
-                                width: 40px;
-                                height: 40px;
+                                background: transparent;
+                                border-radius: 0;
+                                width: 32px;
+                                height: 32px;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
                                 transition: all 0.3s ease;
-                                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                                box-shadow: none;
                             }
 
                             .favorite-heart:hover {
                                 transform: scale(1.1);
-                                background: rgba(255, 255, 255, 1);
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                                background: transparent;
+                                box-shadow: none;
                             }
 
                             .favorite-heart.active svg {
@@ -1672,6 +1686,7 @@
                                 border: 1px solid #eee;
                                 border-radius: 10px;
                                 background: #fafafa;
+                                flex-wrap: wrap;
                             }
 
                             .moderation-card-img {
@@ -1700,6 +1715,28 @@
                                 display: flex;
                                 flex-direction: column;
                                 gap: 8px;
+                            }
+
+                            @media (max-width: 600px) {
+                                .moderation-card {
+                                    flex-direction: column;
+                                    align-items: flex-start;
+                                }
+
+                                .moderation-card-img {
+                                    width: 100%;
+                                    height: auto;
+                                }
+
+                                .moderation-card-actions {
+                                    width: 100%;
+                                    flex-direction: row;
+                                    flex-wrap: wrap;
+                                }
+
+                                .moderation-card-actions .btn {
+                                    flex: 1 1 120px;
+                                }
                             }
 
                             .btn-approve {
@@ -2474,6 +2511,7 @@
                                     <div class="modal-badges-row">
                                         <div id="modal-badges"
                                             style="display:flex; align-items:center; gap: 6px; flex-wrap: wrap;"></div>
+                                        <div id="modal-favorite" class="modal-favorite" onclick="toggleFavoriteFromModal()" title="Добавить в избранное"></div>
                                         <div class="share-btn-wrapper" onclick="shareCurrentAd()" title="Поделиться">
                                             <svg class="share-icon" viewBox="0 0 24 24" stroke-linecap="round"
                                                 stroke-linejoin="round">
@@ -3630,6 +3668,7 @@
                                     acts.classList.remove('visible');
                                 }
                             }
+                            updateModalFavoriteState();
                             document.getElementById('modal').classList.add('active'); document.body.style.overflow = 'hidden';
 
                             updateMetaTags(ad);
@@ -3686,6 +3725,7 @@
                                     acts.classList.remove('visible');
                                 }
                             }
+                            updateModalFavoriteState();
                             document.getElementById('modal').classList.add('active');
                             document.body.style.overflow = 'hidden';
 
@@ -3866,6 +3906,25 @@
                                document.execCommand("copy");
                                document.body.removeChild(t);
                                alert("Ссылка скопирована!");
+                        }
+                        function updateModalFavoriteState() {
+                            const btn = document.getElementById('modal-favorite');
+                            if (!btn) return;
+                            if (!currentAd || !currentAd.rowIndex) {
+                                btn.style.display = 'none';
+                                return;
+                            }
+                            btn.style.display = 'flex';
+                            const isFavorite = userFavorites.includes(currentAd.rowIndex);
+                            const heartFill = isFavorite ? '#ff4757' : 'none';
+                            const heartStroke = isFavorite ? '#ff4757' : '#ccc';
+                            btn.title = isFavorite ? 'Удалить из избранного' : 'Добавить в избранное';
+                            btn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+                        }
+                        async function toggleFavoriteFromModal() {
+                            if (!currentAd || !currentAd.rowIndex) return;
+                            await toggleFavorite(currentAd.rowIndex);
+                            updateModalFavoriteState();
                         }
                         function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
                         function closeModalDirect() {
@@ -4308,6 +4367,8 @@
                                         // Если на вкладке запчастей - обновляем запчасти
                                         renderPartsGrid(allParts);
                                     }
+
+                                    updateModalFavoriteState();
                                 } else {
                                     alert(result.message || 'Ошибка');
                                 }
