@@ -317,6 +317,12 @@
                                 background-color: #F7F9F8;
                             }
 
+                            .t-records,
+                            .t-records_animated,
+                            .t-records_visible {
+                                opacity: 1 !important;
+                            }
+
                             * {
                                 box-sizing: border-box;
                                 -webkit-tap-highlight-color: transparent;
@@ -2644,6 +2650,11 @@
                         }
 
                         document.addEventListener('DOMContentLoaded', () => {
+                            const allRecords = document.getElementById('allrecords');
+                            if (allRecords) {
+                                allRecords.style.opacity = '1';
+                                allRecords.classList.add('t-records_visible');
+                            }
                             tryAutoLogin();
                             loadFilters().catch((e) => console.error('Ошибка загрузки фильтров:', e));
                             loadAds();
@@ -3780,6 +3791,10 @@
                                 ptrIndicator.style.opacity = '0';
                             } catch (e) {
                                 console.log(e)
+                                const adsContainer = document.getElementById('ads-container');
+                                if (adsContainer) {
+                                    adsContainer.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Не удалось загрузить объявления. Обновите страницу.</div>';
+                                }
                             } finally {
                                 document.getElementById('loading-ads').style.display = 'none';
                                 hideLoader();
@@ -3801,6 +3816,10 @@
                                 }
                             } catch (e) {
                                 console.log(e);
+                                const partsContainer = document.getElementById('parts-container');
+                                if (partsContainer) {
+                                    partsContainer.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Не удалось загрузить запчасти. Обновите страницу.</div>';
+                                }
                             } finally {
                                 const loading = document.getElementById('loading-parts');
                                 if (loading) loading.style.display = 'none';
