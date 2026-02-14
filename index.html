@@ -4545,6 +4545,7 @@
                             items.forEach((ad) => {
                                 const card = document.createElement('div');
                                 card.className = 'moderation-card';
+                                card.dataset.rowIndex = ad.rowIndex;
 
                                 const ph = ad.photos ? ad.photos.split(',') : [];
                                 const imgSrc = ph.length > 0 ? ph[0] : '';
@@ -4564,6 +4565,12 @@
 
                                 container.appendChild(card);
                             });
+                        }
+                        function updateModerationPlaceholderState() {
+                            const container = document.getElementById('moderation-grid');
+                            const placeholder = document.getElementById('moderation-placeholder');
+                            if (!container || !placeholder) return;
+                            placeholder.style.display = container.children.length ? 'none' : 'block';
                         }
 
                         function renderFavorites() {
@@ -4930,7 +4937,13 @@
                                 if (idx >= 0) {
                                     allAds[idx].verified = 1;
                                 }
-                                if (typeof applyFilters === 'function') {
+                                const adminTab = document.getElementById('tab-content-admin');
+                                const isAdminActive = adminTab && adminTab.classList.contains('active');
+                                if (isAdminActive) {
+                                    const card = document.querySelector(`.moderation-card[data-row-index="${rowIndex}"]`);
+                                    if (card) card.remove();
+                                    updateModerationPlaceholderState();
+                                } else if (typeof applyFilters === 'function') {
                                     applyFilters();
                                 }
                                 if (isAdmin) {
@@ -4959,7 +4972,13 @@
                                 if (Array.isArray(allAds)) {
                                     allAds = allAds.filter(ad => Number(ad.rowIndex) !== Number(rowIndex));
                                 }
-                                if (typeof applyFilters === 'function') {
+                                const adminTab = document.getElementById('tab-content-admin');
+                                const isAdminActive = adminTab && adminTab.classList.contains('active');
+                                if (isAdminActive) {
+                                    const card = document.querySelector(`.moderation-card[data-row-index="${rowIndex}"]`);
+                                    if (card) card.remove();
+                                    updateModerationPlaceholderState();
+                                } else if (typeof applyFilters === 'function') {
                                     applyFilters();
                                 }
                                 if (isAdmin) {
