@@ -485,6 +485,10 @@
                                 flex-wrap: wrap;
                             }
 
+                            .site-header { display:flex; align-items:center; gap:15px; flex-wrap:nowrap; }
+                            .site-header .header-title { flex: 1 1 0; min-width: 0; margin-right: 12px; }
+                            .site-header .header-actions { flex: 0 0 auto; }
+
                             .header-title {
                                 margin-right: 20px;
                             }
@@ -1702,7 +1706,7 @@
                             <div class="spinner" style="width:20px;height:20px;"></div>
                         </div>
                         <div class="tm-wrapper fade-in" id="main-wrapper">
-                            <div
+                            <div class="site-header"
                                 style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:20px; margin-bottom:20px; flex-wrap: nowrap; gap: 15px;">
                                 <div class="header-title">
                                     <h2 style="margin:0; font-size: 22px;">КупитьВездеход.рф</h2>
