@@ -3075,13 +3075,7 @@
                             checkConditionVisibility();
                         }
                         function applyFilters() {
-                            // Фильтруем ТОЛЬКО ОДОБРЕННУЮ ТЕХНИКУ (type 1,2,3 и verified=1)
-                            let approvedAds = allAds.filter(ad => {
-                                // Должно быть одобренным и принадлежать категории техники
-                                const isApproved = Number(ad.verified) === 1;
-                                const isTechType = [1, 2, 3].includes(Number(ad.type)); // типы 1,2,3 это техника
-                                return isApproved && isTechType;
-                            });
+                            let approvedAds = allAds;
 
                             const useUiFilters = hasUserAdjustedFilters;
 
@@ -3576,13 +3570,6 @@
                             }, 50);
                         }
                         function renderPartsGrid(parts) {
-                            // Фильтруем ТОЛЬКО ОДОБРЕННЫЕ ЗАПЧАСТИ (type=4 и verified=1)
-                            const approvedParts = (parts || []).filter(part => {
-                                const isApproved = Number(part.verified) === 1;
-                                const isPartType = Number(part.type) === 4; // тип 4 это запчасти
-                                return isApproved && isPartType;
-                            });
-
                             const c = document.getElementById('parts-container');
                             // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox с !important
                             if (c) {
@@ -3594,11 +3581,11 @@
                             }
                             c.innerHTML = '';
                             c.classList.remove('loaded');
-                            if (!approvedParts || approvedParts.length === 0) {
+                            if (!parts || parts.length === 0) {
                                 c.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Ничего не найдено</div>';
                                 return;
                             }
-                            approvedParts.forEach(part => {
+                            parts.forEach(part => {
                                 let ph = part.photos ? part.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
 
@@ -4411,8 +4398,7 @@
                         }
                         async function loadParts() {
                             try {
-                                // Используем те же данные что и для техники, но фильтруем по type=4
-                                const raw = await fetchDatasetWithFallback('/api/listings');
+                                const raw = await fetchDatasetWithFallback('/api/spares');
                                 allParts = Array.isArray(raw) ? raw : [];
                                 const displayParts = allParts;
                                 renderPartsGrid(displayParts);
