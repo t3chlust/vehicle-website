@@ -327,6 +327,7 @@
                                 padding: 0;
                                 font-family: 'Roboto', sans-serif !important;
                                 overscroll-behavior-y: contain;
+                                overflow-y: auto;
                                 background-color: #F7F9F8;
                             }
 
@@ -2851,6 +2852,10 @@
                             if (allRecords) {
                                 allRecords.style.opacity = '1';
                                 allRecords.classList.add('t-records_visible');
+                            }
+                            const modalEl = document.getElementById('modal');
+                            if (!modalEl || !modalEl.classList.contains('active')) {
+                                document.body.style.overflow = 'auto';
                             }
                             setupFilterInteractionTracking();
                             enforceCleanFiltersState();
