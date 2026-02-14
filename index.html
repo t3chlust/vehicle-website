@@ -490,6 +490,44 @@
                                 gap: 15px;
                             }
 
+                            .action-buttons-group.visible .btn-approve,
+                            .action-buttons-group.visible .btn-reject {
+                                flex: 1;
+                                height: 40px;
+                                line-height: 40px;
+                                padding: 0 20px;
+                                font-size: 14px;
+                                font-weight: 600;
+                                border: none;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                text-align: center;
+                                white-space: nowrap;
+                                box-sizing: border-box;
+                                width: 100%;
+                            }
+
+                            .action-buttons-group.visible .btn-approve {
+                                background: #28a745;
+                                color: white;
+                            }
+
+                            .action-buttons-group.visible .btn-approve:hover {
+                                background: #218838;
+                            }
+
+                            .action-buttons-group.visible .btn-reject {
+                                background: #dc3545;
+                                color: white;
+                            }
+
+                            .action-buttons-group.visible .btn-reject:hover {
+                                background: #c82333;
+                            }
+
                             .share-btn-wrapper {
                                 cursor: pointer;
                                 padding: 8px;
@@ -3574,6 +3612,116 @@
                             }
                         }
 
+                        function configureModalActions(type) {
+                            const actions = document.getElementById('modal-owner-actions');
+                            if (!actions) return;
+                            const editBtn = actions.querySelector('button:nth-child(1)');
+                            const deleteBtn = actions.querySelector('button:nth-child(2)');
+                            if (!editBtn || !deleteBtn) return;
+
+                            if (type === 'part') {
+                                editBtn.classList.add('hidden');
+                                deleteBtn.onclick = deleteCurrentPart;
+                                deleteBtn.innerText = 'Удалить';
+                            } else {
+                                editBtn.classList.remove('hidden');
+                                editBtn.onclick = editCurrentAd;
+                                deleteBtn.onclick = deleteCurrentAd;
+                                deleteBtn.innerText = 'Удалить';
+                            }
+                        }
+
+                        function openAdForModeration(ad) {
+                            const btnCreate = document.getElementById('btn-create-ad');
+                            const btnProfile = document.getElementById('btn-profile');
+                            if (btnCreate) btnCreate.classList.add('hidden');
+                            if (btnProfile) btnProfile.classList.add('hidden');
+                            currentItemType = 'ad';
+                            currentAd = ad; currentPhotos = []; currentPhotoIndex = 0;
+                            document.getElementById('modal-title').innerText = ad.title || "";
+                            document.getElementById('modal-price').innerText = Number(ad.price || 0).toLocaleString() + ' ₽';
+                            let cleanDesc = (ad.desc || "").replace(NEW_STATUS_TAG, "").replace(/#COLOR_\S+/g, "").replace(/#WHEELS_\S+/g, "").trim();
+                            document.getElementById('modal-desc').innerText = cleanDesc;
+                            document.getElementById('modal-name').innerText = ad.name || "Продавец";
+                            document.getElementById('modal-location').innerText = ad.city || "";
+                            const phEl = document.getElementById('modal-phone'); if (phEl) { phEl.innerText = ad.phone || ""; phEl.href = "tel:" + (ad.phone || ""); }
+
+                            const sellerLabel = getSellerTypeLabel(ad);
+                            let bgHtml = '';
+                            if (checkIsNew(ad)) bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
+                            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
+                            if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
+                            document.getElementById('modal-badges').innerHTML = bgHtml;
+
+                            const tenderBanner = document.getElementById('modal-tender-banner');
+                            if ((ad.tender || "").toLowerCase() === 'yes') {
+                                tenderBanner.innerText = 'В РЕЕСТРЕ МИНПРОМТОРГА';
+                                tenderBanner.classList.add('visible');
+                            } else {
+                                tenderBanner.classList.remove('visible');
+                            }
+
+                            let phs = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+                            currentPhotos = phs;
+                            updateGallery();
+                            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
+                            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
+                            let sType = getSellerTypeLabel(ad);
+                            let wf = ad.wheelFormula;
+
+                            let sp = [
+                                { l: "Тип продавца", v: sType },
+                                { l: "Город", v: ad.city },
+                                { l: "Тип техники", v: ad.techType || '' },
+                            ];
+
+                            if (ad.techType === 'Вездеход') {
+                                sp.push({ l: "Конструкция", v: ad.constructionType });
+                            }
+
+                            if (ad.techType === 'Прицеп') {
+                                sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
+                            } else {
+                                sp.push({ l: "Тип шасси", v: wf });
+                                sp.push({ l: "Плавающий", v: ((ad.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
+                                sp.push({ l: "Двигатель", v: ad.engine });
+                                sp.push({ l: "Мощность", v: ad.power ? ad.power + ' л.с.' : '' });
+                                sp.push({ l: "Трансмиссия", v: ad.transmission });
+                                sp.push({ l: "Топливо", v: ad.fuel });
+                                sp.push({ l: "Колеса", v: ad.wheels });
+                                sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
+                            }
+
+                            sp.push({ l: "Документы", v: ad.docs || 'Без документов' });
+                            sp.push({ l: "Цвет", v: ad.color });
+                            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+                            
+                            const acts = document.getElementById('modal-owner-actions');
+                            if (acts) {
+                                // Для админ-панели показываем кнопки одобрения/отклонения
+                                const btn1 = acts.querySelector('button:nth-child(1)');
+                                const btn2 = acts.querySelector('button:nth-child(2)');
+                                if (btn1 && btn2) {
+                                    btn1.innerText = 'Одобрить';
+                                    btn1.className = 'btn btn-approve';
+                                    btn1.onclick = async () => {
+                                        await approveAd(ad.rowIndex);
+                                        closeModalDirect();
+                                    };
+                                    btn2.innerText = 'Отклонить';
+                                    btn2.className = 'btn btn-reject';
+                                    btn2.onclick = async () => {
+                                        await rejectAd(ad.rowIndex);
+                                        closeModalDirect();
+                                    };
+                                    acts.classList.add('visible');
+                                }
+                            }
+                            
+                            document.getElementById('modal').classList.add('active'); 
+                            document.body.style.overflow = 'hidden';
+                        }
+
                         function openAd(ad) {
                             const btnCreate = document.getElementById('btn-create-ad');
                             const btnProfile = document.getElementById('btn-profile');
@@ -4799,88 +4947,8 @@
                                 alert('Объявление не найдено');
                                 return;
                             }
-
-                            // Создаём модальное окно для просмотра деталей
-                            let modal = document.getElementById('ad-details-modal');
-                            if (!modal) {
-                                modal = document.createElement('div');
-                                modal.id = 'ad-details-modal';
-                                modal.style.cssText = `
-                                    position: fixed;
-                                    top: 0;
-                                    left: 0;
-                                    width: 100%;
-                                    height: 100%;
-                                    background: rgba(0, 0, 0, 0.7);
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    z-index: 10000;
-                                    padding: 20px;
-                                    box-sizing: border-box;
-                                `;
-                                document.body.appendChild(modal);
-                            }
-
-                            const photos = ad.photos ? ad.photos.split(',').filter(p => p.trim()) : [];
-                            const firstPhoto = photos.length > 0 ? photos[0] : 'https://placehold.co/400?text=Нет+фото';
-
-                            const content = document.createElement('div');
-                            content.style.cssText = `
-                                background: white;
-                                border-radius: 8px;
-                                max-width: 600px;
-                                width: 100%;
-                                max-height: 90vh;
-                                overflow-y: auto;
-                                padding: 20px;
-                            `;
-
-                            content.innerHTML = `
-                                <button onclick="document.getElementById('ad-details-modal').style.display='none'" style="float: right; border: none; background: none; font-size: 24px; cursor: pointer;">&times;</button>
-                                <h2 style="clear: both; margin-top: 10px;">${ad.title || 'Без названия'}</h2>
-                                <img src="${firstPhoto}" onerror="this.src='https://placehold.co/400?text=Нет+фото'" style="width: 100%; height: auto; border-radius: 4px; margin-bottom: 15px;">
-                                <div style="margin-bottom: 15px;">
-                                    <div style="font-size: 24px; font-weight: bold; color: #ff4757; margin-bottom: 10px;">${Number(ad.price || 0).toLocaleString()} ₽</div>
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                                        <div><strong>Город:</strong> ${ad.city || 'Не указан'}</div>
-                                        <div><strong>Продавец:</strong> ${ad.name || 'Не указан'}</div>
-                                        <div><strong>Телефон:</strong> ${ad.phone || 'Не указан'}</div>
-                                        <div><strong>Тип продавца:</strong> ${ad.sellerType || 'Не указан'}</div>
-                                        <div><strong>Состояние:</strong> ${ad.condition === 'new' ? 'Новое' : 'Б/У'}</div>
-                                        <div><strong>Дата:</strong> ${ad.creationDate ? new Date(ad.creationDate).toLocaleDateString('ru-RU') : 'Не указана'}</div>
-                                    </div>
-                                    <div style="margin-bottom: 15px;">
-                                        <strong>Техническая информация:</strong>
-                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                                            ${ad.engine ? `<div><strong>Двигатель:</strong> ${ad.engine}</div>` : ''}
-                                            ${ad.power ? `<div><strong>Мощность:</strong> ${ad.power} л.с.</div>` : ''}
-                                            ${ad.mileage ? `<div><strong>Пробег:</strong> ${ad.mileage} км</div>` : ''}
-                                            ${ad.transmission ? `<div><strong>Коробка:</strong> ${ad.transmission}</div>` : ''}
-                                            ${ad.fuel ? `<div><strong>Топливо:</strong> ${ad.fuel}</div>` : ''}
-                                            ${ad.wheelFormula ? `<div><strong>Шасси:</strong> ${ad.wheelFormula}</div>` : ''}
-                                            ${ad.color ? `<div><strong>Цвет:</strong> ${ad.color}</div>` : ''}
-                                            ${ad.technical ? `<div><strong>Тип:</strong> ${ad.technical}</div>` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="border-top: 1px solid #ddd; padding-top: 15px;">
-                                    <button class="btn btn-approve" onclick="approveAd(${ad.rowIndex}); document.getElementById('ad-details-modal').style.display='none';" style="margin-right: 10px;">Одобрить</button>
-                                    <button class="btn btn-reject" onclick="rejectAd(${ad.rowIndex}); document.getElementById('ad-details-modal').style.display='none';">Отклонить</button>
-                                    <button onclick="document.getElementById('ad-details-modal').style.display='none';" style="margin-left: 10px; padding: 8px 16px; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px; cursor: pointer;">Закрыть</button>
-                                </div>
-                            `;
-
-                            modal.innerHTML = '';
-                            modal.appendChild(content);
-                            modal.style.display = 'flex';
-
-                            // Закрытие модала при клике на фон
-                            modal.onclick = (e) => {
-                                if (e.target === modal) {
-                                    modal.style.display = 'none';
-                                }
-                            };
+                            // Показываем объявление в красивом модальном окне как на главной странице
+                            openAdForModeration(ad);
                         }
 
                         async function approveAd(rowIndex) {
