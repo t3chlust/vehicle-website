@@ -816,11 +816,13 @@ app.post('/api/ads/reject', async (req, res) => {
 
     const connection = await pool.getConnection();
     try {
+      // Удаляем объявление и все связанные записи (фото, техническую информацию)
+      // благодаря ON DELETE CASCADE в внешних ключах
       await connection.query(
-        'UPDATE advertisement SET verified = 2 WHERE id = ?',
+        'DELETE FROM advertisement WHERE id = ?',
         [rowIndex]
       );
-      res.json({ status: 'success', message: 'Объявление отклонено' });
+      res.json({ status: 'success', message: 'Объявление удалено' });
     } finally {
       connection.release();
     }
