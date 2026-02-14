@@ -401,7 +401,7 @@ async function fetchPartsPayload() {
   try {
     const [parts] = await connection.query(`
       SELECT
-        a.id, a.name AS partName, a.brand, a.date, a.price, a.userId, 
+        a.id, a.name AS partName, a.brand, a.date, a.price, a.userId, a.verified,
         a.\`condition\`, a.sellerType, st.name AS sellerTypeName, a.city,
         u.name AS userName, u.phone AS userPhone
       FROM advertisement a
@@ -432,7 +432,8 @@ async function fetchPartsPayload() {
         sellerTypeId: part.sellerType,
         name: part.userName || '',
         phone: formatPhoneForDisplay(part.userPhone),
-        photos: photos.map((p) => p.photo).join(',')
+        photos: photos.map((p) => p.photo).join(','),
+        verified: part.verified
       };
     }));
 
@@ -894,8 +895,8 @@ app.post('/api/parts', async (req, res) => {
       if (action === 'create') {
         const [result] = await connection.query(
           `INSERT INTO advertisement
-            (brand, name, type, userId, price, date, city, \`condition\`, sellerType)
-           VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?)`,
+            (brand, name, type, userId, price, date, city, \`condition\`, sellerType, verified)
+           VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?)`,
           [
             brand || null,
             partName || 'Запчасть',
@@ -904,7 +905,8 @@ app.post('/api/parts', async (req, res) => {
             price || 0,
             city || null,
             conditionFlag,
-            resolvedSellerTypeId
+            resolvedSellerTypeId,
+            0
           ]
         );
 

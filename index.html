@@ -4498,9 +4498,8 @@
 
                         // --- NEW ADMIN FUNCTIONS ---
                         function getPendingModerationItems() {
-                            if (!Array.isArray(allAds)) return [];
-                            return allAds.filter(ad => {
-                                const value = (ad && Object.prototype.hasOwnProperty.call(ad, 'verified')) ? ad.verified : null;
+                            const isPending = (item) => {
+                                const value = (item && Object.prototype.hasOwnProperty.call(item, 'verified')) ? item.verified : null;
                                 if (value === null || value === undefined) return false;
                                 if (typeof value === 'object' && value !== null && Array.isArray(value.data)) {
                                     return Number(value.data[0]) === 0;
@@ -4508,7 +4507,10 @@
                                 if (typeof value === 'string') return value.trim() === '0';
                                 if (typeof value === 'boolean') return value === false;
                                 return Number(value) === 0;
-                            });
+                            };
+                            const pendingAds = Array.isArray(allAds) ? allAds.filter(isPending) : [];
+                            const pendingParts = Array.isArray(allParts) ? allParts.filter(isPending) : [];
+                            return [...pendingAds, ...pendingParts];
                         }
                         function openModerationItem(rowIndex) {
                             const id = Number(rowIndex);
@@ -4937,6 +4939,12 @@
                                 if (idx >= 0) {
                                     allAds[idx].verified = 1;
                                 }
+                                const partIdx = Array.isArray(allParts)
+                                    ? allParts.findIndex(part => Number(part.rowIndex) === Number(rowIndex))
+                                    : -1;
+                                if (partIdx >= 0) {
+                                    allParts[partIdx].verified = 1;
+                                }
                                 const adminTab = document.getElementById('tab-content-admin');
                                 const isAdminActive = adminTab && adminTab.classList.contains('active');
                                 if (isAdminActive) {
@@ -4971,6 +4979,9 @@
                                 }
                                 if (Array.isArray(allAds)) {
                                     allAds = allAds.filter(ad => Number(ad.rowIndex) !== Number(rowIndex));
+                                }
+                                if (Array.isArray(allParts)) {
+                                    allParts = allParts.filter(part => Number(part.rowIndex) !== Number(rowIndex));
                                 }
                                 const adminTab = document.getElementById('tab-content-admin');
                                 const isAdminActive = adminTab && adminTab.classList.contains('active');
