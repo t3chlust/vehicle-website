@@ -409,7 +409,7 @@
                                 /* Show secondary buttons below as a single non-wrapping row; allow horizontal scroll if needed */
                                 #main-header .header-bottom { display:flex; flex-direction:row; align-items:center; gap:8px; margin-top:8px; justify-content:flex-start; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
                                 #main-header .header-bottom .btn { width: auto; padding: 6px 10px; height: 34px; box-sizing: border-box; white-space: nowrap; }
-                                #btn-create-ad, #btn-profile { display: inline-flex !important; }
+                                #btn-create-ad:not(.hidden), #btn-profile:not(.hidden) { display: inline-flex !important; }
                             }
 
                             .hidden {
