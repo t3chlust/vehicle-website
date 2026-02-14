@@ -3041,10 +3041,10 @@
                             }
 
                             try {
-                                const queryEndpoint = endpoint === '/api/ads'
-                                    ? '/api/ads/query'
-                                    : endpoint === '/api/parts'
-                                        ? '/api/parts/query'
+                                const queryEndpoint = endpoint === '/api/listings'
+                                    ? '/api/listings/query'
+                                    : endpoint === '/api/spares'
+                                        ? '/api/spares/query'
                                         : null;
 
                                 if (queryEndpoint) {
@@ -3942,7 +3942,7 @@
                         });
                         async function loadAds() {
                             try {
-                                const raw = await fetchDatasetWithFallback('/api/ads');
+                                const raw = await fetchDatasetWithFallback('/api/listings');
 
                                 // Преобразуем записи: если есть Brand и Model, комбинируем их в title
                                 allAds = (Array.isArray(raw) ? raw : []).map(ad => {
@@ -3994,7 +3994,7 @@
                         }
                         async function loadParts() {
                             try {
-                                const raw = await fetchDatasetWithFallback('/api/parts');
+                                const raw = await fetchDatasetWithFallback('/api/spares');
                                 allParts = Array.isArray(raw) ? raw : [];
                                 const displayParts = allParts;
                                 renderPartsGrid(displayParts);

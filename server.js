@@ -461,6 +461,17 @@ app.get('/api/ads', async (req, res) => {
   }
 });
 
+// GET /api/listings - нейтральный endpoint для получения объявлений (кроссбраузерный fallback)
+app.get('/api/listings', async (req, res) => {
+  try {
+    const ads = await fetchAdsPayload();
+    res.json(ads);
+  } catch (error) {
+    console.error('❌ Ошибка при получении listings:', error);
+    res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
+  }
+});
+
 // POST /api/ads/query - получить все объявления (fallback для проблемных GET-кэшей)
 app.post('/api/ads/query', async (req, res) => {
   try {
@@ -468,6 +479,17 @@ app.post('/api/ads/query', async (req, res) => {
     res.json(ads);
   } catch (error) {
     console.error('❌ Ошибка при POST получении объявлений:', error);
+    res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
+  }
+});
+
+// POST /api/listings/query - нейтральный endpoint для получения объявлений
+app.post('/api/listings/query', async (req, res) => {
+  try {
+    const ads = await fetchAdsPayload();
+    res.json(ads);
+  } catch (error) {
+    console.error('❌ Ошибка при POST получении listings:', error);
     res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
   }
 });
@@ -777,6 +799,17 @@ app.get('/api/parts', async (req, res) => {
   }
 });
 
+// GET /api/spares - нейтральный endpoint для получения запчастей (кроссбраузерный fallback)
+app.get('/api/spares', async (req, res) => {
+  try {
+    const payload = await fetchPartsPayload();
+    res.json(payload);
+  } catch (error) {
+    console.error('❌ Ошибка при получении spares:', error);
+    res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
+  }
+});
+
 // POST /api/parts/query - получить все запчасти (fallback для проблемных GET-кэшей)
 app.post('/api/parts/query', async (req, res) => {
   try {
@@ -784,6 +817,17 @@ app.post('/api/parts/query', async (req, res) => {
     res.json(payload);
   } catch (error) {
     console.error('❌ Ошибка при POST получении запчастей:', error);
+    res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
+  }
+});
+
+// POST /api/spares/query - нейтральный endpoint для получения запчастей
+app.post('/api/spares/query', async (req, res) => {
+  try {
+    const payload = await fetchPartsPayload();
+    res.json(payload);
+  } catch (error) {
+    console.error('❌ Ошибка при POST получении spares:', error);
     res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
   }
 });
