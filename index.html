@@ -2926,7 +2926,7 @@
                             const cond = document.getElementById('inp-condition').value;
                             const mileageDiv = document.getElementById('div-mileage');
                             const type = document.getElementById('inp-tech-type').value;
-                            if (type === 'Запчасть') {
+                            if (type === 'Запчасть' || type === 'Прицеп') {
                                 mileageDiv.classList.add('hidden');
                                 document.getElementById('inp-mileage').value = '';
                                 return;
@@ -2946,6 +2946,7 @@
                             const wheelsDiv = document.getElementById('div-wheels');
                             const brandModelDiv = document.getElementById('div-brand-model');
                             const colorDocsDiv = document.getElementById('div-color-docs');
+                            const colorSelect = document.getElementById('inp-color');
                             const partOnlyDiv = document.getElementById('div-part-only');
                             const specsTitle = document.getElementById('specs-title');
                             constrInp.classList.add('hidden');
@@ -2971,6 +2972,16 @@
                                 colorDocsDiv.classList.add('hidden');
                                 partOnlyDiv.classList.remove('hidden');
                                 specsTitle.classList.add('hidden');
+                            }
+                            if (colorDocsDiv && colorSelect) {
+                                if (type === 'Прицеп' || type === 'Запчасть') {
+                                    colorSelect.value = '';
+                                    colorSelect.style.display = 'none';
+                                    colorDocsDiv.style.gridTemplateColumns = '1fr';
+                                } else {
+                                    colorSelect.style.display = '';
+                                    colorDocsDiv.style.gridTemplateColumns = '';
+                                }
                             }
                             if (type !== 'Запчасть') {
                                 setVal('inp-part-title', '');
