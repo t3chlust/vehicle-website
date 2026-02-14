@@ -2992,6 +2992,56 @@
 
                             throw lastError || new Error('Не удалось получить данные');
                         }
+
+                        function xhrGetJsonNoCache(endpoint) {
+                            return new Promise((resolve, reject) => {
+                                const separator = endpoint.includes('?') ? '&' : '?';
+                                const cacheBust = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                                const url = `${endpoint}${separator}_=${cacheBust}`;
+
+                                const xhr = new XMLHttpRequest();
+                                xhr.open('GET', url, true);
+                                xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+                                xhr.setRequestHeader('Pragma', 'no-cache');
+                                xhr.setRequestHeader('Expires', '0');
+
+                                xhr.onload = function () {
+                                    if (xhr.status >= 200 && xhr.status < 300) {
+                                        try {
+                                            resolve(JSON.parse(xhr.responseText));
+                                        } catch (e) {
+                                            reject(e);
+                                        }
+                                    } else {
+                                        reject(new Error(`HTTP ${xhr.status}`));
+                                    }
+                                };
+
+                                xhr.onerror = function () {
+                                    reject(new Error('XHR network error'));
+                                };
+
+                                xhr.send();
+                            });
+                        }
+
+                        async function fetchDatasetWithFallback(endpoint) {
+                            const primary = await fetchJsonNoCacheWithRetry(endpoint, true);
+                            if (Array.isArray(primary) && primary.length > 0) {
+                                return primary;
+                            }
+
+                            try {
+                                const fallback = await xhrGetJsonNoCache(endpoint);
+                                if (Array.isArray(fallback)) {
+                                    return fallback;
+                                }
+                            } catch (e) {
+                                console.error(`XHR fallback failed for ${endpoint}:`, e);
+                            }
+
+                            return Array.isArray(primary) ? primary : [];
+                        }
                         function buildAdSearchIndex(ads) {
                             const approved = ads || [];
                             adSearchIndex = approved
@@ -3863,7 +3913,7 @@
                         });
                         async function loadAds() {
                             try {
-                                const raw = await fetchJsonNoCacheWithRetry('/api/ads', true);
+                                const raw = await fetchDatasetWithFallback('/api/ads');
 
                                 // Преобразуем записи: если есть Brand и Model, комбинируем их в title
                                 allAds = (Array.isArray(raw) ? raw : []).map(ad => {
@@ -3915,7 +3965,7 @@
                         }
                         async function loadParts() {
                             try {
-                                const raw = await fetchJsonNoCacheWithRetry('/api/parts', true);
+                                const raw = await fetchDatasetWithFallback('/api/parts');
                                 allParts = Array.isArray(raw) ? raw : [];
                                 const displayParts = allParts;
                                 renderPartsGrid(displayParts);
