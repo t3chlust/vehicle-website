@@ -2414,7 +2414,7 @@
                                             <option value="Дизель">Дизель</option>
                                             <option value="Электричество">Электричество</option>
                                             <option value="Газ">Газ</option>
-                                        </select> <select class="form-select" id="inp-wheel-f">
+                                        </select> <select class="form-select" id="inp-wheel-f" onchange="checkChassisTypeVisibility()">
                                             <option value="">Тип шасси</option>
                                             <option value="Колёсный">Колёсный</option>
                                             <option value="Гусеничный">Гусеничный</option>
@@ -3045,6 +3045,23 @@
                             }
                             checkTenderVisibility();
                             checkConditionVisibility();
+                            checkChassisTypeVisibility();
+                        }
+                        function checkChassisTypeVisibility() {
+                            const type = document.getElementById('inp-tech-type').value;
+                            const wheelType = safeVal('inp-wheel-f');
+                            const wheelsDiv = document.getElementById('div-wheels');
+                            if (!wheelsDiv) return;
+                            if (type === 'Запчасть' || type === 'Прицеп') {
+                                return;
+                            }
+                            if (wheelType === 'Гусеничный') {
+                                wheelsDiv.classList.add('hidden');
+                                setVal('tire-d', '');
+                                setVal('tire-w', '');
+                            } else {
+                                wheelsDiv.classList.remove('hidden');
+                            }
                         }
                         function applyFilters() {
                             let approvedAds = allAds;
@@ -4465,6 +4482,7 @@
                             setVal('inp-construction', ad.constructionType || "");
                             setVal('inp-capacity', ad.capacity || "");
                             checkTechTypeVisibility();
+                            checkChassisTypeVisibility();
                             document.getElementById('preview-container').innerHTML = '';
                             document.getElementById('file-count').innerText = '';
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
