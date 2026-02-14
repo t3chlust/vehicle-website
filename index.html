@@ -3034,10 +3034,14 @@
                         }
 
                         async function fetchDatasetWithFallback(endpoint) {
+                            console.log(`🔍 fetchDatasetWithFallback: Запрашиваю ${endpoint}`);
                             const primary = await fetchJsonNoCacheWithRetry(endpoint, true);
+                            console.log(`📦 fetchDatasetWithFallback: Получено от ${endpoint}:`, primary);
                             if (Array.isArray(primary) && primary.length > 0) {
+                                console.log(`✅ fetchDatasetWithFallback: ${endpoint} вернул ${primary.length} объектов`);
                                 return primary;
                             }
+                            console.warn(`⚠️ fetchDatasetWithFallback: ${endpoint} вернул пусто, пробую fallback...`);
 
                             try {
                                 const fallback = await xhrGetJsonNoCache(endpoint);
@@ -3950,8 +3954,11 @@
                         });
                         async function loadAds() {
                             try {
+                                console.log('🚀 loadAds: Начинаю загрузку объявлений техники...');
                                 updateDebugPanel('Загружаю...', '...', '...', hasUserAdjustedFilters);
                                 const raw = await fetchDatasetWithFallback('/api/listings');
+                                console.log('📊 loadAds: Получено raw данных:', raw);
+                                console.log('📊 loadAds: Количество полученных объявлений:', Array.isArray(raw) ? raw.length : 'не массив');
                                 updateDebugPanel('Получено', raw.length || 0, '...', hasUserAdjustedFilters);
 
                                 // Преобразуем записи: если есть Brand и Model, комбинируем их в title
@@ -3965,6 +3972,7 @@
                                     return ad;
                                 });
 
+                                console.log('📦 loadAds: После трансформации allAds.length =', allAds.length);
                                 applyFilters();
                                 buildAdSearchIndex(allAds);
                                 initAdsSearch();
@@ -3990,8 +3998,9 @@
                                 if (typeof currentUser !== 'undefined' && currentUser) updateAuthUI(currentUser);
 
                                 ptrIndicator.style.opacity = '0';
+                                console.log('✅ loadAds: Завершено');
                             } catch (e) {
-                                console.log(e);
+                                console.error('❌ loadAds: Ошибка:', e);
                                 updateDebugPanel('ОШИБКА', 'X', 'X', 'X');
                                 const adsContainer = document.getElementById('ads-container');
                                 if (adsContainer) {
