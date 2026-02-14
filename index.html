@@ -400,9 +400,12 @@
 
                             /* On very small screens show secondary buttons stacked under the title */
                             @media (max-width: 420px) {
-                                #main-header .header-top { flex-wrap: wrap; }
-                                #main-header .header-bottom { display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin-top:8px; }
-                                #main-header .header-bottom .btn { width: 100%; padding: 8px 12px; height: 38px; box-sizing: border-box; }
+                                /* Keep title and login on one line but reduce title size */
+                                #main-header .header-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:nowrap; }
+                                #main-header .header-title h2 { font-size: 18px; }
+                                /* Show secondary buttons below as a single non-wrapping row; allow horizontal scroll if needed */
+                                #main-header .header-bottom { display:flex; flex-direction:row; align-items:center; gap:8px; margin-top:8px; justify-content:flex-start; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+                                #main-header .header-bottom .btn { width: auto; padding: 6px 10px; height: 34px; box-sizing: border-box; white-space: nowrap; }
                                 #btn-create-ad, #btn-profile { display: inline-flex !important; }
                             }
 
