@@ -3394,37 +3394,6 @@
                         }
                         function renderGrid(ads) {
                             const c = document.getElementById('vehicles-container');
-                            
-                            // ДИАГНОСТИКА: проверяем видимость родителей
-                            const viewList = document.getElementById('view-list');
-                            const tabContentAds = document.getElementById('tab-content-ads');
-                            
-                            if (viewList) {
-                                const viewListStyles = window.getComputedStyle(viewList);
-                            }
-                            
-                            if (tabContentAds) {
-                                const tabStyles = window.getComputedStyle(tabContentAds);
-                            }
-                            
-                            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox с !important
-                            if (c) {
-                                c.style.setProperty('display', 'grid', 'important');
-                                c.style.setProperty('gridTemplateColumns', 'repeat(auto-fill, minmax(260px, 1fr))', 'important');
-                                c.style.setProperty('gap', '20px', 'important');
-                                c.style.setProperty('marginTop', '30px', 'important');
-                                c.style.setProperty('opacity', '1', 'important');
-                                
-                                // Убеждаемся что родители тоже видимы
-                                if (viewList) viewList.style.setProperty('display', 'block', 'important');
-                                if (tabContentAds) tabContentAds.style.setProperty('display', 'block', 'important');
-                            }
-                            
-                            // Смотрим на стили контейнера ПЕРЕД рендерингом
-                            if (c) {
-                                const styles = window.getComputedStyle(c);
-                            }
-                            
                             c.innerHTML = '';
                             c.classList.remove('loaded');
                             if (!ads || ads.length === 0) { 
