@@ -534,6 +534,13 @@
                                     .header-title h2 { font-size:16px; }
                                 }
 
+                                /* Allow header to wrap on very small screens so title keeps visible */
+                                @media (max-width: 520px) {
+                                    .site-header { flex-wrap: wrap; align-items: center; }
+                                    .site-header .header-actions { width: 100%; display:flex; justify-content: flex-end; gap:8px; margin-top:8px; }
+                                    .site-header .header-title { order: 0; }
+                                }
+
                                 .tab-link {
                                     padding: 8px 12px;
                                     font-size: 14px;
