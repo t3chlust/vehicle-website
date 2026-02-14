@@ -2414,9 +2414,9 @@
                                         <div id="preview-container"></div>
                                         <div id="file-count" style="margin-top:10px; font-weight:bold;"></div>
                                     </div>
-                                    <div style="display:flex; gap:10px;"><button type="button" class="btn btn-red"
+                                        <div style="display:flex; gap:10px;"><button type="button" class="btn btn-red"
                                             onclick="showList()">Отмена</button><button type="submit"
-                                            class="btn btn-black btn-full" id="submit-btn"
+                                            class="btn btn-purple btn-full" id="submit-btn"
                                             style="margin-top:0">Опубликовать</button></div>
                                 </form>
                             </div>
@@ -4176,7 +4176,7 @@
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) btnCreate.classList.add('hidden');
                             document.getElementById('form-title').innerText = "Новое объявление";
-                            document.getElementById('submit-btn').innerText = "Отправить на модерацию";
+                            document.getElementById('submit-btn').innerText = "Опубликовать";
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
                             document.getElementById('view-form').classList.remove('hidden');
@@ -4392,8 +4392,14 @@
 
                         // --- NEW ADMIN FUNCTIONS ---
                         function getPendingModerationItems() {
-                            // Модерации больше нет в новой структуре БД
-                            return [];
+                            if (!Array.isArray(allAds)) return [];
+                            return allAds.filter(ad => {
+                                const value = (ad && Object.prototype.hasOwnProperty.call(ad, 'verified')) ? ad.verified : null;
+                                if (value === null || value === undefined) return false;
+                                if (typeof value === 'string') return value.trim() === '0';
+                                if (typeof value === 'boolean') return value === false;
+                                return Number(value) === 0;
+                            });
                         }
                         function updateAdminCount() {
                             const adminTab = document.getElementById('admin-tab-link');
@@ -4404,10 +4410,36 @@
                         function renderModerationGrid(items) {
                             const container = document.getElementById('moderation-grid');
                             const placeholder = document.getElementById('moderation-placeholder');
+                            if (!container || !placeholder) return;
                             container.innerHTML = '';
 
-                            // Модерации больше нет - всегда показываем placeholder
-                            placeholder.style.display = 'block';
+                            if (!items || items.length === 0) {
+                                placeholder.style.display = 'block';
+                                return;
+                            }
+
+                            placeholder.style.display = 'none';
+                            items.forEach((ad) => {
+                                const card = document.createElement('div');
+                                card.className = 'moderation-card';
+
+                                const ph = ad.photos ? ad.photos.split(',') : [];
+                                const imgSrc = ph.length > 0 ? ph[0] : '';
+
+                                card.innerHTML = `
+                                    <img class="moderation-card-img" src="${imgSrc}" onerror="this.src='https://placehold.co/200x150?text=Нет+фото'">
+                                    <div class="moderation-card-info">
+                                        <div class="moderation-card-title">${ad.title || 'Без названия'}</div>
+                                        <div class="moderation-card-price">${Number(ad.price || 0).toLocaleString()} ₽</div>
+                                    </div>
+                                    <div class="moderation-card-actions">
+                                        <button class="btn btn-approve" onclick="approveAd(${ad.rowIndex})">Одобрить</button>
+                                        <button class="btn btn-reject" onclick="rejectAd(${ad.rowIndex})">Отклонить</button>
+                                    </div>
+                                `;
+
+                                container.appendChild(card);
+                            });
                         }
 
                         function renderFavorites() {
@@ -4736,13 +4768,51 @@
                         }
 
                         async function approveAd(rowIndex) {
-                            // Модерация удалена в новой структуре БД
-                            alert('Модерация больше не требуется');
+                            try {
+                                showLoader('Одобрение...');
+                                const response = await fetch('/api/ads/approve', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ rowIndex })
+                                });
+                                const result = await response.json();
+                                if (result.status !== 'success') {
+                                    throw new Error(result.message || 'Ошибка');
+                                }
+                                await loadAds();
+                                if (isAdmin) {
+                                    renderModerationGrid(getPendingModerationItems());
+                                    updateAdminCount();
+                                }
+                            } catch (e) {
+                                alert(e.message || 'Ошибка');
+                            } finally {
+                                hideLoader();
+                            }
                         }
 
                         async function rejectAd(rowIndex) {
-                            // Модерация удалена в новой структуре БД
-                            alert('Модерация больше не требуется');
+                            try {
+                                showLoader('Отклонение...');
+                                const response = await fetch('/api/ads/reject', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ rowIndex })
+                                });
+                                const result = await response.json();
+                                if (result.status !== 'success') {
+                                    throw new Error(result.message || 'Ошибка');
+                                }
+                                await loadAds();
+                                if (isAdmin) {
+                                    renderModerationGrid(getPendingModerationItems());
+                                    updateAdminCount();
+                                }
+                            } catch (e) {
+                                alert(e.message || 'Ошибка');
+                            } finally {
+                                hideLoader();
+                            }
                         }
                         async function approvePart(rowIndex) {
                             // Модерация удалена в новой структуре БД

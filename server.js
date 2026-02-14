@@ -314,7 +314,7 @@ async function fetchAdsPayload() {
   try {
     const [advertisements] = await connection.query(`
       SELECT 
-        a.id, a.brand, a.name, a.type, a.userId, a.price, a.date, a.city, 
+        a.id, a.brand, a.name, a.type, a.userId, a.price, a.date, a.city, a.verified,
         a.\`condition\`, a.sellerType, st.name AS sellerTypeName,
         at.tender, at.chassis, c.name AS chassisName, at.color, at.mileage, 
         at.engine, at.power, at.transmission, t.name AS transmissionName, 
@@ -352,6 +352,7 @@ async function fetchAdsPayload() {
       return {
         rowIndex: ad.id,
         userId: ad.userId,
+        verified: ad.verified,
         price: ad.price,
         name: ad.userName,
         phone: formatPhoneForDisplay(ad.userPhone),
@@ -559,8 +560,8 @@ app.post('/api/ads', async (req, res) => {
         // Вставляем новое объявление в advertisement
         const [result] = await connection.query(
           `INSERT INTO advertisement 
-            (brand, name, type, userId, price, date, city, \`condition\`, sellerType)
-           VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?)`,
+            (brand, name, type, userId, price, date, city, \`condition\`, sellerType, verified)
+           VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?)`,
           [
             brand || null, 
             model || '', 
@@ -569,7 +570,8 @@ app.post('/api/ads', async (req, res) => {
             price || 0, 
             city, 
             conditionFlag, 
-            resolvedSellerTypeId
+            resolvedSellerTypeId,
+            0
           ]
         );
 
@@ -751,6 +753,52 @@ app.post('/api/ads/delete', async (req, res) => {
       throw err;
     }
 
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
+  }
+});
+
+// POST /api/ads/approve - одобрить объявление
+app.post('/api/ads/approve', async (req, res) => {
+  try {
+    const { rowIndex } = req.body;
+    if (!rowIndex) {
+      return res.status(400).json({ status: 'error', message: 'Не указан ID объявления' });
+    }
+
+    const connection = await pool.getConnection();
+    try {
+      await connection.query(
+        'UPDATE advertisement SET verified = 1 WHERE id = ?',
+        [rowIndex]
+      );
+      res.json({ status: 'success', message: 'Объявление одобрено' });
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
+  }
+});
+
+// POST /api/ads/reject - отклонить объявление
+app.post('/api/ads/reject', async (req, res) => {
+  try {
+    const { rowIndex } = req.body;
+    if (!rowIndex) {
+      return res.status(400).json({ status: 'error', message: 'Не указан ID объявления' });
+    }
+
+    const connection = await pool.getConnection();
+    try {
+      await connection.query(
+        'UPDATE advertisement SET verified = 2 WHERE id = ?',
+        [rowIndex]
+      );
+      res.json({ status: 'success', message: 'Объявление отклонено' });
+    } finally {
+      connection.release();
+    }
   } catch (error) {
     res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
   }
