@@ -2699,8 +2699,15 @@
                                 renderPartsGrid(allParts);
                             }
 
-                            // Create button visibility is controlled by updateAuthUI (shown when user logged in)
-                            // No need to hide it when switching tabs
+                            // Hide create button when viewing profile
+                            const btnCreate = document.getElementById('btn-create-ad');
+                            if (tabName === 'profile') {
+                                if (btnCreate) btnCreate.classList.add('hidden');
+                            } else {
+                                if (btnCreate && typeof currentUser !== 'undefined' && currentUser) {
+                                    btnCreate.classList.remove('hidden');
+                                }
+                            }
                         }
                         function formatPriceInput(input) {
                             let val = input.value.replace(/\s/g, '');
