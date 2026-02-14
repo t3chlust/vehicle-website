@@ -791,11 +791,10 @@ app.post('/api/ads/reject', async (req, res) => {
 
     const connection = await pool.getConnection();
     try {
-      await connection.query(
-        'UPDATE advertisement SET verified = 2 WHERE id = ?',
-        [rowIndex]
-      );
-      res.json({ status: 'success', message: 'Объявление отклонено' });
+      await connection.query('DELETE FROM advertisement_photo WHERE advertisement = ?', [rowIndex]);
+      await connection.query('DELETE FROM advertisement_technic WHERE advertisement = ?', [rowIndex]);
+      await connection.query('DELETE FROM advertisement WHERE id = ?', [rowIndex]);
+      res.json({ status: 'success', message: 'Объявление отклонено и удалено' });
     } finally {
       connection.release();
     }

@@ -1718,6 +1718,14 @@
                                 font-size: 13px;
                             }
 
+                            .btn-view {
+                                background: #6c757d;
+                                color: white;
+                                height: 36px;
+                                line-height: 36px;
+                                font-size: 13px;
+                            }
+
 
                             .manufacturer-socials {
                                 display: grid;
@@ -4396,10 +4404,27 @@
                             return allAds.filter(ad => {
                                 const value = (ad && Object.prototype.hasOwnProperty.call(ad, 'verified')) ? ad.verified : null;
                                 if (value === null || value === undefined) return false;
+                                if (typeof value === 'object' && value !== null && Array.isArray(value.data)) {
+                                    return Number(value.data[0]) === 0;
+                                }
                                 if (typeof value === 'string') return value.trim() === '0';
                                 if (typeof value === 'boolean') return value === false;
                                 return Number(value) === 0;
                             });
+                        }
+                        function openModerationItem(rowIndex) {
+                            const id = Number(rowIndex);
+                            const ad = Array.isArray(allAds) ? allAds.find(item => Number(item.rowIndex) === id) : null;
+                            if (ad) {
+                                openAd(ad);
+                                return;
+                            }
+                            const part = Array.isArray(allParts) ? allParts.find(item => Number(item.rowIndex) === id) : null;
+                            if (part) {
+                                openPart(part);
+                                return;
+                            }
+                            alert('Объявление не найдено');
                         }
                         function updateAdminCount() {
                             const adminTab = document.getElementById('admin-tab-link');
@@ -4433,6 +4458,7 @@
                                         <div class="moderation-card-price">${Number(ad.price || 0).toLocaleString()} ₽</div>
                                     </div>
                                     <div class="moderation-card-actions">
+                                        <button class="btn btn-view" onclick="openModerationItem(${ad.rowIndex})">Просмотр</button>
                                         <button class="btn btn-approve" onclick="approveAd(${ad.rowIndex})">Одобрить</button>
                                         <button class="btn btn-reject" onclick="rejectAd(${ad.rowIndex})">Отклонить</button>
                                     </div>
