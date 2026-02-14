@@ -25,6 +25,31 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+// Run database migrations
+async function runMigrations() {
+  try {
+    const connection = await pool.getConnection();
+    try {
+      // Change verified column from BIT(1) to TINYINT(1) to support values 0, 1, 2
+      await connection.query(
+        `ALTER TABLE advertisement MODIFY COLUMN verified TINYINT(1) NOT NULL DEFAULT 0`
+      );
+      console.log('✓ Migration applied: verified column type updated');
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    if (error.message.includes('Syntax error') || error.message.includes('already')) {
+      console.log('✓ Verified column already updated or no migration needed');
+    } else {
+      console.error('Migration error:', error.message);
+    }
+  }
+}
+
+// Run migrations on startup
+runMigrations().catch(err => console.error('Failed to run migrations:', err));
+
 function bitToBool(value) {
   if (Buffer.isBuffer(value)) {
     return value.length > 0 && value[0] === 1;
@@ -352,7 +377,7 @@ async function fetchAdsPayload() {
       return {
         rowIndex: ad.id,
         userId: ad.userId,
-        verified: bitToBool(ad.verified) ? 1 : 0,
+        verified: Number(ad.verified) || 0,
         price: ad.price,
         name: ad.userName,
         phone: formatPhoneForDisplay(ad.userPhone),

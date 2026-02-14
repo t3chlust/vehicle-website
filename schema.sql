@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `advertisement` (
   `city` varchar(100) NOT NULL,
   `condition` bit(1) NOT NULL,
   `sellerType` int(11) NOT NULL,
-  `verified` bit(1) NOT NULL,
+  `verified` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `FK_advertisement_base_user_personal_data` (`userId`),
   KEY `FK_advertisement_seller_type` (`sellerType`),
