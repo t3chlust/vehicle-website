@@ -3336,7 +3336,19 @@
                             console.log('🎨 renderGrid: Вызвана с ads.length =', ads ? ads.length : 'undefined');
                             const c = document.getElementById('ads-container');
                             console.log('🔍 renderGrid: DOM элемент ads-container:', c);
-                            console.log('🔍 renderGrid: Текущий innerHTML:', c ? c.innerHTML.substring(0, 100) : 'не найден');
+                            
+                            // Смотрим на стили контейнера ПЕРЕД рендерингом
+                            if (c) {
+                                const styles = window.getComputedStyle(c);
+                                console.log('📐 renderGrid: Computed styles контейнера ДО рендеринга:');
+                                console.log('  - display:', styles.display);
+                                console.log('  - visibility:', styles.visibility);
+                                console.log('  - opacity:', styles.opacity);
+                                console.log('  - width:', styles.width);
+                                console.log('  - height:', styles.height);
+                                console.log('  - overflow:', styles.overflow);
+                                console.log('  - grid-template-columns:', styles.gridTemplateColumns);
+                            }
                             
                             c.innerHTML = '';
                             c.classList.remove('loaded');
@@ -3382,9 +3394,28 @@
                                 console.log(`  ✅ Элемент добавлен. c.children.length =`, c.children.length);
                             });
                             console.log('✅ renderGrid: Рендеринг завершен. Итого карточек в DOM:', c.children.length);
-                            console.log('🔍 renderGrid: Полный HTML container-a:', c.innerHTML.substring(0, 200));
+                            
                             setTimeout(() => {
                                 c.classList.add('loaded');
+                                const stylesAfter = window.getComputedStyle(c);
+                                console.log('📐 renderGrid: Computed styles контейнера ПОСЛЕ рендеринга:');
+                                console.log('  - display:', stylesAfter.display);
+                                console.log('  - visibility:', stylesAfter.visibility);
+                                console.log('  - opacity:', stylesAfter.opacity);
+                                console.log('  - width:', stylesAfter.width);
+                                console.log('  - height:', stylesAfter.height);
+                                
+                                // Проверяем первую карточку
+                                const firstCard = c.querySelector('.ad-card');
+                                if (firstCard) {
+                                    const cardStyles = window.getComputedStyle(firstCard);
+                                    console.log('📐 renderGrid: Computed styles КАРТОЧКИ:');
+                                    console.log('  - display:', cardStyles.display);
+                                    console.log('  - visibility:', cardStyles.visibility);
+                                    console.log('  - opacity:', cardStyles.opacity);
+                                    console.log('  - width:', cardStyles.width);
+                                    console.log('  - height:', cardStyles.height);
+                                }
                                 console.log('🎨 renderGrid: Добавил класс loaded');
                             }, 50);
                         }
