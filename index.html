@@ -922,9 +922,11 @@
                                 flex-direction: column;
                             }
 
-                            .ad-card:hover {
-                                transform: translateY(-4px);
-                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                            @media (hover: hover) {
+                                .ad-card:hover {
+                                    transform: translateY(-4px);
+                                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                                }
                             }
 
                             .favorite-heart {
@@ -933,21 +935,18 @@
                                 right: 10px;
                                 z-index: 10;
                                 cursor: pointer;
-                                background: rgba(255, 255, 255, 0.9);
-                                border-radius: 50%;
                                 width: 40px;
                                 height: 40px;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
                                 transition: all 0.3s ease;
-                                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                             }
 
-                            .favorite-heart:hover {
-                                transform: scale(1.1);
-                                background: rgba(255, 255, 255, 1);
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                            @media (hover: hover) {
+                                .favorite-heart:hover {
+                                    transform: scale(1.1);
+                                }
                             }
 
                             .favorite-heart.active svg {
