@@ -4521,9 +4521,10 @@
                         }
                         
                         function renderUserAds() {
-                            const grid = document.getElementById('vehicles-grid');
-                            const placeholder = document.getElementById('vehicles-placeholder');
-                            const countEl = document.getElementById('vehicles-count');
+                            const grid = document.getElementById('profile-my-ads-grid');
+                            const placeholder = document.getElementById('profile-my-ads-placeholder');
+                            const countEl = document.getElementById('profile-my-ads-count');
+                            if (!grid || !placeholder || !countEl) return;
                             
                             if (!currentUser || !currentUser.id) {
                                 grid.innerHTML = '';
