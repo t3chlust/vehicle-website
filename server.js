@@ -352,7 +352,7 @@ async function fetchAdsPayload() {
       return {
         rowIndex: ad.id,
         userId: ad.userId,
-        verified: ad.verified,
+        verified: bitToBool(ad.verified) ? 1 : 0,
         price: ad.price,
         name: ad.userName,
         phone: formatPhoneForDisplay(ad.userPhone),

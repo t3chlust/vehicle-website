@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `advertisement` (
   `city` varchar(100) NOT NULL,
   `condition` bit(1) NOT NULL,
   `sellerType` int(11) NOT NULL,
+  `verified` bit(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_advertisement_base_user_personal_data` (`userId`),
   KEY `FK_advertisement_seller_type` (`sellerType`),
@@ -38,9 +39,14 @@ CREATE TABLE IF NOT EXISTS `advertisement` (
   CONSTRAINT `FK_advertisement_advertisement_type` FOREIGN KEY (`type`) REFERENCES `advertisement_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_base_user_personal_data` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_seller_type` FOREIGN KEY (`sellerType`) REFERENCES `seller_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement: ~0 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement: ~4 rows (приблизительно)
+INSERT INTO `advertisement` (`id`, `brand`, `name`, `type`, `userId`, `price`, `date`, `city`, `condition`, `sellerType`, `verified`) VALUES
+	(3, 'Тингер', 'фыва', 1, 1, 1000000.00, '2026-02-13 10:12:31', 'Ишим', b'1', 1, b'0'),
+	(4, 'Тингер ', 'ТФ4', 1, 1, 2000000.00, '2026-02-14 17:48:18', 'Ишим ', b'0', 2, b'0'),
+	(5, 'Яр ', 'Профи ', 3, 1, 19199.00, '2026-02-14 17:55:17', 'Ишим ', b'0', 1, b'0'),
+	(6, 'Туда ', 'Сюда ', 1, 1, 1000000.00, '2026-02-14 18:01:20', 'Суп Чупино', b'1', 2, b'0');
 
 -- Дамп структуры для таблица vehicle_website.advertisement_photo
 CREATE TABLE IF NOT EXISTS `advertisement_photo` (
@@ -50,7 +56,13 @@ CREATE TABLE IF NOT EXISTS `advertisement_photo` (
   CONSTRAINT `FK_advertisement_photo_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement_photo: ~0 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement_photo: ~4 rows (приблизительно)
+INSERT INTO `advertisement_photo` (`advertisement`, `photo`) VALUES
+	(3, 'https://res.cloudinary.com/duystfz2v/image/upload/v1770977698/qfhmkkr4czdcxvieufjc.png'),
+	(4, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771091296/dnxu0orphvgbpfvbmkbb.jpg'),
+	(4, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771091297/bypwgcmcorslhfojakb5.jpg'),
+	(5, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771091716/rqzg4xdsracbeseorbys.png'),
+	(6, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771092078/vc7jvsmr0hdafthpqndb.png');
 
 -- Дамп структуры для таблица vehicle_website.advertisement_technic
 CREATE TABLE IF NOT EXISTS `advertisement_technic` (
@@ -81,10 +93,12 @@ CREATE TABLE IF NOT EXISTS `advertisement_technic` (
   CONSTRAINT `FK_advertisement_wheel` FOREIGN KEY (`chassis`) REFERENCES `chassis` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement_technic: ~2 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement_technic: ~3 rows (приблизительно)
 INSERT INTO `advertisement_technic` (`advertisement`, `tender`, `chassis`, `color`, `mileage`, `engine`, `power`, `transmission`, `fuel`, `wheelSize`, `amphibious`, `document`, `constructionType`, `capacity`) VALUES
-	(1, b'0', 1, 'Фиолетовый', 239, 'Toyota 1nz fe', 110, 1, 1, '1300x500', b'1', 1, 1, NULL),
-	(2, b'1', 2, 'Зеленый', NULL, 'ВАЗ 2111', 398, 2, 1, '1400x650', b'1', 1, 2, NULL);
+	(3, b'0', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 1, NULL),
+	(4, b'1', 1, 'Оранжевый', 513, 'Ваз 21113', 90, 2, 1, '1400x650', b'1', 1, 2, NULL),
+	(5, b'0', 1, 'Черный', 0, '', 0, 1, 1, '', b'0', 3, 1, 1700),
+	(6, b'1', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 3, NULL);
 
 -- Дамп структуры для таблица vehicle_website.advertisement_type
 CREATE TABLE IF NOT EXISTS `advertisement_type` (
@@ -394,7 +408,10 @@ CREATE TABLE IF NOT EXISTS `user_favorite_advertisement` (
   CONSTRAINT `FK_user_favorite_advertisement_user` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп данных таблицы vehicle_website.user_favorite_advertisement: ~0 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.user_favorite_advertisement: ~1 rows (приблизительно)
+INSERT INTO `user_favorite_advertisement` (`user`, `advertisement`) VALUES
+	(1, 4),
+	(3, 5);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
