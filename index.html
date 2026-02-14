@@ -3746,10 +3746,16 @@
                             isPanning = false;
                         }, { passive: false });
                         function shareCurrentAd() {
-                            if (!currentAd) return;
-                            const url = window.location.origin + window.location.pathname + '?id=' + currentAd.rowIndex;
-                            const text = `Смотри вездеход: ${currentAd.title}\nЦена: ${Number(currentAd.price).toLocaleString()} ₽\n${url}`;
-                            else { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); alert("Ссылка скопирована!"); }
+                               if (!currentAd) return;
+                               const url = window.location.origin + window.location.pathname + '?id=' + currentAd.rowIndex;
+                               const text = `Смотри вездеход: ${currentAd.title}\nЦена: ${Number(currentAd.price).toLocaleString()} ₽\n${url}`;
+                               const t = document.createElement("textarea");
+                               t.value = text;
+                               document.body.appendChild(t);
+                               t.select();
+                               document.execCommand("copy");
+                               document.body.removeChild(t);
+                               alert("Ссылка скопирована!");
                         }
                         function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
                         function closeModalDirect() {
