@@ -33,7 +33,6 @@
                             function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
                             function closeModalDirect() {
                                 document.getElementById('modal').classList.remove('active');
-                                document.body.style.overflow = 'auto';
                                 const btnCreate = document.getElementById('btn-create-ad');
                                 const btnProfile = document.getElementById('btn-profile');
                                 const tabs = document.getElementById('tabs-container');
@@ -326,7 +325,6 @@
                                 margin: 0;
                                 padding: 0;
                                 font-family: 'Roboto', sans-serif !important;
-                                overscroll-behavior-y: contain;
                                 background-color: #F7F9F8;
                             }
 
@@ -377,8 +375,6 @@
                                 }
                             }
 
-                            html, body { overflow-x: hidden; }
-
                             .tm-wrapper {
                                 max-width: 1440px;
                                 margin: 40px auto;
@@ -388,7 +384,6 @@
                                 box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
                                 color: #222;
                                 width: 95%;
-                                overflow-x: hidden;
                                 min-height: 80vh;
                             }
 
@@ -407,8 +402,8 @@
                                 /* Keep title and login on one line but reduce title size */
                                 #main-header .header-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:nowrap; }
                                 #main-header .header-title h2 { font-size: 18px; }
-                                /* Show secondary buttons below as a single non-wrapping row; allow horizontal scroll if needed */
-                                #main-header .header-bottom { display:flex; flex-direction:row; align-items:center; gap:8px; margin-top:8px; justify-content:flex-start; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+                                /* Show secondary buttons below as a single non-wrapping row */
+                                #main-header .header-bottom { display:flex; flex-direction:row; align-items:center; gap:8px; margin-top:8px; justify-content:flex-start; flex-wrap: nowrap; }
                                 #main-header .header-bottom .btn { width: auto; padding: 6px 10px; height: 34px; box-sizing: border-box; white-space: nowrap; }
                                 #btn-create-ad:not(.hidden), #btn-profile:not(.hidden) { display: inline-flex !important; }
                             }
@@ -553,7 +548,6 @@
                                     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
                                     color: #222;
                                     width: 95%;
-                                    overflow-x: hidden;
                                     min-height: 80vh;
                                 }
 
@@ -1152,7 +1146,6 @@
                                 opacity: 0;
                                 pointer-events: none;
                                 transition: opacity 0.6s;
-                                overflow-y: auto;
                             }
 
                             .modal-overlay.active {
@@ -1489,7 +1482,6 @@
                             #preview-container {
                                 display: flex;
                                 gap: 8px;
-                                overflow-x: auto;
                                 padding-top: 10px;
                             }
 
@@ -1500,28 +1492,6 @@
                                 border-radius: 6px;
                                 border: 1px solid #eee;
                                 flex-shrink: 0;
-                            }
-
-                            #ptr-indicator {
-                                position: fixed;
-                                top: 0;
-                                left: 0;
-                                width: 100%;
-                                height: 3px;
-                                z-index: 9999;
-                                display: flex;
-                                justify-content: center;
-                                pointer-events: none;
-                                background: #fff;
-                                opacity: 0;
-                                transition: opacity 0.3s;
-                            }
-
-                            #ptr-indicator .spinner {
-                                width: 20px;
-                                height: 20px;
-                                margin-top: 10px;
-                                border-width: 2px;
                             }
 
                             /* --- STYLES FOR TABS, MANUFACTURERS & ADMIN --- */
@@ -1583,27 +1553,7 @@
                                 align-items: flex-start;
                                 text-align: left;
                                 transition: transform 0.2s;
-                                position: relative;
-                                overflow: hidden;
                             }
-
-                            .manufacturer-card:hover {
-                                transform: translateY(-5px);
-                            }
-
-                            .manufacturer-logo-container {
-                                width: 100%;
-                                aspect-ratio: 1 / 1;
-                                background: #fff;
-                                border-radius: 12px;
-                                margin-bottom: 15px;
-                                overflow: hidden;
-
-                                /* важно */
-                                position: relative;
-                                display: flex;
-                                /* ← меняем на flex */
-                                align-items: center;
                                 justify-content: center;
                             }
 
@@ -1800,9 +1750,6 @@
                                 border-radius: 50%;
                             }
                         </style>
-                        <div id="ptr-indicator">
-                            <div class="spinner" style="width:20px;height:20px;"></div>
-                        </div>
                         <div class="tm-wrapper fade-in" id="main-wrapper">
                             <div id="main-header"
                                 style="border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:12px; gap: 8px;">
@@ -2216,7 +2163,6 @@
                                                     const card = document.getElementById(id);
 
                                                     if (card) {
-                                                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                                         // Подсветка карточки
                                                         card.style.transition = 'background 1.2s';
                                                         card.style.background = 'rgba(171, 71, 188, 0.6)';
@@ -2871,7 +2817,6 @@
                         window.addEventListener('pageshow', () => {
                             setTimeout(enforceCleanFiltersState, 0);
                         });
-                        const ptrIndicator = document.getElementById('ptr-indicator');
                         function toggleFilters() { const fw = document.getElementById('filters-wrapper'); if (fw.classList.contains('open')) { fw.classList.remove('open'); } else { fw.classList.add('open'); } }
                         function checkIsNew(ad) { if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true; if (ad.condition === 'new') return true; return false; }
                         function handlePhoneInput(input) { 
@@ -3225,7 +3170,6 @@
                                 if (input) input.value = match.title;
                                 const card = document.getElementById(`ad-${match.id}`);
                                 if (card) {
-                                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                     card.style.transition = 'background 1.2s';
                                     card.style.background = 'rgba(171, 71, 188, 0.35)';
                                     setTimeout(() => { card.style.background = ''; }, 1600);
@@ -3347,7 +3291,6 @@
                                 if (input) input.value = match.title;
                                 const card = document.getElementById(`part-${match.id}`);
                                 if (card) {
-                                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                     card.style.transition = 'background 1.2s';
                                     card.style.background = 'rgba(171, 71, 188, 0.35)';
                                     setTimeout(() => { card.style.background = ''; }, 1600);
@@ -3765,53 +3708,12 @@
                             }
                             track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
                         }
-                        const gWrap = document.getElementById('gallery-wrapper');
-                        let touchStartX = 0; let touchEndX = 0;
-                        gWrap.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-                        gWrap.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; if (touchStartX - touchEndX > 50) galleryNext(); if (touchEndX - touchStartX > 50) galleryPrev(); }, { passive: true });
                         function galleryNext(e) { if (e) e.stopPropagation(); currentPhotoIndex++; if (currentPhotoIndex >= currentPhotos.length) currentPhotoIndex = 0; updateGallery(); }
                         function galleryPrev(e) { if (e) e.stopPropagation(); currentPhotoIndex--; if (currentPhotoIndex < 0) currentPhotoIndex = currentPhotos.length - 1; updateGallery(); }
                         let currentScale = 1;
                         let panX = 0, panY = 0;
-                        let isPanning = false;
-                        let panStartX = 0, panStartY = 0;
                         const lBox = document.getElementById('lightbox');
-                        const lWrapper = document.getElementById('lightbox-wrapper');
                         const lImg = document.getElementById('lightbox-img');
-                        let lTouchStartX = 0; let lTouchEndX = 0;
-                        function constrainPan() {
-                            if (currentScale <= 1.01) {
-                                panX = 0;
-                                panY = 0;
-                                return;
-                            }
-
-                            const containerWidth = window.innerWidth;
-                            const containerHeight = window.innerHeight;
-                            const imgWidth = lImg.naturalWidth;
-                            const imgHeight = lImg.naturalHeight;
-
-                            let displayWidth, displayHeight;
-                            const imgRatio = imgWidth / imgHeight;
-                            const containerRatio = containerWidth / containerHeight;
-
-                            if (imgRatio > containerRatio) {
-                                displayWidth = containerWidth;
-                                displayHeight = containerWidth / imgRatio;
-                            } else {
-                                displayHeight = containerHeight;
-                                displayWidth = containerHeight * imgRatio;
-                            }
-
-                            const scaledWidth = displayWidth * currentScale;
-                            const scaledHeight = displayHeight * currentScale;
-
-                            const maxPanX = Math.max(0, (scaledWidth - containerWidth) / 2);
-                            const maxPanY = Math.max(0, (scaledHeight - containerHeight) / 2);
-
-                            panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
-                            panY = Math.max(-maxPanY, Math.min(maxPanY, panY));
-                        }
                         function openLightbox(src) {
                             lImg.src = src;
                             currentScale = 1;
@@ -3835,61 +3737,6 @@
                             }
                             lImg.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
                         }
-                        let initialPinchDist = 0;
-                        lBox.addEventListener('touchstart', (e) => {
-                            if (e.touches.length === 1) {
-                                lTouchStartX = e.touches[0].clientX;
-                                if (currentScale > 1) {
-                                    isPanning = true;
-                                    panStartX = e.touches[0].clientX - panX;
-                                    panStartY = e.touches[0].clientY - panY;
-                                }
-                            }
-                            if (e.touches.length === 2) {
-                                initialPinchDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-                            }
-                        }, { passive: false });
-                        lBox.addEventListener('touchmove', (e) => {
-                            if (e.touches.length === 2) {
-                                e.preventDefault();
-                                const dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-                                const delta = dist / initialPinchDist;
-                                let newScale = currentScale * delta;
-                                if (newScale < 1) newScale = 1;
-                                if (newScale > 3.5) newScale = 3.5;
-                                currentScale = newScale;
-                                initialPinchDist = dist;
-
-                                constrainPan();
-                                lImg.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
-                            } else if (e.touches.length === 1 && isPanning && currentScale > 1) {
-                                e.preventDefault();
-                                panX = e.touches[0].clientX - panStartX;
-                                panY = e.touches[0].clientY - panStartY;
-                                constrainPan();
-                                lImg.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
-                            }
-                        }, { passive: false });
-                        lBox.addEventListener('touchend', (e) => {
-                            constrainPan();
-                            lImg.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
-
-                            if (e.changedTouches.length === 1 && !isPanning && currentScale === 1) {
-                                lTouchEndX = e.changedTouches[0].clientX;
-                                if (Math.abs(lTouchStartX - lTouchEndX) > 50) {
-                                    lWrapper.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-                                    if (lTouchStartX - lTouchEndX > 50) {
-                                        lWrapper.style.transform = 'translateX(-50px)'; lWrapper.style.opacity = '0';
-                                        setTimeout(() => { galleryNext(); lImg.src = currentPhotos[currentPhotoIndex]; lWrapper.style.transform = 'translateX(50px)'; setTimeout(() => { lWrapper.style.transform = 'translateX(0)'; lWrapper.style.opacity = '1'; panX = 0; panY = 0; currentScale = 1; lImg.style.transform = 'translate(0px, 0px) scale(1)'; }, 50); }, 200);
-                                    }
-                                    if (lTouchEndX - lTouchStartX > 50) {
-                                        lWrapper.style.transform = 'translateX(50px)'; lWrapper.style.opacity = '0';
-                                        setTimeout(() => { galleryPrev(); lImg.src = currentPhotos[currentPhotoIndex]; lWrapper.style.transform = 'translateX(-50px)'; setTimeout(() => { lWrapper.style.transform = 'translateX(0)'; lWrapper.style.opacity = '1'; panX = 0; panY = 0; currentScale = 1; lImg.style.transform = 'translate(0px, 0px) scale(1)'; }, 50); }, 200);
-                                    }
-                                }
-                            }
-                            isPanning = false;
-                        }, { passive: false });
                         function shareCurrentAd() {
                                if (!currentAd) return;
                                const url = window.location.origin + window.location.pathname + '?id=' + currentAd.rowIndex;
@@ -3924,7 +3771,6 @@
                         function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
                         function closeModalDirect() {
                             document.getElementById('modal').classList.remove('active');
-                            document.body.style.overflow = 'auto';
                             const btnCreate = document.getElementById('btn-create-ad');
                             const btnProfile = document.getElementById('btn-profile');
                             const tabs = document.getElementById('tabs-container');
@@ -4197,7 +4043,6 @@
 
                                 if (typeof currentUser !== 'undefined' && currentUser) updateAuthUI(currentUser);
 
-                                ptrIndicator.style.opacity = '0';
                             } catch (e) {
                                 const adsContainer = document.getElementById('vehicles-container');
                                 if (adsContainer) {
@@ -4206,7 +4051,6 @@
                             } finally {
                                 document.getElementById('loading-ads').style.display = 'none';
                                 hideLoader();
-                                ptrIndicator.style.opacity = '0';
                             }
                         }
                         async function loadParts() {
@@ -4232,7 +4076,7 @@
                             }
                         }
                         function showLoader(t) { document.getElementById('loader-text').innerText = t; document.getElementById('global-loader').style.opacity = '1'; document.getElementById('global-loader').style.pointerEvents = 'all'; }
-                        function hideLoader() { document.getElementById('global-loader').style.opacity = '0'; document.getElementById('global-loader').style.pointerEvents = 'none'; ptrIndicator.style.opacity = '0'; }
+                        function hideLoader() { document.getElementById('global-loader').style.opacity = '0'; document.getElementById('global-loader').style.pointerEvents = 'none'; }
                         function openCreateMode() {
                             isEditMode = false;
                             const btnCreate = document.getElementById('btn-create-ad');
