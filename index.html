@@ -946,6 +946,10 @@
                                 display: block;
                             }
 
+                            .ad-card-media {
+                                position: relative;
+                            }
+
                             .ad-card-content {
                                 padding: 15px;
                                 flex-grow: 1;
@@ -954,18 +958,23 @@
                             }
 
                             .ad-card-tender-badge {
+                                position: absolute;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
                                 width: 100%;
                                 text-align: left;
                                 padding: 8px 12px;
                                 font-weight: 700;
                                 font-size: 13px;
                                 line-height: 1.1;
-                                display: flex;
+                                display: none;
                                 align-items: center;
                                 justify-content: flex-start;
                                 white-space: normal;
                                 word-break: normal;
                                 overflow-wrap: break-word;
+                                z-index: 2;
                             }
 
                             .ad-card-tender-badge.visible {
@@ -975,15 +984,7 @@
                             }
 
                             .ad-card-tender-badge.placeholder {
-                                display: block;
-                                background: transparent;
-                                color: transparent;
-                                user-select: none;
-                                pointer-events: none;
-                            }
-
-                            .ad-card-tender-badge.visible {
-                                display: block;
+                                display: none;
                             }
 
                             .ad-card-header {
@@ -1074,18 +1075,23 @@
                                 }
 
                                 .ad-card-tender-badge {
+                                    position: absolute;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
                                     width: 100%;
                                     text-align: left;
                                     padding: 6px 10px;
                                     font-weight: 700;
                                     font-size: 12px;
                                     line-height: 1.15;
-                                    display: flex;
+                                    display: none;
                                     align-items: center;
                                     justify-content: flex-start;
                                     white-space: normal;
                                     word-break: normal;
                                     overflow-wrap: break-word;
+                                    z-index: 2;
                                 }
 
                                 .ad-card-tender-badge.visible {
@@ -1095,11 +1101,7 @@
                                 }
 
                                 .ad-card-tender-badge.placeholder {
-                                    display: block;
-                                    background: transparent;
-                                    color: transparent;
-                                    user-select: none;
-                                    pointer-events: none;
+                                    display: none;
                                 }
                             }
 
@@ -3529,8 +3531,9 @@
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
 
-                                let tenderClass = ''; let tenderHtml = 'В РЕЕСТРЕ МИНПРОМТОРГА';
-                                if ((ad.tender || "").toLowerCase() === 'yes') { tenderClass = ' visible'; } else { tenderClass = ' placeholder'; }
+                                const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
+                                    ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                    : '';
 
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
@@ -3549,7 +3552,7 @@
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
                                 
-                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge${tenderClass}">${tenderHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
                             });
                             
@@ -3605,7 +3608,7 @@
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
                                 
-                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge placeholder">В РЕЕСТРЕ МИНПРОМТОРГА</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
                             });
                             setTimeout(() => c.classList.add('loaded'), 50);
@@ -4618,8 +4621,9 @@
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
 
-                                let tenderClass = ''; let tenderHtml = 'В РЕЕСТРЕ МИНПРОМТОРГА';
-                                if ((ad.tender || "").toLowerCase() === 'yes') { tenderClass = ' visible'; } else { tenderClass = ' placeholder'; }
+                                const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
+                                    ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                    : '';
 
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
@@ -4636,7 +4640,7 @@
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
                                 
-                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge${tenderClass}">${tenderHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 
                                 grid.appendChild(d);
                             });
@@ -4665,7 +4669,7 @@
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
                                 
-                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge placeholder">В РЕЕСТРЕ МИНПРОМТОРГА</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 
                                 grid.appendChild(d);
                             });
@@ -4762,8 +4766,9 @@
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
 
-                                let tenderClass = ''; let tenderHtml = 'В РЕЕСТРЕ МИНПРОМТОРГА';
-                                if ((ad.tender || "").toLowerCase() === 'yes') { tenderClass = ' visible'; } else { tenderClass = ' placeholder'; }
+                                const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
+                                    ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                    : '';
 
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
@@ -4781,7 +4786,7 @@
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
                                 
-                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge${tenderClass}">${tenderHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 
                                 grid.appendChild(d);
                                 return;
@@ -4811,7 +4816,7 @@
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
                                 
-                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge placeholder">В РЕЕСТРЕ МИНПРОМТОРГА</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 
                                 grid.appendChild(d);
                             });
@@ -4865,8 +4870,9 @@
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
 
-                                let tenderClass = ''; let tenderHtml = 'В РЕЕСТРЕ МИНПРОМТОРГА';
-                                if ((ad.tender || "").toLowerCase() === 'yes') { tenderClass = ' visible'; } else { tenderClass = ' placeholder'; }
+                                const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
+                                    ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                    : '';
 
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
@@ -4883,7 +4889,7 @@
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
                                 
-                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge${tenderClass}">${tenderHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 
                                 grid.appendChild(d);
                             });
@@ -4912,7 +4918,7 @@
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
                                 
-                                d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge placeholder">В РЕЕСТРЕ МИНПРОМТОРГА</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 
                                 grid.appendChild(d);
                             });
