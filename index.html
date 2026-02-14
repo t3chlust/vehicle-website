@@ -389,23 +389,19 @@
                                 min-height: 80vh;
                             }
 
-                            /* Keep the main title and login button on the same line for normal screens */
-                            #main-header { flex-wrap: nowrap; align-items: center; }
+                            /* Header layout: top row = title + login; bottom row = create/profile */
+                            #main-header { }
+                            #main-header .header-top { display:flex; justify-content:space-between; align-items:center; width:100%; }
                             #main-header .header-title { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
                             #main-header .header-title h2 { margin: 0; font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-                            #main-header .header-actions { flex: 0 0 auto; display:flex; gap:8px; align-items:center; }
-                            #main-header .header-actions .btn { flex: 0 0 auto; height: 34px; line-height: 34px; padding: 0 10px; white-space: nowrap; }
+                            #main-header .header-login .btn { height: 34px; line-height: 34px; padding: 0 10px; white-space: nowrap; }
+                            #main-header .header-bottom { display:flex; justify-content:flex-end; gap:8px; margin-top:8px; }
+                            #main-header .header-bottom .btn { height: 34px; line-height: 34px; padding: 0 10px; }
 
                             /* Make secondary buttons hide on very small screens to avoid crowding */
                             @media (max-width: 420px) {
-                                #main-header { flex-wrap: wrap; }
-                                #main-header .header-actions { width: 100%; justify-content: flex-end; margin-top:8px; }
+                                #main-header .header-bottom { justify-content:flex-end; }
                                 #btn-create-ad, #btn-profile { display: none !important; }
-                            }
-
-                            @media (max-width: 420px) {
-                                #main-header { flex-wrap: wrap; }
-                                #main-header .header-actions { width: 100%; justify-content: flex-end; margin-top:8px; }
                             }
 
                             .hidden {
@@ -1735,15 +1731,16 @@
                         </div>
                         <div class="tm-wrapper fade-in" id="main-wrapper">
                             <div id="main-header"
-                                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:20px; margin-bottom:20px; flex-wrap: wrap; gap: 15px;">
-                                <div class="header-title">
-                                    <h2 style="margin:0; font-size: 22px;">КупитьВездеход.рф</h2>
+                                style="border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:12px; gap: 8px;">
+                                <div class="header-top" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                                    <div class="header-title">
+                                        <h2 style="margin:0; font-size: 22px;">КупитьВездеход.рф</h2>
+                                    </div>
+                                    <div class="header-login"><button id="btn-login" class="btn btn-black" onclick="openAuthModal()">Войти</button></div>
                                 </div>
-                                <div class="header-actions"> <button id="btn-login" class="btn btn-black"
-                                    onclick="openAuthModal()">Войти</button> <button id="btn-create-ad"
-                                    class="btn btn-purple hidden" onclick="openCreateMode()">Подать объявление</button>
-                                    <button id="btn-profile"
-                                        class="btn btn-blue hidden" onclick="openProfile()">Личный кабинет</button>
+                                <div class="header-bottom">
+                                    <button id="btn-create-ad" class="btn btn-purple hidden" onclick="openCreateMode()">Подать объявление</button>
+                                    <button id="btn-profile" class="btn btn-blue hidden" onclick="openProfile()">Личный кабинет</button>
                                 </div>
                             </div>
                                 <div class="tabs-nav" id="tabs-nav"> <button class="tab-link active"
