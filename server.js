@@ -321,6 +321,7 @@ app.post('/api/users/ensure', async (req, res) => {
 async function fetchAdsPayload() {
   const connection = await pool.getConnection();
   try {
+    console.log('🔍 [fetchAdsPayload] Запрос объявлений техники...');
     const [advertisements] = await connection.query(`
       SELECT 
         a.id, a.brand, a.name, a.type, a.userId, a.price, a.date, a.city, 
@@ -345,6 +346,7 @@ async function fetchAdsPayload() {
       WHERE a.type IN (1, 2, 3)
       ORDER BY a.date DESC
     `);
+    console.log(`✅ [fetchAdsPayload] Получено объявлений из БД: ${advertisements.length}`);if (advertisements.length === 0) {console.warn('⚠️  [fetchAdsPayload] ВНИМАНИЕ: БД вернула 0 объявлений!');}
 
     const ads = await Promise.all(advertisements.map(async (ad) => {
       const [photos] = await connection.query(
@@ -407,6 +409,7 @@ async function fetchAdsPayload() {
 async function fetchPartsPayload() {
   const connection = await pool.getConnection();
   try {
+    console.log('🔍 [fetchPartsPayload] Запрос запчастей...');
     const [parts] = await connection.query(`
       SELECT
         a.id, a.name AS partName, a.brand, a.date, a.price, a.userId, 
@@ -418,6 +421,7 @@ async function fetchPartsPayload() {
       WHERE a.type = 4
       ORDER BY a.date DESC
     `);
+    console.log(`✅ [fetchPartsPayload] Получено запчастей из БД: ${parts.length}`);if (parts.length === 0) {console.warn('⚠️  [fetchPartsPayload] ВНИМАНИЕ: БД вернула 0 запчастей!');}
 
     const payload = await Promise.all(parts.map(async (part) => {
       const [photos] = await connection.query(
