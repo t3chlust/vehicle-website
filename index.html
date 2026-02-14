@@ -2689,6 +2689,10 @@
                         }
 
                         function showTab(element, tabName) {
+                            try {
+                                sessionStorage.setItem('lastTab', tabName);
+                            } catch (e) {
+                            }
                             // Force hide all tabs first
                             document.querySelectorAll('.tab-content').forEach(content => {
                                 content.style.display = 'none';
@@ -2822,6 +2826,19 @@
                             setupFilterInteractionTracking();
                             enforceCleanFiltersState();
                             tryAutoLogin();
+                            try {
+                                const lastTab = sessionStorage.getItem('lastTab');
+                                if (lastTab) {
+                                    const tabLinks = Array.from(document.querySelectorAll('.tab-link'));
+                                    const tabLink = tabLinks.find(link => {
+                                        const handler = link.getAttribute('onclick') || '';
+                                        return handler.includes(`'${lastTab}'`) || handler.includes(`"${lastTab}"`);
+                                    });
+                                    showTab(tabLink || null, lastTab);
+                                    sessionStorage.removeItem('lastTab');
+                                }
+                            } catch (e) {
+                            }
                             loadFilters()
                                 .then(() => enforceCleanFiltersState())
                             loadAds();
