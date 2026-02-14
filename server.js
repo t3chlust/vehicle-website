@@ -539,12 +539,6 @@ app.post('/api/ads', async (req, res) => {
       vehicleTypeName,
       lookups.vehicleType[0] ? lookups.vehicleType[0].id : null
     );
-    
-    // Логирование для отладки
-      techType: vehicleTypeName,
-      vehicleTypeId: vehicleTypeId,
-      action: action
-    });
 
     const constructionId = resolveIdByName(
       lookups.constructionType,
@@ -849,11 +843,6 @@ app.post('/api/parts', async (req, res) => {
 
       // type = 4 для запчастей
       const partTypeId = 4;
-      
-        action: action,
-        partName: partName,
-        partTypeId: partTypeId
-      });
 
       if (action === 'create') {
         const [result] = await connection.query(
