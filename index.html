@@ -2699,13 +2699,13 @@
                                 renderPartsGrid(allParts);
                             }
 
-                            // Hide create button when viewing profile
+                            // Показывать кнопку только на вкладке "Личный кабинет" и если пользователь авторизован
                             const btnCreate = document.getElementById('btn-create-ad');
-                            if (tabName === 'profile') {
-                                if (btnCreate) btnCreate.classList.add('hidden');
-                            } else {
-                                if (btnCreate && typeof currentUser !== 'undefined' && currentUser) {
+                            if (btnCreate) {
+                                if (tabName === 'profile' && typeof currentUser !== 'undefined' && currentUser) {
                                     btnCreate.classList.remove('hidden');
+                                } else {
+                                    btnCreate.classList.add('hidden');
                                 }
                             }
                         }
