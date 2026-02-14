@@ -2381,7 +2381,7 @@
                                             <option value="yes">Да</option>
                                         </select>
                                     </div>
-                                    <div class="form-section-title">Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span></div> <input
+                                    <div class="form-section-title" id="city-label">Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span></div> <input
                                         class="form-input" id="inp-city" placeholder="Город *" required />
                                     <input type="text" class="form-input" id="inp-price" placeholder="Цена (₽) *"
                                         list="price-list" oninput="formatPriceInput(this)" required />
@@ -3006,6 +3006,7 @@
                             const colorSelect = document.getElementById('inp-color');
                             const partOnlyDiv = document.getElementById('div-part-only');
                             const specsTitle = document.getElementById('specs-title');
+                            const cityLabel = document.getElementById('city-label');
                             constrInp.classList.add('hidden');
                             mainSpecs.classList.remove('hidden');
                             capDiv.classList.add('hidden');
@@ -3029,6 +3030,11 @@
                                 colorDocsDiv.classList.add('hidden');
                                 partOnlyDiv.classList.remove('hidden');
                                 specsTitle.classList.add('hidden');
+                            }
+                            if (cityLabel) {
+                                cityLabel.innerHTML = (type === 'Запчасть')
+                                    ? 'Где находится запчасть <span style="color:#ff4757; font-weight:bold;">*</span>'
+                                    : 'Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span>';
                             }
                             if (colorDocsDiv && colorSelect) {
                                 if (type === 'Прицеп' || type === 'Запчасть') {
