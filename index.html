@@ -3335,6 +3335,9 @@
                         function renderGrid(ads) {
                             console.log('🎨 renderGrid: Вызвана с ads.length =', ads ? ads.length : 'undefined');
                             const c = document.getElementById('ads-container');
+                            console.log('🔍 renderGrid: DOM элемент ads-container:', c);
+                            console.log('🔍 renderGrid: Текущий innerHTML:', c ? c.innerHTML.substring(0, 100) : 'не найден');
+                            
                             c.innerHTML = '';
                             c.classList.remove('loaded');
                             if (!ads || ads.length === 0) { 
@@ -3343,7 +3346,8 @@
                                 return; 
                             }
                             console.log('✅ renderGrid: Рендерю', ads.length, 'объявлений');
-                            ads.forEach(ad => {
+                            ads.forEach((ad, idx) => {
+                                console.log(`  ↳ Рендерю объявление ${idx}:`, ad.title || ad.brand);
                                 let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
 
@@ -3375,9 +3379,14 @@
                                 
                                 d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge${tenderClass}">${tenderHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
+                                console.log(`  ✅ Элемент добавлен. c.children.length =`, c.children.length);
                             });
-                            console.log('✅ renderGrid: Рендеринг завершен');
-                            setTimeout(() => c.classList.add('loaded'), 50);
+                            console.log('✅ renderGrid: Рендеринг завершен. Итого карточек в DOM:', c.children.length);
+                            console.log('🔍 renderGrid: Полный HTML container-a:', c.innerHTML.substring(0, 200));
+                            setTimeout(() => {
+                                c.classList.add('loaded');
+                                console.log('🎨 renderGrid: Добавил класс loaded');
+                            }, 50);
                         }
                         function renderPartsGrid(parts) {
                             const c = document.getElementById('parts-container');
