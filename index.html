@@ -1834,7 +1834,7 @@
                                         <div id="loading-ads" style="text-align:center; padding: 60px; color:#888;">
                                             <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
                                         </div>
-                                        <div id="ads-container" class="ad-grid"></div>
+                                        <div id="vehicles-container" class="ad-grid"></div>
                                     </div>
                                 </div>
                                 <div id="tab-content-parts" class="tab-content">
@@ -3334,8 +3334,8 @@
                         }
                         function renderGrid(ads) {
                             console.log('🎨 renderGrid: Вызвана с ads.length =', ads ? ads.length : 'undefined');
-                            const c = document.getElementById('ads-container');
-                            console.log('🔍 renderGrid: DOM элемент ads-container:', c);
+                            const c = document.getElementById('vehicles-container');
+                            console.log('🔍 renderGrid: DOM элемент vehicles-container:', c);
                             
                             // ДИАГНОСТИКА: проверяем видимость родителей
                             const viewList = document.getElementById('view-list');
@@ -4091,7 +4091,7 @@
                             } catch (e) {
                                 console.error('❌ loadAds: Ошибка:', e);
                                 updateDebugPanel('ОШИБКА', 'X', 'X', 'X');
-                                const adsContainer = document.getElementById('ads-container');
+                                const adsContainer = document.getElementById('vehicles-container');
                                 if (adsContainer) {
                                     adsContainer.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Не удалось загрузить объявления. Обновите страницу.</div>';
                                 }
@@ -4488,9 +4488,9 @@
                         }
                         
                         function renderUserAds() {
-                            const grid = document.getElementById('profile-my-ads-grid');
-                            const placeholder = document.getElementById('profile-my-ads-placeholder');
-                            const countEl = document.getElementById('profile-my-ads-count');
+                            const grid = document.getElementById('vehicles-grid');
+                            const placeholder = document.getElementById('vehicles-placeholder');
+                            const countEl = document.getElementById('vehicles-count');
                             
                             if (!currentUser || !currentUser.id) {
                                 grid.innerHTML = '';
