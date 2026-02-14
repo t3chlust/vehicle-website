@@ -2699,13 +2699,13 @@
                                 renderPartsGrid(allParts);
                             }
 
-                            // Показывать кнопку только на вкладке "Личный кабинет" и если пользователь авторизован
+                            // Кнопка видна на всех вкладках, кроме личного кабинета
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) {
-                                if (tabName === 'profile' && typeof currentUser !== 'undefined' && currentUser) {
-                                    btnCreate.classList.remove('hidden');
-                                } else {
+                                if (tabName === 'profile') {
                                     btnCreate.classList.add('hidden');
+                                } else {
+                                    btnCreate.classList.remove('hidden');
                                 }
                             }
                         }
