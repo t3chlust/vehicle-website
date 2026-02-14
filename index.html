@@ -2515,6 +2515,30 @@
                             }
                         }
 
+                        function resetAdsFiltersOnStartup() {
+                            const defaults = {
+                                'f-sort': 'default',
+                                'f-price-min': '',
+                                'f-price-max': '',
+                                'f-geo': '',
+                                'f-cond': '',
+                                'f-wheels': '',
+                                'f-trans': '',
+                                'f-fuel': '',
+                                'f-docs': '',
+                                'f-amphibious': '',
+                                'f-tender': '',
+                                'f-tech-type': '',
+                                'f-construction': '',
+                                'f-color': ''
+                            };
+
+                            Object.entries(defaults).forEach(([id, value]) => {
+                                const el = document.getElementById(id);
+                                if (el) el.value = value;
+                            });
+                        }
+
                         function goToMainFromProfile() {
                             const targetTab = profileReturnTab || 'ads';
                             const targetTabLink = document.querySelector(`.tab-link[onclick*="${targetTab}"]`);
@@ -2655,8 +2679,11 @@
                                 allRecords.style.opacity = '1';
                                 allRecords.classList.add('t-records_visible');
                             }
+                            resetAdsFiltersOnStartup();
                             tryAutoLogin();
-                            loadFilters().catch((e) => console.error('Ошибка загрузки фильтров:', e));
+                            loadFilters()
+                                .then(() => resetAdsFiltersOnStartup())
+                                .catch((e) => console.error('Ошибка загрузки фильтров:', e));
                             loadAds();
                             loadParts();
                         });
