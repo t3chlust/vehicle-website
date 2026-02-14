@@ -542,6 +542,27 @@
                                 background: #f0f0f0;
                             }
 
+                            .modal-favorite-heart {
+                                cursor: pointer;
+                                padding: 8px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex-shrink: 0;
+                                color: #999;
+                                transition: all 0.3s ease;
+                            }
+
+                            .modal-favorite-heart:hover {
+                                background: #f0f0f0;
+                                color: #222;
+                            }
+
+                            .modal-favorite-heart.active {
+                                color: #ff4757;
+                            }
+
                             .share-icon {
                                 width: 24px;
                                 height: 24px;
@@ -1665,8 +1686,8 @@
                                 display: flex !important;
                                 align-items: center;
                                 justify-content: center;
-                                width: 100% !important;
-                                aspect-ratio: 1 / 1;
+                                width: 80px !important;
+                                height: 80px !important;
                                 background: #fff;
                                 border-radius: 50%;
                                 transition: transform 0.2s;
@@ -1785,8 +1806,8 @@
                                 display: flex !important;
                                 align-items: center;
                                 justify-content: center;
-                                width: 100% !important;
-                                aspect-ratio: 1 / 1;
+                                width: 80px !important;
+                                height: 80px !important;
                                 border-radius: 50% !important;
                                 overflow: hidden;
                                 background: #fff;
@@ -2519,6 +2540,9 @@
                                     <div class="modal-badges-row">
                                         <div id="modal-badges"
                                             style="display:flex; align-items:center; gap: 6px; flex-wrap: wrap;"></div>
+                                        <div class="modal-favorite-heart" id="modal-favorite-heart" onclick="toggleModalFavorite()" title="Добавить в избранное">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                        </div>
                                         <div class="share-btn-wrapper" onclick="shareCurrentAd()" title="Поделиться">
                                             <svg class="share-icon" viewBox="0 0 24 24" stroke-linecap="round"
                                                 stroke-linejoin="round">
@@ -2723,9 +2747,9 @@
                         }
 
                         function showTab(element, tabName) {
-                            // Force hide all tabs first
+                            // Force hide all tabs first with !important to ensure they stay hidden
                             document.querySelectorAll('.tab-content').forEach(content => {
-                                content.style.display = 'none';
+                                content.style.display = 'none !important';
                                 content.classList.remove('active');
                             });
                             document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
@@ -2744,6 +2768,7 @@
                             if (tabName === 'admin' && typeof isAdmin !== 'undefined' && isAdmin && typeof allAds !== 'undefined') {
                                 if (typeof renderModerationGrid === 'function') {
                                     renderModerationGrid(getPendingModerationItems());
+                                    updateAdminCount();
                                 }
                             }
                             
@@ -3708,6 +3733,16 @@
                                 }
                             }
                             
+                            // Обновляем состояние иконки сердечка
+                            const heartBtn = document.getElementById('modal-favorite-heart');
+                            if (heartBtn) {
+                                if (userFavorites.includes(ad.rowIndex)) {
+                                    heartBtn.classList.add('active');
+                                } else {
+                                    heartBtn.classList.remove('active');
+                                }
+                            }
+                            
                             document.getElementById('modal').classList.add('active'); 
                             document.body.style.overflow = 'hidden';
                         }
@@ -3785,6 +3820,17 @@
                                     acts.classList.remove('visible');
                                 }
                             }
+                            
+                            // Обновляем состояние иконки сердечка
+                            const heartBtn = document.getElementById('modal-favorite-heart');
+                            if (heartBtn) {
+                                if (userFavorites.includes(ad.rowIndex)) {
+                                    heartBtn.classList.add('active');
+                                } else {
+                                    heartBtn.classList.remove('active');
+                                }
+                            }
+                            
                             document.getElementById('modal').classList.add('active'); document.body.style.overflow = 'hidden';
 
                             updateMetaTags(ad);
@@ -3841,6 +3887,17 @@
                                     acts.classList.remove('visible');
                                 }
                             }
+                            
+                            // Обновляем состояние иконки сердечка
+                            const heartBtn = document.getElementById('modal-favorite-heart');
+                            if (heartBtn) {
+                                if (userFavorites.includes(part.rowIndex)) {
+                                    heartBtn.classList.add('active');
+                                } else {
+                                    heartBtn.classList.remove('active');
+                                }
+                            }
+                            
                             document.getElementById('modal').classList.add('active');
                             document.body.style.overflow = 'hidden';
 
@@ -4022,6 +4079,28 @@
                                document.body.removeChild(t);
                                alert("Ссылка скопирована!");
                         }
+
+                        async function toggleModalFavorite() {
+                            if (!currentUser || !currentUser.id) {
+                                alert('Войдите в аккаунт, чтобы добавлять в избранное');
+                                return;
+                            }
+                            
+                            if (!currentAd) return;
+                            
+                            await toggleFavorite(currentAd.rowIndex);
+                            
+                            // Обновляем состояние иконки сердечка в модали
+                            const heartBtn = document.getElementById('modal-favorite-heart');
+                            if (heartBtn) {
+                                if (userFavorites.includes(currentAd.rowIndex)) {
+                                    heartBtn.classList.add('active');
+                                } else {
+                                    heartBtn.classList.remove('active');
+                                }
+                            }
+                        }
+
                         function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
                         function closeModalDirect() {
                             document.getElementById('modal').classList.remove('active');
@@ -4567,8 +4646,8 @@
                         function updateAdminCount() {
                             const adminTab = document.getElementById('admin-tab-link');
                             if (!adminTab || !isAdmin) return;
-                            // Модерации больше нет
-                            adminTab.innerText = `Админка`;
+                            const count = getPendingModerationItems().length;
+                            adminTab.innerText = count > 0 ? `Админка (${count})` : `Админка`;
                         }
                         function renderModerationGrid(items) {
                             const container = document.getElementById('moderation-grid');
