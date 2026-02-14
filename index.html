@@ -2695,6 +2695,18 @@
                             if (tabName === 'parts' && typeof renderPartsGrid === 'function' && Array.isArray(allParts)) {
                                 renderPartsGrid(allParts);
                             }
+
+                            // Control visibility of create button: only available when viewing profile and logged in
+                            try {
+                                const btnCreate = document.getElementById('btn-create-ad');
+                                if (btnCreate) {
+                                    if (tabName === 'profile' && typeof currentUser !== 'undefined' && currentUser) {
+                                        btnCreate.classList.remove('hidden');
+                                    } else {
+                                        btnCreate.classList.add('hidden');
+                                    }
+                                }
+                            } catch (e) { }
                         }
                         function formatPriceInput(input) {
                             let val = input.value.replace(/\s/g, '');
@@ -3834,9 +3846,12 @@
                             const btnCreate = document.getElementById('btn-create-ad');
                             const btnProfile = document.getElementById('btn-profile');
                             const tabs = document.getElementById('tabs-container');
+                            // Only show create button if user is logged in and currently on profile tab
+                            const activeTabContent = document.querySelector('.tab-content.active');
+                            const activeTabName = activeTabContent ? activeTabContent.id.replace('tab-content-', '') : null;
                             if (typeof currentUser !== 'undefined' && currentUser && tabs && tabs.style.display !== 'none') {
-                                if (btnCreate) btnCreate.classList.remove('hidden');
                                 if (btnProfile) btnProfile.classList.remove('hidden');
+                                if (btnCreate && activeTabName === 'profile') btnCreate.classList.remove('hidden');
                             }
                         }
                         function updateAuthUI(user) {
@@ -3857,8 +3872,8 @@
                                 const isModalOpen = modal && modal.classList.contains('active');
                                 const isFormOpen = formView && !formView.classList.contains('hidden');
                                 if (tabs && tabs.style.display !== 'none' && !isModalOpen && !isFormOpen) {
-                                    if (btnCreate) btnCreate.classList.remove('hidden');
                                     if (btnProfile) btnProfile.classList.remove('hidden');
+                                    // btnCreate visibility is handled by showTab/openProfile logic (only in profile)
                                 } else {
                                     if (btnCreate) btnCreate.classList.add('hidden');
                                     if (btnProfile) btnProfile.classList.add('hidden');
@@ -4146,10 +4161,9 @@
                             document.getElementById('tabs-nav').style.display = 'flex'; // Show tabs nav
                             document.getElementById('tabs-container').style.display = 'block'; // Show tabs content
                             if (currentUser) {
-                                const btnCreate = document.getElementById('btn-create-ad');
                                 const btnProfile = document.getElementById('btn-profile');
-                                if (btnCreate) btnCreate.classList.remove('hidden');
                                 if (btnProfile) btnProfile.classList.remove('hidden');
+                                // btnCreate will be shown only when user navigates to profile tab
                             }
                             // When returning to list, always show the 'ads' tab
                             showTab(document.querySelector('.tab-link[onclick*="ads"]'), 'ads');
