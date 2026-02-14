@@ -3847,12 +3847,16 @@
                             const btnCreate = document.getElementById('btn-create-ad');
                             const btnProfile = document.getElementById('btn-profile');
                             const tabs = document.getElementById('tabs-container');
-                            // Only show create button if user is logged in and currently on profile tab
+                            // Show create button only when user is logged in and NOT on profile tab
                             const activeTabContent = document.querySelector('.tab-content.active');
                             const activeTabName = activeTabContent ? activeTabContent.id.replace('tab-content-', '') : null;
                             if (typeof currentUser !== 'undefined' && currentUser && tabs && tabs.style.display !== 'none') {
                                 if (btnProfile) btnProfile.classList.remove('hidden');
-                                if (btnCreate && activeTabName === 'profile') btnCreate.classList.remove('hidden');
+                                if (btnCreate && activeTabName !== 'profile') {
+                                    btnCreate.classList.remove('hidden');
+                                } else if (btnCreate) {
+                                    btnCreate.classList.add('hidden');
+                                }
                             }
                         }
                         function updateAuthUI(user) {
@@ -4198,8 +4202,7 @@
                             const btnCreate = document.getElementById('btn-create-ad');
                             const btnProfile = document.getElementById('btn-profile');
                             if (btnProfile) btnProfile.classList.remove('hidden');
-                            // Show create button when user is on profile
-                            if (btnCreate) btnCreate.classList.remove('hidden');
+                            if (btnCreate) btnCreate.classList.add('hidden');
                             // Переключаемся на вкладку профиля
                             showTab(null, 'profile');
                         }
