@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover">
     <title>купитьвездеход.рф</title>
     <link rel="shortcut icon" href="images/logo.svg" type="image/x-icon" /> <!-- Assets -->
     <script
@@ -18,7 +19,7 @@
         })();</script>
 </head>
 
-<body class="t-body" style="margin:0;"> <!--allrecords-->
+    <body class="t-body" style="margin:0;"> <!--allrecords-->
     <div id="allrecords" data-tilda-export="yes" class="t-records" data-hook="blocks-collection-content-node"
         data-tilda-project-id="19128256" data-tilda-page-id="102478216"
         data-tilda-formskey="9584bca1a247ffc811b18d5819128256" data-tilda-cookie="no" data-tilda-lazy="yes"
@@ -70,7 +71,15 @@
                                 if (hint) hint.classList.add('hidden');
                                 if (btn) btn.classList.add('hidden');
                                 if (codeBlock) codeBlock.classList.remove('hidden');
-                                if (title) title.innerText = 'Введите код';
+                                // If the phone currently entered is the admin phone, show admin-specific prompt
+                                try {
+                                    const phoneEl = document.getElementById('auth-phone');
+                                    const normPhone = phoneEl ? (phoneEl.value || '').replace(/\D/g, '') : '';
+                                    const normAdmin = (ADMIN_PHONE || '').replace(/\D/g, '');
+                                    if (title) title.innerText = (normPhone && normPhone === normAdmin) ? 'введите код админа' : 'Введите код';
+                                } catch (e) {
+                                    if (title) title.innerText = 'Введите код';
+                                }
                             }
 
                             function openAuthModal() {
@@ -89,7 +98,10 @@
                             function verifySmsCode() {
                                 const code = safeVal('auth-code')?.trim();
                                 if (!code) {
-                                    alert("Введите код");
+                                    const phoneEl = document.getElementById('auth-phone');
+                                    const normPhone = phoneEl ? (phoneEl.value || '').replace(/\D/g, '') : '';
+                                    const normAdmin = (ADMIN_PHONE || '').replace(/\D/g, '');
+                                    alert((normPhone && normPhone === normAdmin) ? 'введите код админа' : 'Введите код');
                                     return;
                                 }
                                 
@@ -362,6 +374,8 @@
                                 }
                             }
 
+                            html, body { overflow-x: hidden; }
+
                             .tm-wrapper {
                                 max-width: 1440px;
                                 margin: 40px auto;
@@ -496,7 +510,10 @@
                                 .header-actions {
                                     width: 100%;
                                     justify-content: flex-end;
+                                    white-space: nowrap;
                                 }
+
+                                .header-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
                                 .header-actions .btn {
                                     padding: 0 12px;
@@ -511,6 +528,10 @@
                                 .tab-link {
                                     padding: 8px 12px;
                                     font-size: 14px;
+                                    background: #f0f0f0;
+                                    border-radius: 8px;
+                                    color: #222;
+                                    margin-right:6px;
                                 }
 
                                 .manufacturer-grid {
@@ -1677,13 +1698,13 @@
                         </div>
                         <div class="tm-wrapper fade-in" id="main-wrapper">
                             <div
-                                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:20px; margin-bottom:20px; flex-wrap: wrap; gap: 15px;">
+                                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:20px; margin-bottom:20px; flex-wrap: nowrap; gap: 15px;">
                                 <div class="header-title">
                                     <h2 style="margin:0; font-size: 22px;">КупитьВездеход.рф</h2>
                                 </div>
-                                <div class="header-actions"> <button id="btn-login" class="btn btn-black"
-                                        onclick="openAuthModal()">Войти</button> <button id="btn-create-ad"
-                                        class="btn btn-purple hidden" onclick="openCreateMode()">Подать объявление</button>
+                                <div class="header-actions"> <button id="btn-login" class="btn btn-purple"
+                                    onclick="openAuthModal()">Войти</button> <button id="btn-create-ad"
+                                    class="btn btn-purple hidden" onclick="openCreateMode()">Подать объявление</button>
                                     <button id="btn-profile"
                                         class="btn btn-blue hidden" onclick="openProfile()">Личный кабинет</button>
                                 </div>
@@ -1855,7 +1876,7 @@
                                             <circle cx="12" cy="7" r="4"></circle>
                                         </svg>
                                         <h3 style="color:#666; margin-bottom:15px;">Войдите, чтобы увидеть личный кабинет</h3>
-                                        <button class="btn btn-primary" onclick="openAuthModal()">Войти</button>
+                                        <button class="btn btn-purple" onclick="openAuthModal()">Войти</button>
                                     </div>
                                     <div id="profile-content" style="display:block;">
                                         <!-- Информация о пользователе -->

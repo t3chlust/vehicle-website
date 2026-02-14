@@ -15,6 +15,7 @@
             padding: 0;
             font-family: 'Roboto', sans-serif !important;
             background-color: #F7F9F8;
+            overflow-x: hidden;
         }
 
         * {
@@ -97,6 +98,17 @@
             transition: transform 0.2s;
             flex-shrink: 0;
             text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .manufacturer-socials-large a {
+                width: 48px !important;
+                height: 48px !important;
+            }
+            .manufacturer-socials-large img {
+                width: 100% !important;
+                height: 100% !important;
+            }
         }
 
         .manufacturer-socials-large a:hover {
