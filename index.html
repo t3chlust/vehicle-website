@@ -394,9 +394,9 @@
                             #main-header .header-top { display:flex; justify-content:space-between; align-items:center; width:100%; }
                             #main-header .header-title { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; margin-right: 8px; }
                             #main-header .header-title h2 { margin: 0; font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-                            #main-header .header-login .btn { height: 34px; line-height: 34px; padding: 0 10px; white-space: nowrap; }
+                            #main-header .header-login .btn { height: 34px; padding: 0 10px; white-space: nowrap; display:inline-flex; align-items:center; justify-content:center; }
                             #main-header .header-bottom { display:flex; justify-content:flex-start; gap:8px; margin-top:8px; }
-                            #main-header .header-bottom .btn { height: 34px; line-height: 34px; padding: 0 10px; }
+                            #main-header .header-bottom .btn { height: 34px; padding: 0 10px; display:inline-flex; align-items:center; justify-content:center; }
 
                             /* On very small screens show secondary buttons stacked under the title */
                             @media (max-width: 420px) {
@@ -417,15 +417,17 @@
                                 border: none;
                                 padding: 0 20px;
                                 height: 40px;
-                                line-height: 40px;
                                 border-radius: 8px;
                                 cursor: pointer;
                                 font-weight: 600;
                                 font-size: 14px;
                                 transition: 0.2s;
-                                display: inline-block;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
                                 text-align: center;
                                 white-space: nowrap;
+                                box-sizing: border-box;
                             }
 
                             .btn-black {
