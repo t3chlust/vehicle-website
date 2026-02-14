@@ -3874,8 +3874,6 @@
                                 const isFormOpen = formView && !formView.classList.contains('hidden');
                                 if (tabs && tabs.style.display !== 'none' && !isModalOpen && !isFormOpen) {
                                     if (btnProfile) btnProfile.classList.remove('hidden');
-                                    // Show create button when user is logged in
-                                    if (btnCreate) btnCreate.classList.remove('hidden');
                                 } else {
                                     if (btnCreate) btnCreate.classList.add('hidden');
                                     if (btnProfile) btnProfile.classList.add('hidden');
