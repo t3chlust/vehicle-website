@@ -19,7 +19,6 @@
 </head>
 
 <body class="t-body" style="margin:0;"> <!--allrecords-->
-    <div id="debug-panel" style="position: fixed; top: 0; left: 0; right: 0; background: #ffc107; color: black; padding: 8px; z-index: 9999; font-family: monospace; font-size: 11px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
     <div id="allrecords" data-tilda-export="yes" class="t-records" data-hook="blocks-collection-content-node"
         data-tilda-project-id="19128256" data-tilda-page-id="102478216"
         data-tilda-formskey="9584bca1a247ffc811b18d5819128256" data-tilda-cookie="no" data-tilda-lazy="yes"
@@ -162,7 +161,6 @@
                                 })
                                 .catch(error => {
                                     hideLoader();
-                                    console.error('Ошибка:', error);
                                     alert("Ошибка при проверке кода: " + error.message);
                                 });
                             }
@@ -226,7 +224,6 @@
                                 })
                                 .catch(error => {
                                     hideLoader();
-                                    console.error('Ошибка:', error);
                                     alert("Ошибка: " + error.message);
                                 });
                             }
@@ -1950,16 +1947,12 @@
                                             let synonymToOfficial = new Map();   // "тингер" → "TINGER", "трекер" → "TRACKER" и т.д.
                                             // ВРЕМЕННАЯ ОТЛАДКА — посмотри в консоль F12
                                             setTimeout(() => {
-                                                console.log("Все синонимы и их официальные названия:");
                                                 synonymToOfficial.forEach((official, syn) => {
-                                                    // console.log(`"${syn}" → "${official}"`);
                                                 });
                                                 if (synonymToOfficial.size === 0) {
-                                                    // console.warn("synonymToOfficial пустая! Синонимы не загрузились.");
                                                 }
                                             }, 2000);
                                             synonymToOfficial.forEach((official, key) => {
-                                                // console.log(`Синоним: "${key}" → Официальное: "${official}"`);
                                             });
                                             function parseManufacturers(data) {
                                                 // Data is already a JSON array from the API
@@ -2096,7 +2089,6 @@
                                                         setTimeout(() => { card.style.background = ''; }, 1600);
                                                         if (input) input.value = '';
                                                     } else {
-                                                        console.warn('Карточка не найдена по id:', id);
                                                     }
 
                                                     const listDiv = document.getElementById('manufacturerList');
@@ -2200,7 +2192,6 @@
                                                         });
                                                     }
                                                 })
-                                                .catch(err => console.error('Ошибка загрузки производителей:', err));
                                         })();
                                     </script>
                                 </div>
@@ -2448,11 +2439,6 @@
                         let currentPhotoIndex = 0; let currentPhotos = [];
                         let userFavorites = []; // Массив ID избранных объявлений
                         
-                        function updateDebugPanel(source, rawCount, filteredCount, userAdjusted) {
-                            const panel = document.getElementById('debug-panel');
-                            if (!panel) return;
-                            panel.innerHTML = `📊 Источник: ${source} | Получено: ${rawCount} | Отображено: ${filteredCount} | Фильтр: ${userAdjusted}`;
-                        }
 
                         function rebuildSelect(selectId, options, getValue, getLabel) {
                             const select = document.getElementById(selectId);
@@ -2519,7 +2505,6 @@
                                     (item) => item.name
                                 );
                             } catch (error) {
-                                console.error('Ошибка загрузки фильтров:', error);
                             }
                         }
 
@@ -2729,7 +2714,6 @@
                             tryAutoLogin();
                             loadFilters()
                                 .then(() => enforceCleanFiltersState())
-                                .catch((e) => console.error('Ошибка загрузки фильтров:', e));
                             loadAds();
                             loadParts();
 
@@ -2786,26 +2770,20 @@
                         function handlePhoneInput(input) { 
                             // Оставляем только цифры и +
                             let value = input.value.replace(/[^0-9+]/g, '');
-                            console.log('Step 1 - Входное значение:', input.value);
-                            console.log('Step 2 - После удаления спецсимволов:', value);
                             
                             // Извлекаем только цифры
                             let digits = value.replace(/[^0-9]/g, '');
-                            console.log('Step 3 - Только цифры:', digits);
                             
                             // Если начинается с 7 (и не +7), удаляем первую 7
                             if (digits.startsWith('7')) {
                                 digits = digits.substring(1);
-                                console.log('Step 4 - Удалили первую 7:', digits);
                             }
                             
                             // Ограничиваем максимум 10 цифр (после +7)
                             digits = digits.substring(0, 10);
-                            console.log('Step 5 - После ограничения до 10 цифр:', digits);
                             
                             // Форматируем в +7XXXXXXXXXX
                             input.value = '+7' + digits;
-                            console.log('Step 6 - Финальное значение:', input.value);
                             
                             updateSmsButtonState();
                         }
@@ -2910,7 +2888,6 @@
                             checkConditionVisibility();
                         }
                         function applyFilters() {
-                            console.log('🔄 applyFilters: Начало. allAds.length =', allAds.length, ', hasUserAdjustedFilters =', hasUserAdjustedFilters);
                             let approvedAds = allAds;
 
                             const useUiFilters = hasUserAdjustedFilters;
@@ -2932,7 +2909,6 @@
                             const techType = useUiFilters ? safeVal('f-tech-type') : '';
                             const constr = useUiFilters ? safeVal('f-construction') : '';
 
-                            console.log('🔍 applyFilters: Применяю фильтры. useUiFilters =', useUiFilters);
 
                             let filtered = approvedAds.filter(ad => {
                                 const adPrice = Number(ad.price || 0);
@@ -2955,7 +2931,6 @@
                                 return true;
                             });
 
-                            console.log('📊 applyFilters: После фильтрации filtered.length =', filtered.length);
 
                             if (sortType === 'asc') {
                                 filtered.sort((a, b) => getPriceVal(a.price) - getPriceVal(b.price));
@@ -2965,10 +2940,7 @@
                                 filtered.sort((a, b) => Number(b.rowIndex) - Number(a.rowIndex));
                             }
 
-                            console.log('🎨 applyFilters: Вызываю renderGrid с', filtered.length, 'объявлениями');
                             renderGrid(filtered);
-                            updateDebugPanel('OK (ApplyFilters)', allAds.length, filtered.length, hasUserAdjustedFilters);
-                            console.log('✅ applyFilters: Завершено');
 
                             if (isAdmin) {
                                 renderModerationGrid(getPendingModerationItems());
@@ -3040,14 +3012,10 @@
                         }
 
                         async function fetchDatasetWithFallback(endpoint) {
-                            console.log(`🔍 fetchDatasetWithFallback: Запрашиваю ${endpoint}`);
                             const primary = await fetchJsonNoCacheWithRetry(endpoint, true);
-                            console.log(`📦 fetchDatasetWithFallback: Получено от ${endpoint}:`, primary);
                             if (Array.isArray(primary) && primary.length > 0) {
-                                console.log(`✅ fetchDatasetWithFallback: ${endpoint} вернул ${primary.length} объектов`);
                                 return primary;
                             }
-                            console.warn(`⚠️ fetchDatasetWithFallback: ${endpoint} вернул пусто, пробую fallback...`);
 
                             try {
                                 const fallback = await xhrGetJsonNoCache(endpoint);
@@ -3055,7 +3023,6 @@
                                     return fallback;
                                 }
                             } catch (e) {
-                                console.error(`XHR fallback failed for ${endpoint}:`, e);
                             }
 
                             try {
@@ -3084,7 +3051,6 @@
                                     }
                                 }
                             } catch (e) {
-                                console.error(`POST fallback failed for ${endpoint}:`, e);
                             }
 
                             return Array.isArray(primary) ? primary : [];
@@ -3333,9 +3299,7 @@
                             });
                         }
                         function renderGrid(ads) {
-                            console.log('🎨 renderGrid: Вызвана с ads.length =', ads ? ads.length : 'undefined');
                             const c = document.getElementById('vehicles-container');
-                            console.log('🔍 renderGrid: DOM элемент vehicles-container:', c);
                             
                             // ДИАГНОСТИКА: проверяем видимость родителей
                             const viewList = document.getElementById('view-list');
@@ -3343,12 +3307,10 @@
                             
                             if (viewList) {
                                 const viewListStyles = window.getComputedStyle(viewList);
-                                console.log('📊 renderGrid: view-list display:', viewListStyles.display, 'visibility:', viewListStyles.visibility);
                             }
                             
                             if (tabContentAds) {
                                 const tabStyles = window.getComputedStyle(tabContentAds);
-                                console.log('📊 renderGrid: tab-content-ads display:', tabStyles.display, 'class:', tabContentAds.className);
                             }
                             
                             // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox с !important
@@ -3358,7 +3320,6 @@
                                 c.style.setProperty('gap', '20px', 'important');
                                 c.style.setProperty('marginTop', '30px', 'important');
                                 c.style.setProperty('opacity', '1', 'important');
-                                console.log('✅ renderGrid: Установил inline styles с !important для display:grid');
                                 
                                 // Убеждаемся что родители тоже видимы
                                 if (viewList) viewList.style.setProperty('display', 'block', 'important');
@@ -3368,26 +3329,15 @@
                             // Смотрим на стили контейнера ПЕРЕД рендерингом
                             if (c) {
                                 const styles = window.getComputedStyle(c);
-                                console.log('📐 renderGrid: Computed styles контейнера ДО рендеринга:');
-                                console.log('  - display:', styles.display);
-                                console.log('  - visibility:', styles.visibility);
-                                console.log('  - opacity:', styles.opacity);
-                                console.log('  - width:', styles.width);
-                                console.log('  - height:', styles.height);
-                                console.log('  - overflow:', styles.overflow);
-                                console.log('  - grid-template-columns:', styles.gridTemplateColumns);
                             }
                             
                             c.innerHTML = '';
                             c.classList.remove('loaded');
                             if (!ads || ads.length === 0) { 
-                                console.warn('⚠️ renderGrid: ads пусто, показываю "Ничего не найдено"');
                                 c.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Ничего не найдено</div>'; 
                                 return; 
                             }
-                            console.log('✅ renderGrid: Рендерю', ads.length, 'объявлений');
                             ads.forEach((ad, idx) => {
-                                console.log(`  ↳ Рендерю объявление ${idx}:`, ad.title || ad.brand);
                                 let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
 
@@ -3419,32 +3369,17 @@
                                 
                                 d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge${tenderClass}">${tenderHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
-                                console.log(`  ✅ Элемент добавлен. c.children.length =`, c.children.length);
                             });
-                            console.log('✅ renderGrid: Рендеринг завершен. Итого карточек в DOM:', c.children.length);
                             
                             setTimeout(() => {
                                 c.classList.add('loaded');
                                 const stylesAfter = window.getComputedStyle(c);
-                                console.log('📐 renderGrid: Computed styles контейнера ПОСЛЕ рендеринга:');
-                                console.log('  - display:', stylesAfter.display);
-                                console.log('  - visibility:', stylesAfter.visibility);
-                                console.log('  - opacity:', stylesAfter.opacity);
-                                console.log('  - width:', stylesAfter.width);
-                                console.log('  - height:', stylesAfter.height);
                                 
                                 // Проверяем первую карточку
                                 const firstCard = c.querySelector('.ad-card');
                                 if (firstCard) {
                                     const cardStyles = window.getComputedStyle(firstCard);
-                                    console.log('📐 renderGrid: Computed styles КАРТОЧКИ:');
-                                    console.log('  - display:', cardStyles.display);
-                                    console.log('  - visibility:', cardStyles.visibility);
-                                    console.log('  - opacity:', cardStyles.opacity);
-                                    console.log('  - width:', cardStyles.width);
-                                    console.log('  - height:', cardStyles.height);
                                 }
-                                console.log('🎨 renderGrid: Добавил класс loaded');
                             }, 50);
                         }
                         function renderPartsGrid(parts) {
@@ -3814,7 +3749,6 @@
                             if (!currentAd) return;
                             const url = window.location.origin + window.location.pathname + '?id=' + currentAd.rowIndex;
                             const text = `Смотри вездеход: ${currentAd.title}\nЦена: ${Number(currentAd.price).toLocaleString()} ₽\n${url}`;
-                            if (navigator.share) { navigator.share({ title: currentAd.title, text: text, url: url }).catch((e) => console.log(e)); }
                             else { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); alert("Ссылка скопирована!"); }
                         }
                         function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
@@ -4043,12 +3977,7 @@
                         });
                         async function loadAds() {
                             try {
-                                console.log('🚀 loadAds: Начинаю загрузку объявлений техники...');
-                                updateDebugPanel('Загружаю...', '...', '...', hasUserAdjustedFilters);
                                 const raw = await fetchDatasetWithFallback('/api/listings');
-                                console.log('📊 loadAds: Получено raw данных:', raw);
-                                console.log('📊 loadAds: Количество полученных объявлений:', Array.isArray(raw) ? raw.length : 'не массив');
-                                updateDebugPanel('Получено', raw.length || 0, '...', hasUserAdjustedFilters);
 
                                 // Преобразуем записи: если есть Brand и Model, комбинируем их в title
                                 allAds = (Array.isArray(raw) ? raw : []).map(ad => {
@@ -4061,7 +3990,6 @@
                                     return ad;
                                 });
 
-                                console.log('📦 loadAds: После трансформации allAds.length =', allAds.length);
                                 applyFilters();
                                 buildAdSearchIndex(allAds);
                                 initAdsSearch();
@@ -4087,10 +4015,7 @@
                                 if (typeof currentUser !== 'undefined' && currentUser) updateAuthUI(currentUser);
 
                                 ptrIndicator.style.opacity = '0';
-                                console.log('✅ loadAds: Завершено');
                             } catch (e) {
-                                console.error('❌ loadAds: Ошибка:', e);
-                                updateDebugPanel('ОШИБКА', 'X', 'X', 'X');
                                 const adsContainer = document.getElementById('vehicles-container');
                                 if (adsContainer) {
                                     adsContainer.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Не удалось загрузить объявления. Обновите страницу.</div>';
@@ -4103,10 +4028,8 @@
                         }
                         async function loadParts() {
                             try {
-                                updateDebugPanel('Загружаю запчасти...', '...', '...', hasUserAdjustedFilters);
                                 const raw = await fetchDatasetWithFallback('/api/spares');
                                 allParts = Array.isArray(raw) ? raw : [];
-                                updateDebugPanel('Запчасти OK', allParts.length, allParts.length, hasUserAdjustedFilters);
                                 const displayParts = allParts;
                                 renderPartsGrid(displayParts);
                                 buildPartSearchIndex(displayParts);
@@ -4116,8 +4039,6 @@
                                     updateAdminCount();
                                 }
                             } catch (e) {
-                                console.log(e);
-                                updateDebugPanel('Запчасти ОШИБКА', 'X', 'X', 'X');
                                 const partsContainer = document.getElementById('parts-container');
                                 if (partsContainer) {
                                     partsContainer.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Не удалось загрузить запчасти. Обновите страницу.</div>';
@@ -4202,7 +4123,6 @@
                                     userFavorites = [];
                                 }
                             } catch (e) {
-                                console.error('Ошибка загрузки избранного:', e);
                                 userFavorites = [];
                             }
                         }
@@ -4259,7 +4179,6 @@
                                     alert(result.message || 'Ошибка');
                                 }
                             } catch (e) {
-                                console.error('Ошибка при работе с избранным:', e);
                                 alert('Ошибка: ' + e.message);
                             }
                         }

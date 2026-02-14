@@ -163,7 +163,6 @@ app.post('/send-sms', async (req, res) => {
         code: code,
         createdAt: Date.now()
       });
-      console.log(`✅ Админский номер ${phone} - код установлен на: ${code}`);
       
       return res.json({ 
         success: true, 
@@ -194,7 +193,6 @@ app.post('/send-sms', async (req, res) => {
     if (sendResult.status === 'OK') {
       const smsData = sendResult.sms[phone];
       if (smsData && smsData.status === 'OK') {
-        console.log(`✅ СМС отправлена на ${phone} (ID: ${smsData.sms_id})`);
         
         res.json({ 
           success: true, 
@@ -202,14 +200,12 @@ app.post('/send-sms', async (req, res) => {
           smsId: smsData.sms_id
         });
       } else {
-        console.error('❌ Ошибка при отправке СМС на номер:', smsData);
         res.status(500).json({ 
           success: false, 
           error: 'Ошибка при отправке СМС: ' + (smsData?.status || 'Неизвестная ошибка')
         });
       }
     } else {
-      console.error('❌ Ошибка при отправке СМС:', sendResult);
       res.status(500).json({ 
         success: false, 
         error: 'Ошибка при отправке СМС: ' + (sendResult.status || 'Неизвестная ошибка')
@@ -217,7 +213,6 @@ app.post('/send-sms', async (req, res) => {
     }
 
   } catch (error) {
-    console.error('❌ Ошибка на сервере:', error);
     res.status(500).json({ success: false, error: 'Ошибка на сервере: ' + error.message });
   }
 });
@@ -248,7 +243,6 @@ app.post('/verify-code', (req, res) => {
     if (storedData.code === code) {
       // Удаляем использованный код
       verificationCodes.delete(phone);
-      console.log(`✅ Код подтвержден для ${phone}`);
       
       res.json({ success: true, message: 'Код подтвержден успешно' });
     } else {
@@ -256,7 +250,6 @@ app.post('/verify-code', (req, res) => {
     }
 
   } catch (error) {
-    console.error('❌ Ошибка на сервере:', error);
     res.status(500).json({ success: false, error: 'Ошибка на сервере: ' + error.message });
   }
 });
@@ -283,7 +276,6 @@ app.post('/api/users/exists', async (req, res) => {
 
     return res.json({ success: true, exists: false });
   } catch (error) {
-    console.error('❌ Ошибка при проверке пользователя:', error);
     res.status(500).json({ success: false, error: 'Ошибка на сервере: ' + error.message });
   }
 });
@@ -309,7 +301,6 @@ app.post('/api/users/ensure', async (req, res) => {
 
     res.json({ success: true, user });
   } catch (error) {
-    console.error('❌ Ошибка при создании пользователя:', error);
     res.status(500).json({ success: false, error: 'Ошибка на сервере: ' + error.message });
   }
 });
@@ -321,7 +312,6 @@ app.post('/api/users/ensure', async (req, res) => {
 async function fetchAdsPayload() {
   const connection = await pool.getConnection();
   try {
-    console.log('🔍 [fetchAdsPayload] Запрос объявлений техники...');
     const [advertisements] = await connection.query(`
       SELECT 
         a.id, a.brand, a.name, a.type, a.userId, a.price, a.date, a.city, 
@@ -346,7 +336,6 @@ async function fetchAdsPayload() {
       WHERE a.type IN (1, 2, 3)
       ORDER BY a.date DESC
     `);
-    console.log(`✅ [fetchAdsPayload] Получено объявлений из БД: ${advertisements.length}`);if (advertisements.length === 0) {console.warn('⚠️  [fetchAdsPayload] ВНИМАНИЕ: БД вернула 0 объявлений!');}
 
     const ads = await Promise.all(advertisements.map(async (ad) => {
       const [photos] = await connection.query(
@@ -409,7 +398,6 @@ async function fetchAdsPayload() {
 async function fetchPartsPayload() {
   const connection = await pool.getConnection();
   try {
-    console.log('🔍 [fetchPartsPayload] Запрос запчастей...');
     const [parts] = await connection.query(`
       SELECT
         a.id, a.name AS partName, a.brand, a.date, a.price, a.userId, 
@@ -421,7 +409,6 @@ async function fetchPartsPayload() {
       WHERE a.type = 4
       ORDER BY a.date DESC
     `);
-    console.log(`✅ [fetchPartsPayload] Получено запчастей из БД: ${parts.length}`);if (parts.length === 0) {console.warn('⚠️  [fetchPartsPayload] ВНИМАНИЕ: БД вернула 0 запчастей!');}
 
     const payload = await Promise.all(parts.map(async (part) => {
       const [photos] = await connection.query(
@@ -460,7 +447,6 @@ app.get('/api/ads', async (req, res) => {
     const ads = await fetchAdsPayload();
     res.json(ads);
   } catch (error) {
-    console.error('❌ Ошибка при получении объявлений:', error);
     res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
   }
 });
@@ -471,7 +457,6 @@ app.get('/api/listings', async (req, res) => {
     const ads = await fetchAdsPayload();
     res.json(ads);
   } catch (error) {
-    console.error('❌ Ошибка при получении listings:', error);
     res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
   }
 });
@@ -482,7 +467,6 @@ app.post('/api/ads/query', async (req, res) => {
     const ads = await fetchAdsPayload();
     res.json(ads);
   } catch (error) {
-    console.error('❌ Ошибка при POST получении объявлений:', error);
     res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
   }
 });
@@ -493,7 +477,6 @@ app.post('/api/listings/query', async (req, res) => {
     const ads = await fetchAdsPayload();
     res.json(ads);
   } catch (error) {
-    console.error('❌ Ошибка при POST получении listings:', error);
     res.status(500).json({ error: 'Ошибка при получении объявлений: ' + error.message });
   }
 });
@@ -558,7 +541,6 @@ app.post('/api/ads', async (req, res) => {
     );
     
     // Логирование для отладки
-    console.log('📋 Создание/редактирование объявления:', {
       techType: vehicleTypeName,
       vehicleTypeId: vehicleTypeId,
       action: action
@@ -602,7 +584,6 @@ app.post('/api/ads', async (req, res) => {
         // Для техники (тип 1,2,3) вставляем дополнительные данные в advertisement_technic
         // Для запчастей (тип 4) НЕ создаем запись в advertisement_technic
         if (vehicleTypeId !== 4 && vehicleTypeId >= 1 && vehicleTypeId <= 3) {
-          console.log('✅ Создание записи в advertisement_technic для техники (type=' + vehicleTypeId + ')');
           await connection.query(
             `INSERT INTO advertisement_technic 
               (advertisement, tender, chassis, color, mileage, engine, power, 
@@ -615,9 +596,7 @@ app.post('/api/ads', async (req, res) => {
             ]
           );
         } else if (vehicleTypeId === 4) {
-          console.log('⚠️ Тип 4 (Запчасть) - запись в advertisement_technic НЕ создается');
         } else {
-          console.log('⚠️ Неизвестный vehicleTypeId:', vehicleTypeId, '- запись в advertisement_technic НЕ создается');
         }
 
         // Добавляем фотографии
@@ -657,7 +636,6 @@ app.post('/api/ads', async (req, res) => {
         // Для техники (тип 1,2,3) обновляем или вставляем данные в advertisement_technic
         // Для запчастей (тип 4) удаляем запись из advertisement_technic если она есть
         if (vehicleTypeId !== 4 && vehicleTypeId >= 1 && vehicleTypeId <= 3) {
-          console.log('🔄 Обновление advertisement_technic для техники (type=' + vehicleTypeId + ')');
           const [existing] = await connection.query(
             'SELECT advertisement FROM advertisement_technic WHERE advertisement = ?',
             [rowIndex]
@@ -693,13 +671,11 @@ app.post('/api/ads', async (req, res) => {
           }
         } else if (vehicleTypeId === 4) {
           // Для запчастей удаляем данные из advertisement_technic если они есть
-          console.log('🗑️ Удаление записи из advertisement_technic для запчасти (type=4)');
           await connection.query(
             'DELETE FROM advertisement_technic WHERE advertisement = ?',
             [rowIndex]
           );
         } else {
-          console.log('⚠️ Неизвестный vehicleTypeId при редактировании:', vehicleTypeId);
           // Удаляем на всякий случай
           await connection.query(
             'DELETE FROM advertisement_technic WHERE advertisement = ?',
@@ -730,7 +706,6 @@ app.post('/api/ads', async (req, res) => {
     }
 
   } catch (error) {
-    console.error('❌ Ошибка при создании/редактировании объявления:', error);
     res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
   }
 });
@@ -783,7 +758,6 @@ app.post('/api/ads/delete', async (req, res) => {
     }
 
   } catch (error) {
-    console.error('❌ Ошибка при удалении объявления:', error);
     res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
   }
 });
@@ -798,7 +772,6 @@ app.get('/api/parts', async (req, res) => {
     const payload = await fetchPartsPayload();
     res.json(payload);
   } catch (error) {
-    console.error('❌ Ошибка при получении запчастей:', error);
     res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
   }
 });
@@ -809,7 +782,6 @@ app.get('/api/spares', async (req, res) => {
     const payload = await fetchPartsPayload();
     res.json(payload);
   } catch (error) {
-    console.error('❌ Ошибка при получении spares:', error);
     res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
   }
 });
@@ -820,7 +792,6 @@ app.post('/api/parts/query', async (req, res) => {
     const payload = await fetchPartsPayload();
     res.json(payload);
   } catch (error) {
-    console.error('❌ Ошибка при POST получении запчастей:', error);
     res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
   }
 });
@@ -831,7 +802,6 @@ app.post('/api/spares/query', async (req, res) => {
     const payload = await fetchPartsPayload();
     res.json(payload);
   } catch (error) {
-    console.error('❌ Ошибка при POST получении spares:', error);
     res.status(500).json({ error: 'Ошибка при получении запчастей: ' + error.message });
   }
 });
@@ -880,14 +850,12 @@ app.post('/api/parts', async (req, res) => {
       // type = 4 для запчастей
       const partTypeId = 4;
       
-      console.log('📦 Создание/редактирование запчасти:', {
         action: action,
         partName: partName,
         partTypeId: partTypeId
       });
 
       if (action === 'create') {
-        console.log('✅ Создание запчасти (type=4) - запись в advertisement_technic НЕ создается');
         const [result] = await connection.query(
           `INSERT INTO advertisement
             (brand, name, type, userId, price, date, city, \`condition\`, sellerType)
@@ -919,7 +887,6 @@ app.post('/api/parts', async (req, res) => {
         connection.release();
         res.json({ status: 'success', message: 'Запчасть создана', id: partId });
       } else if (action === 'edit') {
-        console.log('🔄 Редактирование запчасти (type=4)');
         
         // Обновляем объявление
         await connection.query(
@@ -939,7 +906,6 @@ app.post('/api/parts', async (req, res) => {
         );
         
         // Удаляем запись из advertisement_technic если она там есть (на случай смены типа)
-        console.log('🗑️ Удаление записи из advertisement_technic для запчасти (если есть)');
         await connection.query(
           'DELETE FROM advertisement_technic WHERE advertisement = ?',
           [rowIndex]
@@ -964,7 +930,6 @@ app.post('/api/parts', async (req, res) => {
       throw err;
     }
   } catch (error) {
-    console.error('❌ Ошибка при создании/редактировании запчасти:', error);
     res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
   }
 });
@@ -1008,7 +973,6 @@ app.post('/api/parts/delete', async (req, res) => {
       throw err;
     }
   } catch (error) {
-    console.error('❌ Ошибка при удалении запчасти:', error);
     res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
   }
 });
@@ -1038,7 +1002,6 @@ app.get('/api/favorites', async (req, res) => {
     // Возвращаем массив ID избранных объявлений
     res.json(favorites.map(f => f.advertisement));
   } catch (error) {
-    console.error('❌ Ошибка при получении избранного:', error);
     res.status(500).json({ error: 'Ошибка при получении избранного: ' + error.message });
   }
 });
@@ -1079,7 +1042,6 @@ app.post('/api/favorites/add', async (req, res) => {
       throw err;
     }
   } catch (error) {
-    console.error('❌ Ошибка при добавлении в избранное:', error);
     res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
   }
 });
@@ -1103,7 +1065,6 @@ app.post('/api/favorites/remove', async (req, res) => {
     connection.release();
     res.json({ status: 'success', message: 'Удалено из избранного' });
   } catch (error) {
-    console.error('❌ Ошибка при удалении из избранного:', error);
     res.status(500).json({ status: 'error', message: 'Ошибка: ' + error.message });
   }
 });
@@ -1144,7 +1105,6 @@ app.get('/api/manufacturers', async (req, res) => {
     connection.release();
     res.json(result);
   } catch (error) {
-    console.error('❌ Ошибка при получении производителей:', error);
     res.status(500).json({ error: 'Ошибка при получении производителей: ' + error.message });
   }
 });
@@ -1184,7 +1144,6 @@ app.get('/api/manufacturer-synonyms', async (req, res) => {
     connection.release();
     res.json(csvData);
   } catch (error) {
-    console.error('❌ Ошибка при получении синонимов:', error);
     res.status(500).json({ error: 'Ошибка при получении синонимов: ' + error.message });
   }
 });
@@ -1209,7 +1168,6 @@ app.get('/api/filters', async (req, res) => {
       sellerType: lookups.sellerTypes
     });
   } catch (error) {
-    console.error('❌ Ошибка при получении фильтров:', error);
     res.status(500).json({ error: 'Ошибка при получении фильтров: ' + error.message });
   }
 });
@@ -1220,7 +1178,5 @@ app.get('/api/filters', async (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✨ Сайт запущен на порту ${PORT}`);
-  console.log(`📊 Подключение к MariaDB: vehicle_website`);
 });
 
