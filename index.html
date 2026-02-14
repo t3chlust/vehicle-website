@@ -2442,6 +2442,7 @@
                         const ADMIN_PHONE = "+79829817369";
                         let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [];
                         let profileReturnTab = 'ads';
+                        let hasUserAdjustedFilters = false;
                         let currentItemType = 'ad';
                         let currentPhotoIndex = 0; let currentPhotos = [];
                         let userFavorites = []; // Массив ID избранных объявлений
@@ -2547,6 +2548,19 @@
                             if (Array.isArray(allAds) && allAds.length > 0 && typeof applyFilters === 'function') {
                                 applyFilters();
                             }
+                        }
+
+                        function setupFilterInteractionTracking() {
+                            const markAsAdjusted = (event) => {
+                                const target = event.target;
+                                if (!target || !target.id) return;
+                                if (target.id.startsWith('f-')) {
+                                    hasUserAdjustedFilters = true;
+                                }
+                            };
+
+                            document.addEventListener('input', markAsAdjusted, true);
+                            document.addEventListener('change', markAsAdjusted, true);
                         }
 
                         function goToMainFromProfile() {
@@ -2689,6 +2703,7 @@
                                 allRecords.style.opacity = '1';
                                 allRecords.classList.add('t-records_visible');
                             }
+                            setupFilterInteractionTracking();
                             enforceCleanFiltersState();
                             tryAutoLogin();
                             loadFilters()
@@ -2876,18 +2891,24 @@
                         function applyFilters() {
                             let approvedAds = allAds;
 
-                            const minStr = getPriceValue('f-price-min');
-                            const maxStr = getPriceValue('f-price-max');
+                            const useUiFilters = hasUserAdjustedFilters;
+
+                            const minStr = useUiFilters ? getPriceValue('f-price-min') : '';
+                            const maxStr = useUiFilters ? getPriceValue('f-price-max') : '';
                             const min = minStr ? parseInt(minStr, 10) : 0;
                             const max = maxStr ? parseInt(maxStr, 10) : 0;
-                            const cond = safeVal('f-cond'), wheels = safeVal('f-wheels'), color = safeVal('f-color'), geo = safeVal('f-geo').toLowerCase().trim(), sortType = safeVal('f-sort');
-                            const amph = safeVal('f-amphibious');
-                            const trans = safeVal('f-trans');
-                            const fuel = safeVal('f-fuel');
-                            const docs = safeVal('f-docs');
-                            const tender = safeVal('f-tender');
-                            const techType = safeVal('f-tech-type');
-                            const constr = safeVal('f-construction');
+                            const cond = useUiFilters ? safeVal('f-cond') : '';
+                            const wheels = useUiFilters ? safeVal('f-wheels') : '';
+                            const color = useUiFilters ? safeVal('f-color') : '';
+                            const geo = useUiFilters ? safeVal('f-geo').toLowerCase().trim() : '';
+                            const sortType = useUiFilters ? safeVal('f-sort') : 'default';
+                            const amph = useUiFilters ? safeVal('f-amphibious') : '';
+                            const trans = useUiFilters ? safeVal('f-trans') : '';
+                            const fuel = useUiFilters ? safeVal('f-fuel') : '';
+                            const docs = useUiFilters ? safeVal('f-docs') : '';
+                            const tender = useUiFilters ? safeVal('f-tender') : '';
+                            const techType = useUiFilters ? safeVal('f-tech-type') : '';
+                            const constr = useUiFilters ? safeVal('f-construction') : '';
 
                             let filtered = approvedAds.filter(ad => {
                                 const adPrice = Number(ad.price || 0);
