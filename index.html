@@ -3337,6 +3337,20 @@
                             const c = document.getElementById('ads-container');
                             console.log('🔍 renderGrid: DOM элемент ads-container:', c);
                             
+                            // ДИАГНОСТИКА: проверяем видимость родителей
+                            const viewList = document.getElementById('view-list');
+                            const tabContentAds = document.getElementById('tab-content-ads');
+                            
+                            if (viewList) {
+                                const viewListStyles = window.getComputedStyle(viewList);
+                                console.log('📊 renderGrid: view-list display:', viewListStyles.display, 'visibility:', viewListStyles.visibility);
+                            }
+                            
+                            if (tabContentAds) {
+                                const tabStyles = window.getComputedStyle(tabContentAds);
+                                console.log('📊 renderGrid: tab-content-ads display:', tabStyles.display, 'class:', tabContentAds.className);
+                            }
+                            
                             // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: явно устанавливаем display: grid для Firefox
                             if (c) {
                                 c.style.display = 'grid';
@@ -3345,6 +3359,10 @@
                                 c.style.marginTop = '30px';
                                 c.style.opacity = '1';
                                 console.log('✅ renderGrid: Установил inline styles для display:grid');
+                                
+                                // Убеждаемся что родители тоже видимы
+                                if (viewList) viewList.style.display = 'block';
+                                if (tabContentAds) tabContentAds.style.display = 'block';
                             }
                             
                             // Смотрим на стили контейнера ПЕРЕД рендерингом
