@@ -2019,6 +2019,11 @@
                                                 <p>У вас пока нет объявлений</p>
                                             </div>
                                             <div id="profile-my-ads-grid" class="ad-grid"></div>
+                                            <div id="profile-my-ads-toggle-wrap" style="display:none; margin-top:15px; text-align:center;">
+                                                <button id="profile-my-ads-toggle" class="btn btn-purple" onclick="toggleProfileAdsList()" style="width:100%; max-width:240px;">
+                                                    Показать все
+                                                </button>
+                                            </div>
                                         </div>
                                         
                                         <!-- Избранное -->
@@ -2559,7 +2564,7 @@
                         const FILTERS_API_URL = "/api/filters";
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
-                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [];
+                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [], profileShowAllAds = false;
                         let profileReturnTab = 'ads';
                         let hasUserAdjustedFilters = false;
                         let currentItemType = 'ad';
@@ -4644,6 +4649,7 @@
                             document.getElementById('profile-user-phone').innerText = currentUser.phoneNumber || '';
                             
                             // Рендерим мои объявления
+                            profileShowAllAds = false;
                             renderUserAds();
                             
                             // Рендерим избранное
@@ -4654,12 +4660,15 @@
                             const grid = document.getElementById('profile-my-ads-grid');
                             const placeholder = document.getElementById('profile-my-ads-placeholder');
                             const countEl = document.getElementById('profile-my-ads-count');
+                            const toggleWrap = document.getElementById('profile-my-ads-toggle-wrap');
+                            const toggleBtn = document.getElementById('profile-my-ads-toggle');
                             if (!grid || !placeholder || !countEl) return;
                             
                             if (!currentUser || !currentUser.id) {
                                 grid.innerHTML = '';
                                 placeholder.style.display = 'block';
                                 countEl.innerText = '(0)';
+                                if (toggleWrap) toggleWrap.style.display = 'none';
                                 return;
                             }
                             
@@ -4673,23 +4682,36 @@
                             const userParts = allParts.filter(part => {
                                 return part.userId === currentUser.id || normalizePhone(part.phone) === userPhone;
                             });
-                            const allUserItems = [...userAds, ...userParts];
+                            const allUserItems = [
+                                ...userAds.map(ad => ({ type: 'ad', data: ad })),
+                                ...userParts.map(part => ({ type: 'part', data: part }))
+                            ];
                             
                             countEl.innerText = `(${allUserItems.length})`;
                             
                             if (allUserItems.length === 0) {
                                 placeholder.style.display = 'block';
                                 grid.style.display = 'none';
+                                if (toggleWrap) toggleWrap.style.display = 'none';
                                 return;
+                            }
+
+                            const shouldShowToggle = allUserItems.length > 2;
+                            if (toggleWrap) toggleWrap.style.display = shouldShowToggle ? 'block' : 'none';
+                            if (!shouldShowToggle) profileShowAllAds = false;
+                            if (toggleBtn) {
+                                toggleBtn.innerText = profileShowAllAds ? 'Показать меньше' : 'Показать все';
                             }
                             
                             placeholder.style.display = 'none';
                             grid.style.display = 'grid';
                             grid.innerHTML = '';
                             grid.classList.remove('loaded');
-                            
-                            // Рендерим технику пользователя
-                            userAds.forEach(ad => {
+
+                            const itemsToRender = profileShowAllAds ? allUserItems : allUserItems.slice(0, 2);
+                            itemsToRender.forEach(entry => {
+                                if (entry.type === 'ad') {
+                                    const ad = entry.data;
                                 let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
 
@@ -4721,10 +4743,10 @@
                                 d.innerHTML = `<img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"><div class="ad-card-tender-badge${tenderClass}">${tenderHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 
                                 grid.appendChild(d);
-                            });
-                            
-                            // Рендерим запчасти пользователя
-                            userParts.forEach(part => {
+                                return;
+                            }
+
+                            const part = entry.data;
                                 let ph = part.photos ? part.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
 
@@ -4755,6 +4777,10 @@
                             
                             // Добавляем класс loaded для показа карточек с анимацией
                             setTimeout(() => grid.classList.add('loaded'), 50);
+                        }
+                        function toggleProfileAdsList() {
+                            profileShowAllAds = !profileShowAllAds;
+                            renderUserAds();
                         }
                         
                         function renderProfileFavorites() {
