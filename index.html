@@ -544,6 +544,75 @@
                                 -webkit-appearance: none;
                             }
 
+                            .search-container {
+                                position: relative;
+                            }
+
+                            .search-container::before {
+                                content: '';
+                                position: absolute;
+                                left: 14px;
+                                top: 50%;
+                                width: 18px;
+                                height: 18px;
+                                transform: translateY(-50%);
+                                background-repeat: no-repeat;
+                                background-size: contain;
+                                opacity: 0.55;
+                                pointer-events: none;
+                                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='16.65' y1='16.65' x2='21' y2='21'/%3E%3C/svg%3E");
+                            }
+
+                            .search-container .filter-input {
+                                height: 46px;
+                                margin-bottom: 0;
+                                padding: 0 14px 0 42px;
+                                border: 1px solid #e2d8ee;
+                                border-radius: 12px;
+                                background: linear-gradient(180deg, #ffffff 0%, #fbf9fe 100%);
+                                box-shadow: 0 4px 14px rgba(80, 41, 116, 0.08);
+                                transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+                            }
+
+                            .search-container .filter-input::placeholder {
+                                color: #8f8f9a;
+                            }
+
+                            .search-container .filter-input:focus {
+                                outline: none;
+                                border-color: #ab47bc;
+                                background: #fff;
+                                box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.14), 0 8px 20px rgba(80, 41, 116, 0.12);
+                            }
+
+                            .search-suggestions {
+                                display: none;
+                                margin-top: 10px;
+                                border: 1px solid #ebe2f3;
+                                border-radius: 12px;
+                                background: #fff;
+                                box-shadow: 0 10px 26px rgba(51, 24, 80, 0.12);
+                                overflow: hidden;
+                            }
+
+                            .search-suggestions .manufacturer {
+                                padding: 11px 14px;
+                                font-size: 14px;
+                                color: #2f2f38;
+                                cursor: pointer;
+                                border-bottom: 1px solid #f3ecf9;
+                                transition: background 0.15s, color 0.15s;
+                            }
+
+                            .search-suggestions .manufacturer:last-child {
+                                border-bottom: none;
+                            }
+
+                            .search-suggestions .manufacturer:hover {
+                                background: #f7f1fb;
+                                color: #4b2a69;
+                            }
+
                             select.form-select,
                             select.filter-input {
                                 background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -1463,10 +1532,11 @@
                             }
 
                             .manufacturer-socials {
-                                display: flex;
-                                gap: 10px;
+                                display: grid;
+                                grid-template-columns: repeat(3, minmax(0, 1fr));
+                                gap: 22px;
+                                padding: 0 6px;
                                 margin-top: auto;
-                                flex-wrap: wrap;
                                 width: 100%;
                             }
 
@@ -1474,13 +1544,12 @@
                                 display: flex !important;
                                 align-items: center;
                                 justify-content: center;
-                                width: 34px !important;
-                                height: 34px !important;
+                                width: 100% !important;
+                                aspect-ratio: 1 / 1;
                                 background: #fff;
                                 border-radius: 50%;
                                 transition: transform 0.2s;
                                 overflow: hidden;
-                                flex-shrink: 0;
                                 text-decoration: none;
                             }
 
@@ -1567,10 +1636,11 @@
 
 
                             .manufacturer-socials {
-                                display: flex;
-                                gap: 10px;
+                                display: grid;
+                                grid-template-columns: repeat(3, minmax(0, 1fr));
+                                gap: 22px;
+                                padding: 0 6px;
                                 margin-top: auto;
-                                flex-wrap: wrap;
                                 width: 100%;
                             }
 
@@ -1578,8 +1648,8 @@
                                 display: flex !important;
                                 align-items: center;
                                 justify-content: center;
-                                width: 34px !important;
-                                height: 34px !important;
+                                width: 100% !important;
+                                aspect-ratio: 1 / 1;
                                 border-radius: 50% !important;
                                 overflow: hidden;
                                 background: #fff;
@@ -1626,10 +1696,9 @@
                                         <div class="search-container">
                                             <input type="text" id="adsSearchInput" class="form-input filter-input" placeholder="Поиск техники" autocomplete="off">
                                         </div>
-                                        <div id="adsSearchList" style="display:none; margin-top:8px;"></div>
+                                        <div id="adsSearchList" class="search-suggestions"></div>
                                     </div>
-                                    <div id="view-filters" class="filters-container fade-in"
-                                        style="animation-delay: 0.2s;">
+                                    <div id="view-filters" class="filters-container">
                                         <div class="filters-toggle-btn" onclick="toggleFilters()">Фильтры</div>
                                         <div id="filters-wrapper" class="filters-wrapper">
                                             <div class="filters-content">
@@ -1766,7 +1835,7 @@
                                         <div class="search-container">
                                             <input type="text" id="partsSearchInput" class="form-input filter-input" placeholder="Поиск запчастей" autocomplete="off">
                                         </div>
-                                        <div id="partsSearchList" style="display:none; margin-top:8px;"></div>
+                                        <div id="partsSearchList" class="search-suggestions"></div>
                                     </div>
                                     <div id="view-parts-list" style="min-height: 400px;">
                                         <div id="loading-parts" style="text-align:center; padding: 60px; color:#888;">
@@ -1854,7 +1923,7 @@
                                         <div class="search-container">
                                             <input type="text" id="searchInput" class="form-input filter-input" placeholder="Поиск производителя" autocomplete="off">
                                         </div>
-                                        <div id="manufacturerList" style="display:none; margin-top:8px;"></div>
+                                        <div id="manufacturerList" class="search-suggestions"></div>
                                     </div>
                                     <div class="manufacturer-grid" id="manufacturer-grid">
                                         <!-- Manufacturer cards will be rendered here from the JS `manufacturers` array -->
@@ -2018,6 +2087,7 @@
                                                         card.style.transition = 'background 1.2s';
                                                         card.style.background = 'rgba(171, 71, 188, 0.6)';
                                                         setTimeout(() => { card.style.background = ''; }, 1600);
+                                                        if (input) input.value = '';
                                                     } else {
                                                         console.warn('Карточка не найдена по id:', id);
                                                     }
@@ -2042,6 +2112,12 @@
                                                             if (e.key === 'Enter') {
                                                                 e.preventDefault();
                                                                 findAndScroll();
+                                                            }
+                                                        });
+
+                                                        input.addEventListener('focus', function () {
+                                                            if (this.value.trim()) {
+                                                                this.dispatchEvent(new Event('input'));
                                                             }
                                                         });
 
@@ -2359,6 +2435,7 @@
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
                         let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [];
+                        let profileReturnTab = 'ads';
                         let currentItemType = 'ad';
                         let currentPhotoIndex = 0; let currentPhotos = [];
                         let userFavorites = []; // Массив ID избранных объявлений
@@ -2432,6 +2509,25 @@
                             }
                         }
 
+                        function goToMainFromProfile() {
+                            const targetTab = profileReturnTab || 'ads';
+                            const targetTabLink = document.querySelector(`.tab-link[onclick*="${targetTab}"]`);
+                            showTab(targetTabLink, targetTab);
+                        }
+
+                        function syncProfileButton(tabName) {
+                            const btnProfile = document.getElementById('btn-profile');
+                            if (!btnProfile) return;
+
+                            if (tabName === 'profile') {
+                                btnProfile.innerText = 'На главную';
+                                btnProfile.onclick = goToMainFromProfile;
+                            } else {
+                                btnProfile.innerText = 'Личный кабинет';
+                                btnProfile.onclick = openProfile;
+                            }
+                        }
+
                         function showTab(element, tabName) {
                             // Force hide all tabs first
                             document.querySelectorAll('.tab-content').forEach(content => {
@@ -2448,6 +2544,8 @@
                             }
                             if (element) element.classList.add('active');
 
+                            syncProfileButton(tabName);
+
                             // Admin Refresh
                             if (tabName === 'admin' && typeof isAdmin !== 'undefined' && isAdmin && typeof allAds !== 'undefined') {
                                 if (typeof renderModerationGrid === 'function') {
@@ -2458,6 +2556,14 @@
                             // Profile Refresh
                             if (tabName === 'profile') {
                                 renderProfile();
+                            }
+
+                            // Refresh lists to keep favorites state in sync across tabs
+                            if (tabName === 'ads' && typeof applyFilters === 'function') {
+                                applyFilters();
+                            }
+                            if (tabName === 'parts' && typeof renderPartsGrid === 'function' && Array.isArray(allParts)) {
+                                renderPartsGrid(allParts);
                             }
                         }
                         function formatPriceInput(input) {
@@ -2537,9 +2643,9 @@
                             }
                         }
 
-                        document.addEventListener('DOMContentLoaded', async () => {
+                        document.addEventListener('DOMContentLoaded', () => {
                             tryAutoLogin();
-                            await loadFilters();
+                            loadFilters().catch((e) => console.error('Ошибка загрузки фильтров:', e));
                             loadAds();
                             loadParts();
                         });
@@ -2795,6 +2901,7 @@
                                     card.style.transition = 'background 1.2s';
                                     card.style.background = 'rgba(171, 71, 188, 0.35)';
                                     setTimeout(() => { card.style.background = ''; }, 1600);
+                                    if (input) input.value = '';
                                 }
                             }
                             if (listDiv) listDiv.style.display = 'none';
@@ -2811,6 +2918,12 @@
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
                                     findAdAndScroll();
+                                }
+                            });
+
+                            input.addEventListener('focus', function () {
+                                if (this.value.trim()) {
+                                    this.dispatchEvent(new Event('input'));
                                 }
                             });
 
@@ -2910,6 +3023,7 @@
                                     card.style.transition = 'background 1.2s';
                                     card.style.background = 'rgba(171, 71, 188, 0.35)';
                                     setTimeout(() => { card.style.background = ''; }, 1600);
+                                    if (input) input.value = '';
                                 }
                             }
                             if (listDiv) listDiv.style.display = 'none';
@@ -2926,6 +3040,12 @@
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
                                     findPartAndScroll();
+                                }
+                            });
+
+                            input.addEventListener('focus', function () {
+                                if (this.value.trim()) {
+                                    this.dispatchEvent(new Event('input'));
                                 }
                             });
 
@@ -3419,6 +3539,7 @@
 
                             if (user) {
                                 btnLogin.classList.add('hidden');
+                                syncProfileButton('ads');
                                 const isModalOpen = modal && modal.classList.contains('active');
                                 const isFormOpen = formView && !formView.classList.contains('hidden');
                                 if (tabs && tabs.style.display !== 'none' && !isModalOpen && !isFormOpen) {
@@ -3454,6 +3575,7 @@
                                 btnLogin.classList.remove('hidden');
                                 if (btnCreate) btnCreate.classList.add('hidden');
                                 if (btnProfile) btnProfile.classList.add('hidden');
+                                syncProfileButton('ads');
                                 userFavorites = []; // Очищаем избранное при выходе
                             }
                         }
@@ -3727,6 +3849,15 @@
                                 document.getElementById('tabs-nav').style.display = 'flex';
                                 document.getElementById('tabs-container').style.display = 'block';
                             }
+
+                            const activeTabContent = document.querySelector('.tab-content.active');
+                            if (activeTabContent && activeTabContent.id) {
+                                const activeTabName = activeTabContent.id.replace('tab-content-', '');
+                                if (activeTabName && activeTabName !== 'profile') {
+                                    profileReturnTab = activeTabName;
+                                }
+                            }
+
                             const btnCreate = document.getElementById('btn-create-ad');
                             const btnProfile = document.getElementById('btn-profile');
                             if (btnCreate) btnCreate.classList.remove('hidden');
