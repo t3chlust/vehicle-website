@@ -4201,7 +4201,8 @@
                             const btnCreate = document.getElementById('btn-create-ad');
                             const btnProfile = document.getElementById('btn-profile');
                             if (btnProfile) btnProfile.classList.remove('hidden');
-                            // btn-create will be shown by showTab when on profile
+                            // Show create button when user is on profile
+                            if (btnCreate) btnCreate.classList.remove('hidden');
                             // Переключаемся на вкладку профиля
                             showTab(null, 'profile');
                         }
