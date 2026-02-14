@@ -37,10 +37,13 @@
                                 const btnCreate = document.getElementById('btn-create-ad');
                                 const btnProfile = document.getElementById('btn-profile');
                                 const tabs = document.getElementById('tabs-container');
+                                // Only show buttons if user is logged in AND tabs are visible
                                 if (typeof currentUser !== 'undefined' && currentUser && tabs && tabs.style.display !== 'none') {
-                                    if (btnCreate) btnCreate.classList.remove('hidden');
                                     if (btnProfile) btnProfile.classList.remove('hidden');
+                                    // btn-create visibility is handled by showTab (only in profile)
                                 }
+                                // Button should remain hidden if not logged in
+                                if (!currentUser && btnCreate) btnCreate.classList.add('hidden');
                             }
                             function showRegistrationPrompt() {
                                 const nameInput = document.getElementById('auth-name');
@@ -4190,10 +4193,15 @@
                                 }
                             }
 
+                            // Only proceed if user is logged in
+                            if (!currentUser) {
+                                alert('Пожалуйста, войдите в аккаунт');
+                                return;
+                            }
                             const btnCreate = document.getElementById('btn-create-ad');
                             const btnProfile = document.getElementById('btn-profile');
-                            if (btnCreate) btnCreate.classList.remove('hidden');
                             if (btnProfile) btnProfile.classList.remove('hidden');
+                            // btn-create will be shown by showTab when on profile
                             // Переключаемся на вкладку профиля
                             showTab(null, 'profile');
                         }
