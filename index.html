@@ -1785,6 +1785,111 @@
                                 object-fit: cover;
                                 border-radius: 50%;
                             }
+
+                            /* Footer Styles */
+                            .footer {
+                                background-color: #3a3a3a;
+                                color: #fff;
+                                padding: 30px 20px;
+                                margin-top: 50px;
+                                border-top: 1px solid #2a2a2a;
+                            }
+
+                            .footer-content {
+                                max-width: 1440px;
+                                margin: 0 auto;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                gap: 30px;
+                            }
+
+                            .footer-left {
+                                flex: 1;
+                                display: flex;
+                                flex-direction: column;
+                                gap: 8px;
+                            }
+
+                            .footer-text {
+                                font-size: 14px;
+                                line-height: 1.4;
+                                color: #ccc;
+                            }
+
+                            .footer-text:first-child {
+                                color: #fff;
+                                font-weight: 500;
+                            }
+
+                            .footer-center {
+                                display: flex;
+                                gap: 20px;
+                                align-items: center;
+                                justify-content: center;
+                            }
+
+                            .footer-icon {
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                width: 44px;
+                                height: 44px;
+                                background: rgba(255, 255, 255, 0.1);
+                                border-radius: 50%;
+                                transition: all 0.3s ease;
+                                text-decoration: none;
+                                cursor: pointer;
+                            }
+
+                            .footer-icon:hover {
+                                background: rgba(255, 255, 255, 0.2);
+                                transform: scale(1.1);
+                            }
+
+                            .footer-icon svg {
+                                width: 24px;
+                                height: 24px;
+                            }
+
+                            .footer-right {
+                                flex: 1;
+                                text-align: right;
+                            }
+
+                            .footer-top-link {
+                                color: #fff;
+                                text-decoration: none;
+                                font-size: 14px;
+                                font-weight: 500;
+                                padding: 8px 12px;
+                                border: 1px solid rgba(255, 255, 255, 0.3);
+                                border-radius: 6px;
+                                transition: all 0.3s ease;
+                                cursor: pointer;
+                                display: inline-block;
+                            }
+
+                            .footer-top-link:hover {
+                                background: rgba(255, 255, 255, 0.1);
+                                border-color: rgba(255, 255, 255, 0.5);
+                            }
+
+                            @media (max-width: 768px) {
+                                .footer-content {
+                                    flex-direction: column;
+                                    gap: 20px;
+                                    text-align: center;
+                                }
+
+                                .footer-left {
+                                    align-items: center;
+                                }
+
+                                .footer-right {
+                                    text-align: center;
+                                }
+                            }
                         </style>
                         <div class="tm-wrapper fade-in" id="main-wrapper">
                             <div id="main-header"
@@ -4914,6 +5019,43 @@
         </div>
     </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-text">© 2025 купитьвездеход.рф</div>
+                <div class="footer-text">© 2025 kupitvezdehod.ru</div>
+                <div class="footer-text">Маркетплейс вездеходов</div>
+                <div class="footer-text">Все права защищены</div>
+            </div>
+            <div class="footer-center">
+                <a href="tel:+79999999999" class="footer-icon" title="Звонок">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                </a>
+                <a href="https://t.me/kupitvezdehod" target="_blank" class="footer-icon" title="Telegram">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.869 4.332-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.461c.54-.203 1.01.132.84.957z"/>
+                    </svg>
+                </a>
+                <a href="https://vk.com/kupitvezdehod" target="_blank" class="footer-icon" title="ВКонтакте">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm1.066 16h-2.131v-5.104h2.131v5.104zm0-8.347h-2.131V6.529h2.131v1.12zm4.933 8.347h-2.131v-2.482c0-.591-.211-1.986-1.211-1.986-.911 0-1.049.669-1.049 1.36v3.108H10.76V9.913h2.048v.91h.029c.286-.543.984-1.112 2.025-1.112 2.162 0 2.562 1.422 2.562 3.274v3.953z"/>
+                    </svg>
+                </a>
+                <a href="https://wa.me/79999999999" target="_blank" class="footer-icon" title="WhatsApp">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 3c4.95 0 9 4.05 9 9s-4.05 9-9 9-9-4.05-9-9 4.05-9 9-9zm4.5 11c-.55 0-.5.45-.5.45v1.5c0 .55-.45.5-.45.5h-6.1c-.55 0-.5-.45-.5-.45v-1.5c0-.55.45-.5.45-.5h6.1z"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="footer-right">
+                <a href="#" class="footer-top-link" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">К началу ↑</a>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>
