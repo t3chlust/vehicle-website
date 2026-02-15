@@ -271,11 +271,13 @@
             border-radius: 16px;
             max-width: 900px;
             width: 100%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
             position: relative;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-window::-webkit-scrollbar {
@@ -283,8 +285,8 @@
         }
 
         .modal-close {
-            position: absolute;
-            top: 15px;
+            position: sticky;
+            top: 0;
             right: 15px;
             width: 40px;
             height: 40px;
@@ -296,8 +298,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
+            z-index: 1001;
             transition: background 0.2s;
+            margin-left: auto;
+            margin: 15px 15px 0 auto;
         }
 
         .modal-close:hover {
@@ -492,15 +496,22 @@
             }
 
             .modal-window {
-                max-height: 95vh;
+                max-height: calc(100dvh - 80px);
+                border-radius: 12px;
             }
 
             .gallery-wrapper {
-                height: 300px;
+                height: 250px;
             }
 
             .modal-content {
-                padding: 20px;
+                padding: 15px;
+                flex: 1;
+                overflow-y: auto;
+            }
+
+            .modal-close {
+                margin: 10px 10px 0 0;
             }
 
             .modal-title-text {
@@ -509,6 +520,39 @@
 
             .modal-title-row {
                 flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-overlay {
+                padding: 10px;
+            }
+
+            .modal-window {
+                max-height: calc(100dvh - 60px);
+            }
+
+            .gallery-wrapper {
+                height: 200px;
+            }
+
+            .modal-close {
+                width: 36px;
+                height: 36px;
+                font-size: 24px;
+                margin: 8px 8px 0 auto;
+            }
+
+            .modal-content {
+                padding: 12px;
+            }
+
+            .modal-title-text {
+                font-size: 18px;
+            }
+
+            .modal-title-row {
+                gap: 8px;
             }
         }
     </style>
