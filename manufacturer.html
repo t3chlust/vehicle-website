@@ -252,92 +252,218 @@
 
         /* Modal Styles */
         .modal-overlay {
-            display: none;
             position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-            align-items: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9000;
+            display: flex;
             justify-content: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s;
         }
 
         .modal-overlay.active {
-            display: flex;
+            opacity: 1;
+            pointer-events: all;
         }
 
         .modal-window {
-            background: white;
-            border-radius: 16px;
-            max-width: 900px;
+            background: #fff;
             width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
+            max-width: 720px;
+            max-height: 100vh;
+            border-radius: 0;
             position: relative;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            scrollbar-width: none;
             display: flex;
             flex-direction: column;
+            margin: auto;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
         .modal-window::-webkit-scrollbar {
-            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        @media (min-width: 600px) {
+            .modal-overlay {
+                padding: 20px;
+                padding-top: calc(20px + env(safe-area-inset-top));
+                padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            }
+
+            .modal-window {
+                border-radius: 16px;
+            }
         }
 
         .modal-close {
-            position: sticky;
-            top: 0;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 0, 0, 0.1);
-            border: none;
-            border-radius: 8px;
+            position: absolute;
+            top: 12px;
+            right: 16px;
             font-size: 28px;
+            font-weight: bold;
+            color: #333;
             cursor: pointer;
+            line-height: 1;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1001;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
             transition: background 0.2s;
-            margin-left: auto;
-            margin: 15px 15px 0 auto;
+            z-index: 1001;
         }
 
         .modal-close:hover {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(240, 240, 240, 0.9);
+        }
+
+        .modal-content {
+            padding: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .modal-content {
+                padding: 20px;
+            }
+        }
+
+        .modal-tender-banner {
+            background: #ab47bc;
+            color: #fff;
+            text-align: left;
+            padding: 12px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            display: none;
+            line-height: 1.1;
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: break-word;
+        }
+
+        .modal-tender-banner.visible {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .modal-tender-banner {
+                font-size: 11px;
+                padding: 10px 15px;
+            }
+        }
+
+        .modal-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .modal-title-text {
+            font-size: 24px;
+            font-weight: 800;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .modal-badges-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        @media (min-width: 600px) {
+            .modal-title-row {
+                align-items: center;
+            }
+
+            .modal-badges-row {
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .modal-title-text {
+                font-size: 20px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .modal-title-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .modal-badges-row {
+                width: 100%;
+                justify-content: flex-start;
+            }
         }
 
         .gallery-wrapper {
             position: relative;
             width: 100%;
             height: 400px;
-            background: #f5f5f5;
+            background: #000;
+            flex-shrink: 0;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .gallery-wrapper {
+                height: 300px;
+            }
         }
 
         .gallery-track {
-            display: flex;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            transition: transform 0.3s ease;
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .gallery-slide {
-            min-width: 100%;
+            width: 100% !important;
+            min-width: 100% !important;
+            flex: 0 0 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #000;
+            overflow: hidden;
         }
 
         .modal-gallery-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .gallery-arrow {
@@ -370,30 +496,6 @@
             right: 10px;
         }
 
-        .modal-content {
-            padding: 30px;
-        }
-
-        .modal-title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-            gap: 15px;
-        }
-
-        .modal-title-text {
-            font-size: 28px;
-            font-weight: 700;
-            color: #2a2a2a;
-        }
-
-        .modal-badges-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         .specs-table {
             width: 100%;
             border-collapse: collapse;
@@ -413,17 +515,25 @@
 
         /* Lightbox Styles */
         .lightbox-overlay {
-            display: none;
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.95);
             z-index: 9998;
+            display: none;
             align-items: center;
             justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s;
         }
 
         .lightbox-overlay.active {
             display: flex;
+            opacity: 1;
+            pointer-events: all;
         }
 
         .lightbox-img-wrapper {
@@ -442,7 +552,7 @@
         }
 
         .lightbox-close {
-            position: absolute;
+            position: fixed;
             top: 20px;
             right: 20px;
             width: 50px;
@@ -456,12 +566,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
+            z-index: 10001;
             transition: background 0.2s;
         }
 
         .lightbox-close:hover {
             background: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .gallery-wrapper {
+                height: 300px;
+            }
+
+            .lightbox-close {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 28px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -495,64 +619,14 @@
                 font-size: 11px;
             }
 
-            .modal-window {
-                max-height: calc(100dvh - 80px);
-                border-radius: 12px;
-            }
-
-            .gallery-wrapper {
-                height: 250px;
-            }
-
             .modal-content {
-                padding: 15px;
-                flex: 1;
-                overflow-y: auto;
-            }
-
-            .modal-close {
-                margin: 10px 10px 0 0;
-            }
-
-            .modal-title-text {
-                font-size: 20px;
-            }
-
-            .modal-title-row {
-                flex-direction: column;
+                padding: 20px;
             }
         }
 
         @media (max-width: 480px) {
-            .modal-overlay {
-                padding: 10px;
-            }
-
-            .modal-window {
-                max-height: calc(100dvh - 60px);
-            }
-
             .gallery-wrapper {
-                height: 200px;
-            }
-
-            .modal-close {
-                width: 36px;
-                height: 36px;
-                font-size: 24px;
-                margin: 8px 8px 0 auto;
-            }
-
-            .modal-content {
-                padding: 12px;
-            }
-
-            .modal-title-text {
-                font-size: 18px;
-            }
-
-            .modal-title-row {
-                gap: 8px;
+                height: 250px;
             }
         }
     </style>
@@ -578,6 +652,7 @@
                 <div class="gallery-track" id="gallery-track"></div>
                 <div id="arrow-next" class="gallery-arrow arrow-right" onclick="galleryNext(event)">›</div>
             </div>
+            <div id="modal-tender-banner" class="modal-tender-banner"></div>
             <div class="modal-content">
                 <div class="modal-title-row">
                     <div class="modal-title-text" id="modal-title"></div>
@@ -739,6 +814,20 @@
             if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
             document.getElementById('modal-badges').innerHTML = bgHtml;
 
+            const tenderBanner = document.getElementById('modal-tender-banner');
+            if ((ad.tender || "").toLowerCase() === 'yes') {
+                tenderBanner.innerText = 'В РЕЕСТРЕ МИНПРОМТОРГА';
+                tenderBanner.classList.add('visible');
+            } else {
+                tenderBanner.classList.remove('visible');
+            }
+
+            let phs = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+            currentPhotos = phs;
+            updateGallery();
+            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
+            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
+            
             const techTypeLabel = ad.techType || '';
             const techTypeNormalized = normalizeText(techTypeLabel);
 
@@ -770,12 +859,6 @@
             sp.push({ l: "Цвет", v: ad.color });
             
             document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-
-            let phs = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
-            currentPhotos = phs;
-            updateGallery();
-            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
-            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
             
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
