@@ -590,23 +590,26 @@
                                     margin-right:6px;
                                 }
 
-                                .manufacturer-grid {
-                                    grid-template-columns: repeat(2, 1fr) !important;
-                                    gap: 10px;
-                                }
+                            .manufacturer-grid {
+                                grid-template-columns: repeat(2, 1fr) !important;
+                                gap: 10px;
+                            }
 
-                                .manufacturer-card {
-                                    padding: 12px;
-                                }
+                            .manufacturer-card {
+                                padding: 12px;
+                            }
 
-                                .manufacturer-name {
-                                    font-size: 16px;
-                                }
+                            .manufacturer-name {
+                                font-size: 16px;
+                            }
 
-                                .manufacturer-city {
-                                    font-size: 14px;
-                                    margin-bottom: 15px;
-                                }
+                            .manufacturer-section-title {
+                                font-size: 18px;
+                            }
+
+                            .manufacturer-grid-inner {
+                                grid-template-columns: repeat(2, 1fr) !important;
+                            }
                             }
 
                             .form-input,
@@ -1546,10 +1549,31 @@
 
 
                             .manufacturer-grid {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 0;
+                                margin-top: 20px;
+                            }
+
+                            .manufacturer-section {
+                                width: 100%;
+                                margin-bottom: 30px;
+                            }
+
+                            .manufacturer-section-title {
+                                font-size: 24px;
+                                font-weight: 700;
+                                color: #2a2a2a;
+                                margin-bottom: 15px;
+                                padding-left: 0;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+
+                            .manufacturer-grid-inner {
                                 display: grid;
                                 grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
                                 gap: 15px;
-                                margin-top: 20px;
                             }
 
                             .manufacturer-card {
@@ -1592,13 +1616,6 @@
                                 color: #000;
                                 text-transform: uppercase;
                                 word-break: break-word;
-                            }
-
-                            .manufacturer-city {
-                                font-size: 19px;
-                                font-weight: 600;
-                                color: #000;
-                                margin-bottom: 20px;
                             }
 
                             .manufacturer-socials {
@@ -2083,7 +2100,42 @@
                                                 if (!grid) return;
                                                 grid.innerHTML = '';
 
+                                                const recommended = ['TINGER', 'TUNDRA', 'KAPRAL', 'DOZER'];
+                                                let recommendedManufacturers = [];
+                                                let otherManufacturers = [];
+
+                                                // Разделяем на рекомендуемых и остальных
                                                 list.forEach(m => {
+                                                    if (recommended.includes(m.name.toUpperCase())) {
+                                                        recommendedManufacturers.push(m);
+                                                    } else {
+                                                        otherManufacturers.push(m);
+                                                    }
+                                                });
+
+                                                // Сортируем рекомендуемых в нужном порядке
+                                                recommendedManufacturers.sort((a, b) => {
+                                                    return recommended.indexOf(a.name.toUpperCase()) - recommended.indexOf(b.name.toUpperCase());
+                                                });
+
+                                                // Группируем остальных по городам
+                                                const byCity = {};
+                                                otherManufacturers.forEach(m => {
+                                                    const city = m.city || 'Без города';
+                                                    if (!byCity[city]) byCity[city] = [];
+                                                    byCity[city].push(m);
+                                                });
+
+                                                // Сортируем города
+                                                const sortedCities = Object.keys(byCity).sort();
+
+                                                // Внутри каждого города сортируем по названию
+                                                sortedCities.forEach(city => {
+                                                    byCity[city].sort((a, b) => a.name.localeCompare(b.name));
+                                                });
+
+                                                // Создаём функцию для создания карточки
+                                                const createCard = (m) => {
                                                     const card = document.createElement('div');
                                                     card.className = 'manufacturer-card';
                                                     card.id = `manuf-${m.name.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
@@ -2091,10 +2143,8 @@
                                                     card.onclick = (e) => {
                                                         const url = `/manufacturer.html?name=${encodeURIComponent(m.name)}`;
                                                         if (e.ctrlKey || e.metaKey) {
-                                                            // Ctrl/Cmd + клик = новая вкладка
                                                             window.open(url, '_blank');
                                                         } else {
-                                                            // Обычный клик = текущая вкладка
                                                             window.location.href = url;
                                                         }
                                                     };
@@ -2113,11 +2163,6 @@
                                                     const nameEl = document.createElement('div');
                                                     nameEl.className = 'manufacturer-name';
                                                     nameEl.textContent = m.name;
-
-                                                    // Город
-                                                    const cityEl = document.createElement('div');
-                                                    cityEl.className = 'manufacturer-city';
-                                                    cityEl.textContent = m.city || '—';
 
                                                     // Соцсети
                                                     const socials = document.createElement('div');
@@ -2140,8 +2185,46 @@
                                                     add(m.rutube, ICON_RUTUBE);
                                                     add(m.telegram, ICON_TG);
 
-                                                    card.append(logoWrap, nameEl, cityEl, socials);
-                                                    grid.appendChild(card);
+                                                    card.append(logoWrap, nameEl, socials);
+                                                    return card;
+                                                };
+
+                                                // Добавляем раздел "Рекомендуем"
+                                                if (recommendedManufacturers.length > 0) {
+                                                    const section = document.createElement('div');
+                                                    section.className = 'manufacturer-section';
+                                                    
+                                                    const title = document.createElement('div');
+                                                    title.className = 'manufacturer-section-title';
+                                                    title.textContent = 'Рекомендуем';
+                                                    section.appendChild(title);
+
+                                                    const gridInner = document.createElement('div');
+                                                    gridInner.className = 'manufacturer-grid-inner';
+                                                    recommendedManufacturers.forEach(m => {
+                                                        gridInner.appendChild(createCard(m));
+                                                    });
+                                                    section.appendChild(gridInner);
+                                                    grid.appendChild(section);
+                                                }
+
+                                                // Добавляем разделы по городам
+                                                sortedCities.forEach(city => {
+                                                    const section = document.createElement('div');
+                                                    section.className = 'manufacturer-section';
+
+                                                    const title = document.createElement('div');
+                                                    title.className = 'manufacturer-section-title';
+                                                    title.textContent = city;
+                                                    section.appendChild(title);
+
+                                                    const gridInner = document.createElement('div');
+                                                    gridInner.className = 'manufacturer-grid-inner';
+                                                    byCity[city].forEach(m => {
+                                                        gridInner.appendChild(createCard(m));
+                                                    });
+                                                    section.appendChild(gridInner);
+                                                    grid.appendChild(section);
                                                 });
                                             }
                                             function fillDatalist() {
