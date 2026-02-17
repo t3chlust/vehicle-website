@@ -794,141 +794,109 @@
 
         // Показать объявление в модальном окне
         function openAd(ad) {
-                            const btnCreate = document.getElementById('btn-create-ad');
-                            const btnProfile = document.getElementById('btn-profile');
-                            if (btnCreate) btnCreate.classList.add('hidden');
-                            if (btnProfile) btnProfile.classList.add('hidden');
-                            currentItemType = 'ad';
-                            currentAd = ad; currentPhotos = []; currentPhotoIndex = 0;
-                            document.getElementById('modal-title').innerText = ad.title || "";
-                            document.getElementById('modal-price').innerText = Number(ad.price || 0).toLocaleString() + ' ₽';
-                            let cleanDesc = (ad.desc || "").replace(NEW_STATUS_TAG, "").replace(/#COLOR_\S+/g, "").replace(/#WHEELS_\S+/g, "").trim();
-                            document.getElementById('modal-desc').innerText = cleanDesc;
-                            document.getElementById('modal-name').innerText = ad.name || "Продавец";
-                            document.getElementById('modal-location').innerText = ad.city || "";
-                            const phEl = document.getElementById('modal-phone'); if (phEl) { phEl.innerText = ad.phone || ""; phEl.href = "tel:" + (ad.phone || ""); }
+            currentAd = ad; currentPhotos = []; currentPhotoIndex = 0;
+            document.getElementById('modal-title').innerText = ad.title || "";
+            document.getElementById('modal-price').innerText = Number(ad.price || 0).toLocaleString() + ' ₽';
+            let cleanDesc = (ad.desc || "").replace(NEW_STATUS_TAG, "").replace(/#COLOR_\S+/g, "").replace(/#WHEELS_\S+/g, "").trim();
+            document.getElementById('modal-desc').innerText = cleanDesc;
+            document.getElementById('modal-name').innerText = ad.name || "Продавец";
+            document.getElementById('modal-location').innerText = ad.city || "";
+            const phEl = document.getElementById('modal-phone'); if (phEl) { phEl.innerText = ad.phone || ""; phEl.href = "tel:" + (ad.phone || ""); }
 
-                            const sellerLabel = getSellerTypeLabel(ad);
-                            let bgHtml = '';
-                            if (checkIsNew(ad)) bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
-                            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
-                            if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
-                            document.getElementById('modal-badges').innerHTML = bgHtml;
+            const sellerLabel = getSellerTypeLabel(ad);
+            let bgHtml = '';
+            if (checkIsNew(ad)) bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
+            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
+            if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
+            document.getElementById('modal-badges').innerHTML = bgHtml;
 
-                            const tenderBanner = document.getElementById('modal-tender-banner');
-                            if ((ad.tender || "").toLowerCase() === 'yes') {
-                                tenderBanner.innerText = 'В РЕЕСТРЕ МИНПРОМТОРГА';
-                                tenderBanner.classList.add('visible');
-                            } else {
-                                tenderBanner.classList.remove('visible');
-                            }
+            const tenderBanner = document.getElementById('modal-tender-banner');
+            if ((ad.tender || "").toLowerCase() === 'yes') {
+                tenderBanner.innerText = 'В РЕЕСТРЕ МИНПРОМТОРГА';
+                tenderBanner.classList.add('visible');
+            } else {
+                tenderBanner.classList.remove('visible');
+            }
 
-                            let phs = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
-                            currentPhotos = phs;
-                            updateGallery();
-                            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
-                            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
-                            let sType = getSellerTypeLabel(ad);
-                            let wf = ad.wheelFormula;
+            let phs = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+            currentPhotos = phs;
+            updateGallery();
+            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
+            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
+            let sType = getSellerTypeLabel(ad);
+            let wf = ad.wheelFormula;
 
-                            let sp = [
-                                { l: "Тип продавца", v: sType },
-                                { l: "Город", v: ad.city },
-                                { l: "Тип техники", v: ad.techType || '' },
-                            ];
+            let sp = [
+                { l: "Тип продавца", v: sType },
+                { l: "Город", v: ad.city },
+                { l: "Тип техники", v: ad.techType || '' },
+            ];
 
-                            if (ad.techType === 'Вездеход') {
-                                sp.push({ l: "Конструкция", v: ad.constructionType });
-                            }
+            if (ad.techType === 'Вездеход') {
+                sp.push({ l: "Конструкция", v: ad.constructionType });
+            }
 
-                            if (ad.techType === 'Прицеп') {
-                                sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
-                            } else {
-                                sp.push({ l: "Тип шасси", v: wf });
-                                sp.push({ l: "Плавающий", v: ((ad.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
-                                sp.push({ l: "Двигатель", v: ad.engine });
-                                sp.push({ l: "Мощность", v: ad.power ? ad.power + ' л.с.' : '' });
-                                sp.push({ l: "Трансмиссия", v: ad.transmission });
-                                sp.push({ l: "Топливо", v: ad.fuel });
-                                sp.push({ l: "Колеса", v: ad.wheels });
-                                sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
-                            }
+            if (ad.techType === 'Прицеп') {
+                sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
+            } else {
+                sp.push({ l: "Тип шасси", v: wf });
+                sp.push({ l: "Плавающий", v: ((ad.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
+                sp.push({ l: "Двигатель", v: ad.engine });
+                sp.push({ l: "Мощность", v: ad.power ? ad.power + ' л.с.' : '' });
+                sp.push({ l: "Трансмиссия", v: ad.transmission });
+                sp.push({ l: "Топливо", v: ad.fuel });
+                sp.push({ l: "Колеса", v: ad.wheels });
+                sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
+            }
 
-                            if (ad.techType !== 'Прицеп') {
-                                sp.push({ l: "Документы", v: ad.docs || 'Без документов' });
-                            }
-                            sp.push({ l: "Цвет", v: ad.color });
-                            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-                            const acts = document.getElementById('modal-owner-actions'); const norm = p => String(p).replace(/[^0-9]/g, '');
-                            if (acts) {
-                                if (currentUser && (norm(currentUser.phoneNumber) === norm(ad.phone) || isAdmin)) {
-                                    acts.classList.add('visible');
-                                    configureModalActions('ad');
-                                } else {
-                                    acts.classList.remove('visible');
-                                }
-                            }
-                            updateModalFavoriteState();
-                            document.getElementById('modal').classList.add('active');
-                            document.body.style.overflow = 'hidden';
-
-                            updateMetaTags(ad);
-                        }
+            if (ad.techType !== 'Прицеп') {
+                sp.push({ l: "Документы", v: ad.docs || 'Без документов' });
+            }
+            sp.push({ l: "Цвет", v: ad.color });
+            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+            document.getElementById('modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
 
         function openPart(part) {
-                            const btnCreate = document.getElementById('btn-create-ad');
-                            const btnProfile = document.getElementById('btn-profile');
-                            if (btnCreate) btnCreate.classList.add('hidden');
-                            if (btnProfile) btnProfile.classList.add('hidden');
-                            currentItemType = 'part';
-                            currentAd = part; currentPhotos = []; currentPhotoIndex = 0;
+            currentAd = part; currentPhotos = []; currentPhotoIndex = 0;
 
-                            document.getElementById('modal-title').innerText = part.title || 'Запчасть';
-                            document.getElementById('modal-price').innerText = Number(part.price || 0).toLocaleString() + ' ₽';
-                            document.getElementById('modal-desc').innerText = '';
-                            document.getElementById('modal-name').innerText = part.name || 'Продавец';
-                            document.getElementById('modal-location').innerText = part.city || '';
-                            const phEl = document.getElementById('modal-phone');
-                            if (phEl) { phEl.innerText = part.phone || ""; phEl.href = "tel:" + (part.phone || ""); }
+            document.getElementById('modal-title').innerText = part.title || 'Запчасть';
+            document.getElementById('modal-price').innerText = Number(part.price || 0).toLocaleString() + ' ₽';
+            document.getElementById('modal-desc').innerText = '';
+            document.getElementById('modal-name').innerText = part.name || 'Продавец';
+            document.getElementById('modal-location').innerText = part.city || '';
+            const phEl = document.getElementById('modal-phone');
+            if (phEl) { phEl.innerText = part.phone || ""; phEl.href = "tel:" + (part.phone || ""); }
 
-                            const sellerLabel = getSellerTypeLabel(part);
-                            let bgHtml = '';
-                            if (part.condition === 'new') bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
-                            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
-                            document.getElementById('modal-badges').innerHTML = bgHtml;
+            const sellerLabel = getSellerTypeLabel(part);
+            let bgHtml = '';
+            if (part.condition === 'new') bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
+            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
+            document.getElementById('modal-badges').innerHTML = bgHtml;
 
-                            const tenderBanner = document.getElementById('modal-tender-banner');
-                            tenderBanner.classList.remove('visible');
+            const tenderBanner = document.getElementById('modal-tender-banner');
+            tenderBanner.classList.remove('visible');
 
-                            let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
-                            currentPhotos = phs;
-                            updateGallery();
-                            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
-                            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
+            let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+            currentPhotos = phs;
+            updateGallery();
+            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
+            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
 
-                            let sp = [
-                                { l: "Тип", v: 'Запчасть' },
-                                { l: "Название", v: part.partName || part.title },
-                                { l: "Бренд", v: part.brand || '' },
-                                { l: "Состояние", v: part.condition === 'new' ? 'Новая' : 'Б/У' },
-                                { l: "Тип продавца", v: sellerLabel },
-                                { l: "Город", v: part.city }
-                            ];
+            let sp = [
+                { l: "Тип", v: 'Запчасть' },
+                { l: "Название", v: part.partName || part.title },
+                { l: "Бренд", v: part.brand || '' },
+                { l: "Состояние", v: part.condition === 'new' ? 'Новая' : 'Б/У' },
+                { l: "Тип продавца", v: sellerLabel },
+                { l: "Город", v: part.city }
+            ];
 
-                            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-                            const acts = document.getElementById('modal-owner-actions');
-                            const norm = p => String(p).replace(/[^0-9]/g, '');
-                            if (acts) {
-                                if (currentUser && (norm(currentUser.phoneNumber) === norm(part.phone) || isAdmin)) {
-                                    acts.classList.add('visible');
-                                    configureModalActions('part');
-                                } else {
-                                    acts.classList.remove('visible');
-                                }
-                            }
-                            updateModalFavoriteState();
-                            document.getElementById('modal').classList.add('active');
-                            document.body.style.overflow = 'hidden';
+            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+            document.getElementById('modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
 
 
         // Функция для проверки новизны объявления
