@@ -263,11 +263,12 @@
             justify-content: center;
             align-items: center;
             padding: 10px;
+            padding-top: 0;
+            padding-bottom: 0;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.6s;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .modal-overlay.active {
@@ -286,7 +287,6 @@
             flex-direction: column;
             margin: 10px auto;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -300,6 +300,8 @@
         @media (min-width: 600px) {
             .modal-overlay {
                 padding: 20px;
+                padding-top: 20px;
+                padding-bottom: 20px;
             }
 
             .modal-window {
