@@ -2585,7 +2585,7 @@
                                                         if (section.textContent === cityFound) {
                                                             // Подсвечиваем и скроллим
                                                             section.parentElement.style.transition = 'background 1.2s';
-                                                            section.parentElement.style.background = 'rgba(171, 71, 188, 0.1)';
+                                                            section.parentElement.style.background = getHighlightColor(0.1);
                                                             section.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                                             setTimeout(() => { section.parentElement.style.background = ''; }, 1600);
                                                             if (input) input.value = '';
@@ -2610,7 +2610,7 @@
                                                         if (card) {
                                                             // Подсветка карточки
                                                             card.style.transition = 'background 1.2s';
-                                                            card.style.background = 'rgba(171, 71, 188, 0.6)';
+                                                            card.style.background = getHighlightColor(0.6);
                                                             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                                             setTimeout(() => { card.style.background = ''; }, 1600);
                                                             if (input) input.value = '';
@@ -3596,6 +3596,26 @@
                             }
                             return Array.isArray(primary) ? primary : [];
                         }
+
+                        function getHighlightColor(opacity = 0.35) {
+                            // Determine active tab
+                            const activeTab = document.querySelector('.tab-link.active');
+                            const activeTabName = activeTab ? activeTab.getAttribute('onclick')?.match(/'([^']+)'/) : null;
+                            const tabName = activeTabName ? activeTabName[1] : 'ads';
+                            
+                            let rgb;
+                            if (tabName === 'ads') {
+                                rgb = '38, 166, 154'; // #26A69A - green
+                            } else if (tabName === 'parts') {
+                                rgb = '255, 193, 7'; // #FFC107 - yellow
+                            } else if (tabName === 'manufacturers') {
+                                rgb = '30, 136, 229'; // #1E88E5 - blue
+                            } else {
+                                rgb = '171, 71, 188'; // default purple
+                            }
+                            return `rgba(${rgb}, ${opacity})`;
+                        }
+
                         function buildAdSearchIndex(ads) {
                             const approved = ads || [];
                             adSearchIndex = approved
@@ -3624,7 +3644,7 @@
                                 const card = document.getElementById(`ad-${match.id}`);
                                 if (card) {
                                     card.style.transition = 'background 1.2s';
-                                    card.style.background = 'rgba(171, 71, 188, 0.35)';
+                                    card.style.background = getHighlightColor(0.35);
                                     setTimeout(() => { card.style.background = ''; }, 1600);
                                     if (input) input.value = '';
                                 }
@@ -3736,7 +3756,7 @@
                                 const card = document.getElementById(`part-${match.id}`);
                                 if (card) {
                                     card.style.transition = 'background 1.2s';
-                                    card.style.background = 'rgba(171, 71, 188, 0.35)';
+                                    card.style.background = getHighlightColor(0.35);
                                     setTimeout(() => { card.style.background = ''; }, 1600);
                                     if (input) input.value = '';
                                 }
