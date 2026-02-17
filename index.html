@@ -856,8 +856,32 @@
 
                             .search-container .filter-input:focus {
                                 outline: none;
-                                border-color: #ab47bc;
                                 background: #fff;
+                            }
+
+                            /* Search input focus colors for each tab */
+                            #tab-content-ads .filter-input:focus {
+                                border-color: #26A69A;
+                                box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.14), 0 8px 20px rgba(38, 166, 154, 0.12);
+                            }
+
+                            #tab-content-parts .filter-input:focus {
+                                border-color: #FFC107;
+                                box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.14), 0 8px 20px rgba(255, 193, 7, 0.12);
+                            }
+
+                            #tab-content-manufacturers .filter-input:focus {
+                                border-color: #1E88E5;
+                                box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.14), 0 8px 20px rgba(30, 136, 229, 0.12);
+                            }
+
+                            #tab-content-tender .filter-input:focus {
+                                border-color: #ab47bc;
+                                box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.14), 0 8px 20px rgba(80, 41, 116, 0.12);
+                            }
+
+                            #tab-content-admin .filter-input:focus {
+                                border-color: #ab47bc;
                                 box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.14), 0 8px 20px rgba(80, 41, 116, 0.12);
                             }
 
@@ -1732,10 +1756,30 @@
                             }
 
                             .tab-link.active {
-                                color: #ab47bc;
                                 border-color: #d9cfe0;
                                 background: #fff;
                                 box-shadow: none;
+                            }
+
+                            /* Active tab colors */
+                            .tab-link[onclick*="ads"].active {
+                                color: #26A69A;
+                            }
+
+                            .tab-link[onclick*="parts"].active {
+                                color: #FFC107;
+                            }
+
+                            .tab-link[onclick*="manufacturers"].active {
+                                color: #1E88E5;
+                            }
+
+                            #tender-tab-link.active {
+                                color: #ab47bc;
+                            }
+
+                            #admin-tab-link.active {
+                                color: #666;
                             }
 
                             .tab-content {
