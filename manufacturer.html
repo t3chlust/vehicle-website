@@ -413,10 +413,6 @@
             });
 
             if (combined.length > 0) {
-                const title = document.createElement('h2');
-                title.className = 'ads-title';
-                title.textContent = `Предложения (${combined.length})`;
-                container.appendChild(title);
                 const grid = document.createElement('div');
                 grid.className = 'ad-grid';
                 combined.forEach(entry => {
