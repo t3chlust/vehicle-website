@@ -852,6 +852,17 @@
             }
             sp.push({ l: "Цвет", v: ad.color });
             document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+            
+            const acts = document.getElementById('modal-owner-actions');
+            const norm = p => String(p).replace(/[^0-9]/g, '');
+            if (acts) {
+                if (typeof currentUser !== 'undefined' && currentUser && (norm(currentUser.phoneNumber) === norm(ad.phone) || (typeof isAdmin !== 'undefined' && isAdmin))) {
+                    acts.style.display = 'flex';
+                } else {
+                    acts.style.display = 'none';
+                }
+            }
+            
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
@@ -892,6 +903,17 @@
             ];
 
             document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+            
+            const acts = document.getElementById('modal-owner-actions');
+            const norm = p => String(p).replace(/[^0-9]/g, '');
+            if (acts) {
+                if (typeof currentUser !== 'undefined' && currentUser && (norm(currentUser.phoneNumber) === norm(part.phone) || (typeof isAdmin !== 'undefined' && isAdmin))) {
+                    acts.style.display = 'flex';
+                } else {
+                    acts.style.display = 'none';
+                }
+            }
+            
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
@@ -1187,11 +1209,26 @@
         }
 
         function editCurrentAd() {
-            alert('Редактирование доступно только на главной странице');
+            if (!currentAd) return;
+            closeModalDirect();
+            // Открываем профиль на главной странице для редактирования
+            if (typeof window.parent !== 'undefined') {
+                window.parent.location.href = '/#profile';
+            } else {
+                window.location.href = '/#profile';
+            }
         }
 
         function deleteCurrentAd() {
-            alert('Удаление доступно только на главной странице');
+            if (!currentAd) return;
+            if (!confirm('Вы уверены, что хотите удалить это объявление?')) return;
+            closeModalDirect();
+            // Открываем профиль на главной странице для удаления
+            if (typeof window.parent !== 'undefined') {
+                window.parent.location.href = '/#profile';
+            } else {
+                window.location.href = '/#profile';
+            }
         }
 
         // Запустить при загрузке страницы
