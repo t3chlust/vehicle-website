@@ -4227,7 +4227,11 @@
                                     }
                                     if (found) {
                                         currentAd = found;
-                                        openEditMode(found);
+                                        if (editType === 'part') {
+                                            openEditModePart(found);
+                                        } else {
+                                            openEditMode(found);
+                                        }
                                         // Очищаем параметры из URL
                                         window.history.replaceState({}, document.title, window.location.pathname);
                                     }
@@ -4279,10 +4283,14 @@
                             document.getElementById('main-form').reset();
                             document.getElementById('preview-container').innerHTML = '';
                             document.getElementById('file-count').innerText = '';
+                            // Убедимся что inp-tech-type включен (не disabled)
+                            document.getElementById('inp-tech-type').disabled = false;
                             checkTechTypeVisibility();
                             checkConditionVisibility();
                         }
                         function showList() {
+                            // Убедимся что inp-tech-type включен (не disabled)
+                            document.getElementById('inp-tech-type').disabled = false;
                             document.getElementById('view-form').classList.add('hidden'); // Hide form
                             document.getElementById('tabs-nav').style.display = 'flex'; // Show tabs nav
                             document.getElementById('tabs-container').style.display = 'block'; // Show tabs content
@@ -4465,11 +4473,45 @@
                             setVal('inp-tender', ad.tender || "no");
                             setVal('inp-amphibious', ad.amphibious || "no");
                             setVal('inp-docs', ad.docs || "");
+                            // Убедимся что inp-tech-type включен (не disabled)
+                            document.getElementById('inp-tech-type').disabled = false;
                             setVal('inp-tech-type', ad.techType || "Вездеход");
                             setVal('inp-construction', ad.constructionType || "");
                             setVal('inp-capacity', ad.capacity || "");
                             checkTechTypeVisibility();
                             checkChassisTypeVisibility();
+                            document.getElementById('preview-container').innerHTML = '';
+                            document.getElementById('file-count').innerText = '';
+                            document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
+                            document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
+                            document.getElementById('view-form').classList.remove('hidden'); // Show form
+                        }
+                        function openEditModePart(part) {
+                            isEditMode = true;
+                            document.getElementById('form-title').innerText = "Редактирование";
+                            document.getElementById('submit-btn').innerText = "Сохранить";
+                            const btnCreate = document.getElementById('btn-create-ad');
+                            if (btnCreate) btnCreate.classList.add('hidden');
+                            setVal('edit-row-index', part.rowIndex);
+                            setVal('inp-price', Number(part.price || 0).toLocaleString('ru-RU').replace(/,/g, ' '));
+                            setVal('inp-desc', (part.desc || "").replace(NEW_STATUS_TAG, "").trim());
+                            setVal('inp-city', part.city);
+                            setVal('inp-condition', part.condition === 'new' ? 'new' : 'used');
+                            checkConditionVisibility();
+                            if (part.sellerTypeId) {
+                                setVal('inp-seller-type', String(part.sellerTypeId));
+                            } else {
+                                setSellerTypeSelectByLabel(getSellerTypeLabel(part));
+                            }
+                            // Установка типа как "Запчасть" и отключение его изменения
+                            setVal('inp-tech-type', 'Запчасть');
+                            document.getElementById('inp-tech-type').disabled = true;
+                            setVal('inp-part-brand', part.brand || "");
+                            setVal('inp-part-title', part.partName || part.title || "");
+                            // Очищаем поля техники
+                            setVal('inp-brand', "");
+                            setVal('inp-model', "");
+                            checkTechTypeVisibility();
                             document.getElementById('preview-container').innerHTML = '';
                             document.getElementById('file-count').innerText = '';
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
