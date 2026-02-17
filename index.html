@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -18,7 +17,6 @@
             }
         })();</script>
 </head>
-
 <body class="t-body" style="margin:0;"> <!--allrecords-->
     <div id="allrecords" data-tilda-export="yes" class="t-records" data-hook="blocks-collection-content-node"
         data-tilda-project-id="19128256" data-tilda-page-id="102478216"
@@ -60,7 +58,6 @@
                                 if (codeBlock) codeBlock.classList.add('hidden');
                                 if (title) title.innerText = 'Введите имя';
                             }
-
                             function hideRegistrationPrompt() {
                                 const nameInput = document.getElementById('auth-name');
                                 const hint = null;
@@ -84,17 +81,13 @@
                                     if (title) title.innerText = 'Введите код';
                                 }
                             }
-
                             function openAuthModal() {
                                 document.getElementById('auth-step-1').classList.remove('hidden');
                                 document.getElementById('auth-step-2').classList.add('hidden');
-
                                 document.getElementById('auth-code').value = '';
                                 document.getElementById('auth-phone').value = '+7';
                                 hideRegistrationPrompt();
-
                                 document.getElementById('auth-modal').classList.add('active');
-
                                 updateSmsButtonState();
                             }
                             function closeAuthModal() { document.getElementById('auth-modal').classList.remove('active') }
@@ -107,15 +100,12 @@
                                     alert((normPhone && normPhone === normAdmin) ? 'введите код админа' : 'Введите код');
                                     return;
                                 }
-
                                 const phone = safeVal('auth-phone').trim();
                                 if (!phone) {
                                     alert("Ошибка: номер телефона не найден");
                                     return;
                                 }
-
                                 showLoader("Проверка кода...");
-
                                 // Отправляем код на сервер для проверки
                                 fetch('/verify-code', {
                                     method: 'POST',
@@ -134,7 +124,6 @@
                                             alert("Ошибка: " + (data.error || "Неверный код"));
                                             return;
                                         }
-
                                         fetch('/api/users/exists', {
                                             method: 'POST',
                                             headers: {
@@ -149,13 +138,11 @@
                                                 if (!userCheck.success) {
                                                     throw new Error(userCheck.error || 'Ошибка проверки пользователя');
                                                 }
-
                                                 if (userCheck.exists) {
                                                     const user = userCheck.user || {};
                                                     localStorage.setItem('vezdehod_auth_phone', phone);
                                                     localStorage.setItem('vezdehod_username', user.name || 'Пользователь');
                                                     localStorage.setItem('vezdehod_user_id', user.id || '');
-
                                                     currentUser = {
                                                         phoneNumber: phone,
                                                         uid: `local-${user.id || 'unknown'}`,
@@ -163,7 +150,6 @@
                                                         name: user.name
                                                     };
                                                     currentUserName = user.name || 'Пользователь';
-
                                                     closeAuthModal();
                                                     updateAuthUI(currentUser);
                                                 } else {
@@ -183,37 +169,27 @@
                                 localStorage.removeItem('vezdehod_auth_phone');
                                 localStorage.removeItem('vezdehod_username');
                                 localStorage.removeItem('vezdehod_user_id');
-
                                 currentUser = null;
                                 currentUserName = "";
                                 isAdmin = false;
-
                                 updateAuthUI(null);
-
                                 // Можно сразу переключить на вкладку объявлений
                                 showTab(null, 'ads');
                             }
-
                             function sendSmsCode() {
                                 const phoneInput = safeVal('auth-phone');
-
                                 if (!phoneInput) {
                                     alert("Введите номер телефона");
                                     return;
                                 }
-
                                 let formattedPhone = phoneInput.trim();
-
                                 if (formattedPhone.startsWith('8')) {
                                     formattedPhone = '+7' + formattedPhone.substring(1);
                                 }
-
                                 if (!formattedPhone.startsWith('+')) {
                                     formattedPhone = '+' + formattedPhone;
                                 }
-
                                 showLoader("Отправка SMS...");
-
                                 fetch('/send-sms', {
                                     method: 'POST',
                                     headers: {
@@ -242,7 +218,6 @@
                                         alert("Ошибка: " + error.message);
                                     });
                             }
-
                             function completeRegistration() {
                                 const phone = safeVal('auth-phone').trim();
                                 const name = safeVal('auth-name').trim();
@@ -250,7 +225,6 @@
                                     alert('Введите имя');
                                     return;
                                 }
-
                                 showLoader('Регистрация...');
                                 fetch('/api/users/ensure', {
                                     method: 'POST',
@@ -267,12 +241,10 @@
                                         if (!userData.success) {
                                             throw new Error(userData.error || 'Не удалось создать пользователя');
                                         }
-
                                         const user = userData.user || {};
                                         localStorage.setItem('vezdehod_auth_phone', phone);
                                         localStorage.setItem('vezdehod_username', user.name || 'Пользователь');
                                         localStorage.setItem('vezdehod_user_id', user.id || '');
-
                                         currentUser = {
                                             phoneNumber: phone,
                                             uid: `local-${user.id || 'unknown'}`,
@@ -280,7 +252,6 @@
                                             name: user.name
                                         };
                                         currentUserName = user.name || 'Пользователь';
-
                                         closeAuthModal();
                                         updateAuthUI(currentUser);
                                     })
@@ -294,7 +265,6 @@
                                 let n = String(v).replace(/[^0-9]/g, '');
                                 return n ? parseInt(n, 10) : 0;
                             }
-
                             (function () {
                                 let meta = document.querySelector('meta[name="viewport"]');
                                 if (!meta) {
@@ -313,13 +283,11 @@
                         </datalist>
                         <style>
                             @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
                             .t-tildalаbеl {
                                 display: none !important;
                                 opacity: 0 !important;
                                 visibility: hidden !important;
                             }
-
                             body,
                             html {
                                 width: 100%;
@@ -328,54 +296,44 @@
                                 font-family: 'Roboto', sans-serif !important;
                                 background-color: #F7F9F8;
                             }
-
                             .t-records,
                             .t-records_animated,
                             .t-records_visible {
                                 opacity: 1 !important;
                             }
-
                             * {
                                 box-sizing: border-box;
                                 -webkit-tap-highlight-color: transparent;
                             }
-
                             input[type=number]::-webkit-inner-spin-button,
                             input[type=number]::-webkit-outer-spin-button {
                                 -webkit-appearance: none;
                                 margin: 0;
                             }
-
                             input[type=number] {
                                 -moz-appearance: textfield;
                             }
-
                             .price-input-wrapper {
                                 position: relative;
                                 width: 100%;
                             }
-
                             .price-input-wrapper input {
                                 width: 100%;
                             }
-
                             .fade-in {
                                 animation: fadeIn 0.6s ease-in-out forwards;
                                 opacity: 0;
                             }
-
                             @keyframes fadeIn {
                                 from {
                                     opacity: 0;
                                     transform: translateY(10px);
                                 }
-
                                 to {
                                     opacity: 1;
                                     transform: translateY(0);
                                 }
                             }
-
                             .tm-wrapper {
                                 max-width: 1440px;
                                 margin: 40px auto;
@@ -387,17 +345,14 @@
                                 width: 95%;
                                 min-height: 80vh;
                             }
-
                             /* Header layout: top row = title + login; bottom row = create/profile */
                             #main-header {}
-
                             #main-header .header-top {
                                 display: flex;
                                 justify-content: space-between;
                                 align-items: center;
                                 width: 100%;
                             }
-
                             #main-header .header-title {
                                 flex: 1 1 0;
                                 min-width: 0;
@@ -405,7 +360,6 @@
                                 text-overflow: ellipsis;
                                 margin-right: 8px;
                             }
-
                             #main-header .header-title h2 {
                                 margin: 0;
                                 font-size: 20px;
@@ -413,7 +367,6 @@
                                 overflow: hidden;
                                 text-overflow: ellipsis;
                             }
-
                             #main-header .header-login .btn {
                                 height: 34px;
                                 padding: 0 12px;
@@ -422,18 +375,15 @@
                                 align-items: center;
                                 justify-content: center;
                             }
-
                             #btn-login {
                                 margin-right: -1px;
                             }
-
                             #main-header .header-bottom {
                                 display: flex;
                                 justify-content: flex-start;
                                 gap: 8px;
                                 margin-top: 8px;
                             }
-
                             #main-header .header-bottom .btn {
                                 height: 34px;
                                 padding: 0 10px;
@@ -441,10 +391,8 @@
                                 align-items: center;
                                 justify-content: center;
                             }
-
                             /* On very small screens show secondary buttons stacked under the title */
                             @media (max-width: 420px) {
-
                                 /* Keep title and login on one line but reduce title size */
                                 #main-header .header-top {
                                     display: flex;
@@ -452,11 +400,9 @@
                                     align-items: center;
                                     flex-wrap: nowrap;
                                 }
-
                                 #main-header .header-title h2 {
                                     font-size: 18px;
                                 }
-
                                 /* Show secondary buttons below as a single non-wrapping row */
                                 #main-header .header-bottom {
                                     display: flex;
@@ -467,7 +413,6 @@
                                     justify-content: flex-start;
                                     flex-wrap: nowrap;
                                 }
-
                                 #main-header .header-bottom .btn {
                                     width: auto;
                                     padding: 6px 10px;
@@ -475,17 +420,14 @@
                                     box-sizing: border-box;
                                     white-space: nowrap;
                                 }
-
                                 #btn-create-ad:not(.hidden),
                                 #btn-profile:not(.hidden) {
                                     display: inline-flex !important;
                                 }
                             }
-
                             .hidden {
                                 display: none !important;
                             }
-
                             .btn {
                                 border: none;
                                 padding: 0 20px;
@@ -502,67 +444,53 @@
                                 white-space: nowrap;
                                 box-sizing: border-box;
                             }
-
                             .btn-black {
                                 background: #222;
                                 color: #fff;
                             }
-
                             .btn-black:hover {
                                 background: #000;
                             }
-
                             .btn-purple {
                                 background: #ab47bc;
                                 color: #fff;
                             }
-
                             .btn-purple:hover {
                                 background: #8e24aa;
                             }
-
                             .btn-blue {
                                 background: #0066cc;
                                 color: #fff;
                             }
-
                             .btn-blue:hover {
                                 background: #0052a3;
                             }
-
                             /* Make profile button black specifically */
                             #btn-profile {
                                 background: #222 !important;
                                 color: #fff !important;
                                 border-color: transparent !important;
                             }
-
                             #btn-profile:hover {
                                 background: #000 !important;
                             }
-
                             .btn-red {
                                 background: #222;
                                 color: #fff;
                             }
-
                             .btn-full {
                                 width: 100%;
                                 margin-top: 10px;
                                 display: block;
                             }
-
-
                             .action-buttons-group {
                                 margin-top: 30px;
                                 display: none;
                             }
-
                             .action-buttons-group.visible {
                                 display: flex !important;
                                 gap: 15px;
                             }
-
                             .share-btn-wrapper {
                                 cursor: pointer;
                                 padding: 8px;
@@ -572,11 +500,9 @@
                                 justify-content: center;
                                 flex-shrink: 0;
                             }
-
                             .share-btn-wrapper:hover {
                                 background: #f0f0f0;
                             }
-
                             .share-icon {
                                 width: 24px;
                                 height: 24px;
@@ -584,7 +510,6 @@
                                 stroke-width: 2;
                                 fill: none;
                             }
-
                             .modal-favorite {
                                 cursor: pointer;
                                 padding: 8px;
@@ -593,28 +518,23 @@
                                 justify-content: center;
                                 flex-shrink: 0;
                             }
-
                             .modal-favorite svg {
                                 width: 24px;
                                 height: 24px;
                             }
-
                             .header-actions {
                                 display: flex;
                                 gap: 10px;
                                 flex-wrap: wrap;
                             }
-
                             .header-actions {
                                 display: flex;
                                 gap: 10px;
                                 flex-wrap: wrap;
                             }
-
                             .header-title {
                                 margin-right: 20px;
                             }
-
                             @media (max-width: 450px) {
                                 .tm-wrapper {
                                     max-width: 1440px;
@@ -627,21 +547,17 @@
                                     width: 95%;
                                     min-height: 80vh;
                                 }
-
                                 .header-title h2 {
                                     font-size: 18px !important;
                                 }
-
                                 .header-actions {
                                     width: 100%;
                                     justify-content: flex-end;
                                     white-space: nowrap;
                                 }
-
                                 .header-title {
                                     margin-right: 20px;
                                 }
-
                                 .header-actions .btn {
                                     padding: 0 12px;
                                     font-size: 12px;
@@ -651,7 +567,6 @@
                                     min-width: 0;
                                     max-width: none;
                                 }
-
                                 @media (max-width: 480px) {
                                     .header-actions .btn {
                                         padding: 0 8px;
@@ -659,14 +574,10 @@
                                         height: 34px;
                                         line-height: 34px;
                                     }
-
                                     .header-title h2 {
                                         font-size: 16px;
                                     }
                                 }
-
-
-
                                 .tab-link {
                                     padding: 8px 12px;
                                     font-size: 14px;
@@ -675,29 +586,23 @@
                                     color: #222;
                                     margin-right: 6px;
                                 }
-
                                 .manufacturer-grid {
                                     grid-template-columns: repeat(2, 1fr) !important;
                                     gap: 10px;
                                 }
-
                                 .manufacturer-card {
                                     padding: 12px;
                                 }
-
                                 .manufacturer-name {
                                     font-size: 16px;
                                 }
-
                                 .manufacturer-section-title {
                                     font-size: 18px;
                                 }
-
                                 .manufacturer-grid-inner {
                                     grid-template-columns: repeat(2, 1fr) !important;
                                 }
                             }
-
                             .form-input,
                             .form-select,
                             .filter-input {
@@ -713,20 +618,16 @@
                                 appearance: none;
                                 -webkit-appearance: none;
                             }
-
                             @media (max-width: 768px) {
-
                                 .form-input,
                                 .form-select,
                                 .filter-input {
                                     font-size: 16px;
                                 }
                             }
-
                             .search-container {
                                 position: relative;
                             }
-
                             .search-container::before {
                                 content: '';
                                 position: absolute;
@@ -741,7 +642,6 @@
                                 pointer-events: none;
                                 background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='16.65' y1='16.65' x2='21' y2='21'/%3E%3C/svg%3E");
                             }
-
                             .search-container .filter-input {
                                 height: 46px;
                                 margin-bottom: 0;
@@ -752,18 +652,15 @@
                                 box-shadow: 0 4px 14px rgba(80, 41, 116, 0.08);
                                 transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
                             }
-
                             .search-container .filter-input::placeholder {
                                 color: #8f8f9a;
                             }
-
                             .search-container .filter-input:focus {
                                 outline: none;
                                 border-color: #ab47bc;
                                 background: #fff;
                                 box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.14), 0 8px 20px rgba(80, 41, 116, 0.12);
                             }
-
                             .search-suggestions {
                                 display: none;
                                 margin-top: 10px;
@@ -773,7 +670,6 @@
                                 box-shadow: 0 10px 26px rgba(51, 24, 80, 0.12);
                                 overflow: hidden;
                             }
-
                             .search-suggestions .manufacturer {
                                 padding: 11px 14px;
                                 font-size: 14px;
@@ -782,16 +678,13 @@
                                 border-bottom: 1px solid #f3ecf9;
                                 transition: background 0.15s, color 0.15s;
                             }
-
                             .search-suggestions .manufacturer:last-child {
                                 border-bottom: none;
                             }
-
                             .search-suggestions .manufacturer:hover {
                                 background: #f7f1fb;
                                 color: #4b2a69;
                             }
-
                             select.form-select,
                             select.filter-input {
                                 background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -800,20 +693,17 @@
                                 background-size: 12px auto;
                                 padding-right: 30px;
                             }
-
                             input.filter-input[list] {
                                 padding-right: 30px;
                                 cursor: pointer;
                                 position: relative;
                             }
-
                             textarea.form-input {
                                 resize: none;
                                 height: auto;
                                 line-height: 1.4;
                                 padding: 12px;
                             }
-
                             .form-section-title {
                                 font-size: 12px;
                                 font-weight: bold;
@@ -822,7 +712,6 @@
                                 margin-bottom: 8px;
                                 margin-top: 10px;
                             }
-
                             .tires-group {
                                 display: flex;
                                 gap: 10px;
@@ -830,7 +719,6 @@
                                 margin-bottom: 15px;
                                 width: 100%;
                             }
-
                             .tires-input {
                                 flex: 1;
                                 height: 42px;
@@ -842,7 +730,6 @@
                                 background: #f9f9f9;
                                 min-width: 0;
                             }
-
                             .filters-toggle-btn {
                                 background: #E0E0E0;
                                 padding: 12px 15px;
@@ -855,18 +742,15 @@
                                 z-index: 2;
                                 position: relative;
                             }
-
                             .filters-toggle-btn::after {
                                 content: '▼';
                                 font-size: 12px;
                                 color: #666;
                                 transition: transform 0.3s;
                             }
-
                             .filters-wrapper.open+.filters-toggle-btn::after {
                                 transform: rotate(180deg);
                             }
-
                             .filters-wrapper {
                                 max-height: 0;
                                 overflow: hidden;
@@ -874,50 +758,41 @@
                                 opacity: 0;
                                 will-change: max-height;
                             }
-
                             .filters-wrapper.open {
                                 max-height: 1200px;
                                 opacity: 1;
                             }
-
                             .filters-content {
                                 background: #fff;
                                 padding: 20px 0;
                             }
-
                             .filters-grid {
                                 display: grid;
                                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
                                 gap: 15px;
                             }
-
                             .filter-label {
                                 font-size: 12px;
                                 font-weight: 600;
                                 margin-bottom: 5px;
                                 display: block;
                             }
-
                             .filters-grid select {
                                 color: #0066cc;
                                 font-weight: 700;
                             }
-
                             .filters-grid select option {
                                 color: #222;
                                 font-weight: normal;
                             }
-
                             .filter-price-group {
                                 display: grid;
                                 grid-template-columns: 1fr 1fr;
                                 gap: 10px;
                             }
-
                             .filter-item {
                                 position: relative;
                             }
-
                             .price-dropdown-trigger {
                                 position: absolute;
                                 right: 8px;
@@ -931,34 +806,27 @@
                                 pointer-events: none;
                                 z-index: 1;
                             }
-
                             @media (max-width: 600px) {
                                 .filters-grid {
                                     grid-template-columns: 1fr 1fr;
                                     padding: 0 5px;
                                 }
-
                                 .filter-item:nth-child(1) {
                                     order: 1;
                                 }
-
                                 .filter-item:nth-child(4) {
                                     order: 2;
                                 }
-
                                 .filter-item:nth-child(2) {
                                     order: 3;
                                 }
-
                                 .filter-item:nth-child(3) {
                                     order: 4;
                                 }
-
                                 .filter-input {
                                     margin-bottom: 0;
                                 }
                             }
-
                             .ad-grid {
                                 display: grid;
                                 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -967,11 +835,9 @@
                                 opacity: 1;
                                 transition: opacity 0.6s;
                             }
-
                             .ad-grid.loaded {
                                 opacity: 1;
                             }
-
                             .ad-card {
                                 border: 1px solid #eee;
                                 border-radius: 12px;
@@ -983,12 +849,10 @@
                                 display: flex;
                                 flex-direction: column;
                             }
-
                             .ad-card:hover {
                                 transform: translateY(-4px);
                                 box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
                             }
-
                             .favorite-heart {
                                 position: absolute;
                                 top: 10px;
@@ -1005,33 +869,26 @@
                                 transition: all 0.3s ease;
                                 box-shadow: none;
                             }
-
                             .favorite-heart:hover {
                                 transform: scale(1.1);
                                 background: transparent;
                                 box-shadow: none;
                             }
-
                             .favorite-heart.active svg {
                                 animation: heartBeat 0.3s ease;
                             }
-
                             @keyframes heartBeat {
-
                                 0%,
                                 100% {
                                     transform: scale(1);
                                 }
-
                                 25% {
                                     transform: scale(1.3);
                                 }
-
                                 50% {
                                     transform: scale(1.1);
                                 }
                             }
-
                             .ad-card-img {
                                 height: 180px;
                                 width: 100%;
@@ -1039,18 +896,15 @@
                                 background: #f0f0f0;
                                 display: block;
                             }
-
                             .ad-card-media {
                                 position: relative;
                             }
-
                             .ad-card-content {
                                 padding: 15px;
                                 flex-grow: 1;
                                 display: flex;
                                 flex-direction: column;
                             }
-
                             .ad-card-tender-badge {
                                 position: absolute;
                                 left: 0;
@@ -1070,24 +924,20 @@
                                 overflow-wrap: break-word;
                                 z-index: 2;
                             }
-
                             .ad-card-tender-badge.visible {
                                 display: flex;
                                 background: #ab47bc;
                                 color: #fff;
                             }
-
                             .ad-card-tender-badge.placeholder {
                                 display: none;
                             }
-
                             .ad-card-header {
                                 display: flex;
                                 flex-direction: column;
                                 gap: 8px;
                                 margin-bottom: 8px;
                             }
-
                             .ad-card-title {
                                 font-weight: 600;
                                 color: #0066cc;
@@ -1100,21 +950,17 @@
                                 line-height: 22px;
                                 order: 1;
                             }
-
                             .ad-card-price {
                                 font-weight: 800;
                                 font-size: 20px;
                                 order: 2;
                             }
-
                             .ad-card-price-text {
                                 font-size: 19px;
                             }
-
                             div[style*="rgba(0, 102, 204"] .form-input {
                                 margin-bottom: 0;
                             }
-
                             .badge-wrap {
                                 display: flex;
                                 flex-direction: row;
@@ -1124,36 +970,29 @@
                                 order: 3;
                                 margin-top: 4px;
                             }
-
                             .ad-card-info {
                                 font-size: 13px;
                                 color: #666;
                                 margin-top: auto;
                             }
-
                             @media (max-width: 600px) {
                                 .ad-grid {
                                     grid-template-columns: repeat(2, 1fr);
                                     gap: 10px;
                                 }
-
                                 .ad-card-img {
                                     height: 120px !important;
                                 }
-
                                 .ad-card-title {
                                     font-size: 14px !important;
                                     line-height: 18px;
                                 }
-
                                 .ad-card-price {
                                     font-size: 16px !important;
                                 }
-
                                 .ad-card-price-text {
                                     font-size: 15px !important;
                                 }
-
                                 .badge-new,
                                 .badge-private,
                                 .badge-float {
@@ -1163,11 +1002,9 @@
                                     line-height: 12px;
                                     margin: 0 !important;
                                 }
-
                                 .ad-card-info {
                                     font-size: 11px !important;
                                 }
-
                                 .ad-card-tender-badge {
                                     position: absolute;
                                     left: 0;
@@ -1187,18 +1024,15 @@
                                     overflow-wrap: break-word;
                                     z-index: 2;
                                 }
-
                                 .ad-card-tender-badge.visible {
                                     display: flex;
                                     background: #ab47bc;
                                     color: #fff;
                                 }
-
                                 .ad-card-tender-badge.placeholder {
                                     display: none;
                                 }
                             }
-
                             .badge-new {
                                 background: #d4edda;
                                 color: #155724;
@@ -1208,7 +1042,6 @@
                                 font-weight: 700;
                                 white-space: nowrap;
                             }
-
                             .badge-private {
                                 background: #f0f0f0;
                                 color: #555;
@@ -1218,7 +1051,6 @@
                                 font-weight: 700;
                                 white-space: nowrap;
                             }
-
                             .badge-float {
                                 background: #e3f2fd;
                                 color: #1976d2;
@@ -1229,7 +1061,6 @@
                                 margin-left: 0;
                                 white-space: nowrap;
                             }
-
                             .modal-overlay {
                                 position: fixed;
                                 top: 0;
@@ -1248,12 +1079,10 @@
                                 pointer-events: none;
                                 transition: opacity 0.6s;
                             }
-
                             .modal-overlay.active {
                                 opacity: 1;
                                 pointer-events: all;
                             }
-
                             .modal-window {
                                 background: #fff;
                                 width: 100%;
@@ -1269,24 +1098,20 @@
                                 scrollbar-width: none;
                                 -ms-overflow-style: none;
                             }
-
                             .modal-window::-webkit-scrollbar {
                                 width: 0;
                                 height: 0;
                             }
-
                             @media (min-width: 600px) {
                                 .modal-overlay {
                                     padding: 20px;
                                     padding-top: calc(20px + env(safe-area-inset-top));
                                     padding-bottom: calc(20px + env(safe-area-inset-bottom));
                                 }
-
                                 .modal-window {
                                     border-radius: 16px;
                                 }
                             }
-
                             .modal-close {
                                 position: absolute;
                                 top: 12px;
@@ -1306,21 +1131,17 @@
                                 transition: background 0.2s;
                                 z-index: 10;
                             }
-
                             .modal-close:hover {
                                 background: rgba(240, 240, 240, 0.9);
                             }
-
                             .modal-content {
                                 padding: 30px;
                             }
-
                             @media (max-width: 600px) {
                                 .modal-content {
                                     padding: 20px;
                                 }
                             }
-
                             .modal-tender-banner {
                                 /* width: 100%; */
                                 background: #ab47bc;
@@ -1335,20 +1156,17 @@
                                 word-break: normal;
                                 overflow-wrap: break-word;
                             }
-
                             .modal-tender-banner.visible {
                                 display: flex;
                                 justify-content: flex-start;
                                 align-items: center;
                             }
-
                             @media (max-width: 600px) {
                                 .modal-tender-banner {
                                     font-size: 11px;
                                     padding: 10px 15px;
                                 }
                             }
-
                             .modal-title-row {
                                 display: flex;
                                 justify-content: space-between;
@@ -1356,14 +1174,12 @@
                                 gap: 15px;
                                 margin-bottom: 15px;
                             }
-
                             .modal-title-text {
                                 font-size: 24px;
                                 font-weight: 800;
                                 flex: 1;
                                 min-width: 0;
                             }
-
                             .modal-badges-row {
                                 display: flex;
                                 align-items: center;
@@ -1371,17 +1187,14 @@
                                 flex-wrap: wrap;
                                 flex-shrink: 0;
                             }
-
                             @media (min-width: 600px) {
                                 .modal-title-row {
                                     align-items: center;
                                 }
-
                                 .modal-badges-row {
                                     margin-left: auto;
                                 }
                             }
-
                             @media (max-width: 600px) {
                                 .modal-title-text {
                                     font-size: 20px;
@@ -1389,19 +1202,16 @@
                                     overflow: hidden;
                                     text-overflow: ellipsis;
                                 }
-
                                 .modal-title-row {
                                     flex-direction: column;
                                     align-items: flex-start;
                                     gap: 10px;
                                 }
-
                                 .modal-badges-row {
                                     width: 100%;
                                     justify-content: flex-start;
                                 }
                             }
-
                             .gallery-wrapper {
                                 position: relative;
                                 width: 100%;
@@ -1410,13 +1220,11 @@
                                 flex-shrink: 0;
                                 overflow: hidden;
                             }
-
                             @media (max-width: 600px) {
                                 .gallery-wrapper {
                                     height: 300px;
                                 }
                             }
-
                             .gallery-track {
                                 position: absolute;
                                 top: 0;
@@ -1426,7 +1234,6 @@
                                 display: flex;
                                 transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
                             }
-
                             .gallery-slide {
                                 width: 100% !important;
                                 min-width: 100% !important;
@@ -1438,14 +1245,12 @@
                                 background: #000;
                                 overflow: hidden;
                             }
-
                             .modal-gallery-img {
                                 width: 100%;
                                 height: 100%;
                                 object-fit: cover;
                                 display: block;
                             }
-
                             .gallery-arrow {
                                 position: absolute;
                                 top: 50%;
@@ -1461,15 +1266,12 @@
                                 justify-content: center;
                                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
                             }
-
                             .arrow-left {
                                 left: 15px;
                             }
-
                             .arrow-right {
                                 right: 15px;
                             }
-
                             .lightbox-overlay {
                                 position: fixed;
                                 top: 0;
@@ -1483,11 +1285,9 @@
                                 align-items: center;
                                 overflow: hidden;
                             }
-
                             .lightbox-overlay.active {
                                 display: flex;
                             }
-
                             .lightbox-img-wrapper {
                                 width: 100%;
                                 height: 100%;
@@ -1496,7 +1296,6 @@
                                 align-items: center;
                                 touch-action: none;
                             }
-
                             .lightbox-img {
                                 max-width: 100%;
                                 max-height: 100%;
@@ -1506,7 +1305,6 @@
                                 user-select: none;
                                 -webkit-user-select: none;
                             }
-
                             .lightbox-close {
                                 position: fixed !important;
                                 top: max(20px, env(safe-area-inset-top)) !important;
@@ -1525,24 +1323,20 @@
                                 box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3) !important;
                                 pointer-events: all !important;
                             }
-
                             .specs-table {
                                 width: 100%;
                                 border-collapse: collapse;
                                 margin-bottom: 30px;
                             }
-
                             .specs-table td {
                                 padding: 10px 0;
                                 border-bottom: 1px solid #eee;
                                 font-size: 15px;
                             }
-
                             .specs-table td:first-child {
                                 color: #888;
                                 width: 40%;
                             }
-
                             .auth-window {
                                 position: relative;
                                 background: #fff;
@@ -1552,7 +1346,6 @@
                                 max-width: 340px;
                                 margin: auto;
                             }
-
                             .loader-overlay {
                                 position: fixed;
                                 top: 0;
@@ -1567,7 +1360,6 @@
                                 z-index: 9999;
                                 transition: opacity 0.6s;
                             }
-
                             .spinner {
                                 width: 40px;
                                 height: 40px;
@@ -1577,23 +1369,19 @@
                                 animation: spin 0.8s linear infinite;
                                 margin: 0 auto;
                             }
-
                             @keyframes spin {
                                 0% {
                                     transform: rotate(0deg);
                                 }
-
                                 100% {
                                     transform: rotate(360deg);
                                 }
                             }
-
                             #preview-container {
                                 display: flex;
                                 gap: 8px;
                                 padding-top: 10px;
                             }
-
                             .preview-thumb {
                                 width: 60px;
                                 height: 60px;
@@ -1602,7 +1390,6 @@
                                 border: 1px solid #eee;
                                 flex-shrink: 0;
                             }
-
                             /* --- STYLES FOR TABS, MANUFACTURERS & ADMIN --- */
                             .tabs-nav {
                                 display: flex;
@@ -1611,7 +1398,6 @@
                                 border-bottom: none;
                                 flex-wrap: wrap;
                             }
-
                             .tab-link {
                                 padding: 10px 18px;
                                 cursor: pointer;
@@ -1623,40 +1409,32 @@
                                 border-radius: 8px;
                                 transition: background 0.12s, color 0.12s, border-color 0.12s;
                             }
-
                             .tab-link:hover {
                                 background: #fafafa;
                             }
-
                             .tab-link.active {
                                 color: #ab47bc;
                                 border-color: #d9cfe0;
                                 background: #fff;
                                 box-shadow: none;
                             }
-
                             .tab-content {
                                 display: none;
                             }
-
                             .tab-content.active {
                                 display: block;
                                 animation: fadeIn 0.5s;
                             }
-
-
                             .manufacturer-grid {
                                 display: flex;
                                 flex-direction: column;
                                 gap: 0;
                                 margin-top: 20px;
                             }
-
                             .manufacturer-section {
                                 width: 100%;
                                 margin-bottom: 30px;
                             }
-
                             .manufacturer-section-title {
                                 font-size: 24px;
                                 font-weight: 700;
@@ -1666,13 +1444,11 @@
                                 text-transform: uppercase;
                                 letter-spacing: 0.5px;
                             }
-
                             .manufacturer-grid-inner {
                                 display: grid;
                                 grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
                                 gap: 15px;
                             }
-
                             .manufacturer-card {
                                 border: none;
                                 border-radius: 16px;
@@ -1684,7 +1460,6 @@
                                 text-align: left;
                                 transition: transform 0.2s;
                             }
-
                             .manufacturer-logo-container {
                                 width: 100%;
                                 aspect-ratio: 1 / 1;
@@ -1696,7 +1471,6 @@
                                 justify-content: center;
                                 background: #fff;
                             }
-
                             .manufacturer-logo {
                                 width: 100%;
                                 height: 100%;
@@ -1705,7 +1479,6 @@
                                 object-position: center;
                                 display: block;
                             }
-
                             .manufacturer-name {
                                 font-size: 20px;
                                 font-weight: 800;
@@ -1714,7 +1487,6 @@
                                 text-transform: uppercase;
                                 word-break: break-word;
                             }
-
                             .manufacturer-socials {
                                 display: grid;
                                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1723,7 +1495,6 @@
                                 margin-top: auto;
                                 width: 100%;
                             }
-
                             .manufacturer-socials a {
                                 display: flex !important;
                                 align-items: center;
@@ -1736,11 +1507,9 @@
                                 overflow: hidden;
                                 text-decoration: none;
                             }
-
                             .manufacturer-socials a:hover {
                                 transform: scale(1.1);
                             }
-
                             .manufacturer-socials img {
                                 width: 100% !important;
                                 height: 100% !important;
@@ -1748,22 +1517,18 @@
                                 display: block;
                                 margin: 0;
                             }
-
                             .tab-content {
                                 display: none;
                             }
-
                             .tab-content.active {
                                 display: block;
                                 animation: fadeIn 0.5s;
                             }
-
                             .moderation-grid {
                                 display: grid;
                                 grid-template-columns: 1fr;
                                 gap: 15px;
                             }
-
                             .moderation-card {
                                 display: flex;
                                 gap: 20px;
@@ -1774,7 +1539,6 @@
                                 background: #fafafa;
                                 flex-wrap: wrap;
                             }
-
                             .moderation-card-img {
                                 width: 100px;
                                 height: 75px;
@@ -1782,49 +1546,40 @@
                                 border-radius: 6px;
                                 flex-shrink: 0;
                             }
-
                             .moderation-card-info {
                                 flex-grow: 1;
                             }
-
                             .moderation-card-title {
                                 font-weight: 600;
                                 margin-bottom: 5px;
                             }
-
                             .moderation-card-price {
                                 color: #555;
                                 font-size: 14px;
                             }
-
                             .moderation-card-actions {
                                 display: flex;
                                 flex-direction: column;
                                 gap: 8px;
                             }
-
                             @media (max-width: 600px) {
                                 .moderation-card {
                                     flex-direction: column;
                                     align-items: flex-start;
                                 }
-
                                 .moderation-card-img {
                                     width: 100%;
                                     height: auto;
                                 }
-
                                 .moderation-card-actions {
                                     width: 100%;
                                     flex-direction: row;
                                     flex-wrap: wrap;
                                 }
-
                                 .moderation-card-actions .btn {
                                     flex: 1 1 120px;
                                 }
                             }
-
                             .btn-approve {
                                 background: #28a745;
                                 color: white;
@@ -1832,7 +1587,6 @@
                                 line-height: 36px;
                                 font-size: 13px;
                             }
-
                             .btn-reject {
                                 background: #dc3545;
                                 color: white;
@@ -1840,7 +1594,6 @@
                                 line-height: 36px;
                                 font-size: 13px;
                             }
-
                             .btn-view {
                                 background: #6c757d;
                                 color: white;
@@ -1848,8 +1601,6 @@
                                 line-height: 36px;
                                 font-size: 13px;
                             }
-
-
                             .manufacturer-socials {
                                 display: grid;
                                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1858,7 +1609,6 @@
                                 margin-top: auto;
                                 width: 100%;
                             }
-
                             .manufacturer-socials a {
                                 display: flex !important;
                                 align-items: center;
@@ -1871,18 +1621,15 @@
                                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
                                 transition: transform 0.2s;
                             }
-
                             .manufacturer-socials a:hover {
                                 transform: scale(1.1);
                             }
-
                             .manufacturer-socials img {
                                 width: 100% !important;
                                 height: 100% !important;
                                 object-fit: cover;
                                 border-radius: 50%;
                             }
-
                             /* Footer Styles */
                             .footer {
                                 background-color: #3a3a3a;
@@ -1891,7 +1638,6 @@
                                 margin-top: 50px;
                                 border-top: 1px solid #2a2a2a;
                             }
-
                             .footer-content {
                                 max-width: 1440px;
                                 margin: 0 auto;
@@ -1900,32 +1646,27 @@
                                 align-items: center;
                                 gap: 30px;
                             }
-
                             .footer-left {
                                 flex: 1;
                                 display: flex;
                                 flex-direction: column;
                                 gap: 8px;
                             }
-
                             .footer-text {
                                 font-size: 14px;
                                 line-height: 1.4;
                                 color: #ccc;
                             }
-
                             .footer-text:first-child {
                                 color: #fff;
                                 font-weight: 500;
                             }
-
                             .footer-center {
                                 display: flex;
                                 gap: 20px;
                                 align-items: center;
                                 justify-content: center;
                             }
-
                             .footer-icon {
                                 display: inline-flex;
                                 align-items: center;
@@ -1938,22 +1679,18 @@
                                 text-decoration: none;
                                 cursor: pointer;
                             }
-
                             .footer-icon:hover {
                                 background: rgba(255, 255, 255, 0.2);
                                 transform: scale(1.1);
                             }
-
                             .footer-icon svg {
                                 width: 24px;
                                 height: 24px;
                             }
-
                             .footer-right {
                                 flex: 1;
                                 text-align: right;
                             }
-
                             .footer-top-link {
                                 color: #fff;
                                 text-decoration: none;
@@ -1966,23 +1703,19 @@
                                 cursor: pointer;
                                 display: inline-block;
                             }
-
                             .footer-top-link:hover {
                                 background: rgba(255, 255, 255, 0.1);
                                 border-color: rgba(255, 255, 255, 0.5);
                             }
-
                             @media (max-width: 768px) {
                                 .footer-content {
                                     flex-direction: column;
                                     gap: 20px;
                                     text-align: center;
                                 }
-
                                 .footer-left {
                                     align-items: center;
                                 }
-
                                 .footer-right {
                                     text-align: center;
                                 }
@@ -2212,7 +1945,6 @@
                                                 Подать объявление
                                             </button>
                                         </div>
-
                                         <!-- Мои объявления -->
                                         <div
                                             style="background:#fff; padding:25px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
@@ -2241,7 +1973,6 @@
                                                 </button>
                                             </div>
                                         </div>
-
                                         <!-- Избранное -->
                                         <div
                                             style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
@@ -2262,7 +1993,6 @@
                                             </div>
                                             <div id="profile-favorites-grid" class="ad-grid"></div>
                                         </div>
-
                                         <!-- Кнопка выхода -->
                                         <div style="margin-top:20px; text-align:center;">
                                             <button class="btn btn-black" onclick="doLogout()"
@@ -2290,17 +2020,14 @@
                                     <div class="manufacturer-grid" id="manufacturer-grid">
                                         <!-- Manufacturer cards will be rendered here from the JS `manufacturers` array -->
                                     </div>
-
                                     <script>
                                         (function () {
                                             const SHEET_CSV_URL = '/api/manufacturer-synonyms';
-
                                             const ICON_VK = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/VK_Compact_Logo_%282021-present%29.svg/1024px-VK_Compact_Logo_%282021-present%29.svg.png';
                                             const ICON_YT = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1024px-YouTube_full-color_icon_%282017%29.svg.png';
                                             const ICON_WEB = 'https://cdn-icons-png.flaticon.com/512/1006/1006771.png';
                                             const ICON_TG = 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg';
                                             const ICON_RUTUBE = 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Rutube_icon.svg';
-
                                             let manufacturers = [];
                                             let synonymToOfficial = new Map();   // "тингер" → "TINGER", "трекер" → "TRACKER" и т.д.
                                             // ВРЕМЕННАЯ ОТЛАДКА — посмотри в консоль F12
@@ -2316,12 +2043,10 @@
                                                 // Data is already a JSON array from the API
                                                 return data.map(entry => {
                                                     const { name, city, logo, vk, youtube, website, rutube, telegram, aliases } = entry;
-
                                                     // Добавляем основное название
                                                     if (name) {
                                                         synonymToOfficial.set(name.toLowerCase(), name);
                                                     }
-
                                                     // Добавляем синонимы
                                                     if (aliases && Array.isArray(aliases)) {
                                                         aliases.forEach(alias => {
@@ -2331,20 +2056,16 @@
                                                             }
                                                         });
                                                     }
-
                                                     return { name, city, logo, vk, youtube, website, rutube, telegram };
                                                 });
                                             }
-
                                             function renderManufacturers(list) {
                                                 const grid = document.getElementById('manufacturer-grid');
                                                 if (!grid) return;
                                                 grid.innerHTML = '';
-
                                                 const recommended = ['TINGER', 'TUNDRA', 'КАПРАЛ', 'ДОЗЕР'];
                                                 let recommendedManufacturers = [];
                                                 let otherManufacturers = [];
-
                                                 // Разделяем на рекомендуемых и остальных
                                                 list.forEach(m => {
                                                     if (recommended.includes(m.name.toUpperCase())) {
@@ -2353,12 +2074,10 @@
                                                         otherManufacturers.push(m);
                                                     }
                                                 });
-
                                                 // Сортируем рекомендуемых в нужном порядке
                                                 recommendedManufacturers.sort((a, b) => {
                                                     return recommended.indexOf(a.name.toUpperCase()) - recommended.indexOf(b.name.toUpperCase());
                                                 });
-
                                                 // Группируем остальных по городам
                                                 const byCity = {};
                                                 otherManufacturers.forEach(m => {
@@ -2366,15 +2085,12 @@
                                                     if (!byCity[city]) byCity[city] = [];
                                                     byCity[city].push(m);
                                                 });
-
                                                 // Сортируем города
                                                 const sortedCities = Object.keys(byCity).sort();
-
                                                 // Внутри каждого города сортируем по названию
                                                 sortedCities.forEach(city => {
                                                     byCity[city].sort((a, b) => a.name.localeCompare(b.name));
                                                 });
-
                                                 // Создаём функцию для создания карточки
                                                 const createCard = (m) => {
                                                     const card = document.createElement('div');
@@ -2389,7 +2105,6 @@
                                                             window.location.href = url;
                                                         }
                                                     };
-
                                                     // Логотип
                                                     const logoWrap = document.createElement('div');
                                                     logoWrap.className = 'manufacturer-logo-container';
@@ -2399,16 +2114,13 @@
                                                     img.alt = m.name;
                                                     img.onerror = () => img.src = 'https://placehold.co/200x200?text=нет+лого';
                                                     logoWrap.appendChild(img);
-
                                                     // Название
                                                     const nameEl = document.createElement('div');
                                                     nameEl.className = 'manufacturer-name';
                                                     nameEl.textContent = m.name;
-
                                                     // Соцсети
                                                     const socials = document.createElement('div');
                                                     socials.className = 'manufacturer-socials';
-
                                                     const add = (url, icon) => {
                                                         if (!url) return;
                                                         const a = document.createElement('a');
@@ -2419,27 +2131,22 @@
                                                         a.appendChild(i);
                                                         socials.appendChild(a);
                                                     };
-
                                                     add(m.website, ICON_WEB);
                                                     add(m.vk, ICON_VK);
                                                     add(m.youtube, ICON_YT);
                                                     add(m.rutube, ICON_RUTUBE);
                                                     add(m.telegram, ICON_TG);
-
                                                     card.append(logoWrap, nameEl, socials);
                                                     return card;
                                                 };
-
                                                 // Добавляем раздел "Рекомендуем"
                                                 if (recommendedManufacturers.length > 0) {
                                                     const section = document.createElement('div');
                                                     section.className = 'manufacturer-section';
-
                                                     const title = document.createElement('div');
                                                     title.className = 'manufacturer-section-title';
                                                     title.textContent = 'Рекомендуем';
                                                     section.appendChild(title);
-
                                                     const gridInner = document.createElement('div');
                                                     gridInner.className = 'manufacturer-grid-inner';
                                                     recommendedManufacturers.forEach(m => {
@@ -2448,17 +2155,14 @@
                                                     section.appendChild(gridInner);
                                                     grid.appendChild(section);
                                                 }
-
                                                 // Добавляем разделы по городам
                                                 sortedCities.forEach(city => {
                                                     const section = document.createElement('div');
                                                     section.className = 'manufacturer-section';
-
                                                     const title = document.createElement('div');
                                                     title.className = 'manufacturer-section-title';
                                                     title.textContent = city;
                                                     section.appendChild(title);
-
                                                     const gridInner = document.createElement('div');
                                                     gridInner.className = 'manufacturer-grid-inner';
                                                     byCity[city].forEach(m => {
@@ -2472,25 +2176,20 @@
                                                 const datalist = document.getElementById('manufacturer-suggestions');
                                                 if (!datalist) return;
                                                 datalist.innerHTML = '';
-
                                                 const officialSet = new Set();
                                                 synonymToOfficial.forEach(official => officialSet.add(official));
-
                                                 [...officialSet].sort().forEach(name => {
                                                     const opt = document.createElement('option');
                                                     opt.value = name;
                                                     datalist.appendChild(opt);
                                                 });
                                             }
-
                                             function findAndScroll(name) {
                                                 const input = document.getElementById('searchInput');
                                                 let val = name ? name : (input ? input.value.trim() : '');
                                                 if (!val) return;
-
                                                 const lower = val.toLowerCase();
                                                 let officialName = synonymToOfficial.get(lower);
-
                                                 // Если прямого соответствия нет, попробуем найти точное совпадение среди официальных названий
                                                 if (!officialName) {
                                                     const officialSet = new Set();
@@ -2498,13 +2197,10 @@
                                                     const exact = [...officialSet].find(n => n.toLowerCase() === val.toLowerCase());
                                                     if (exact) officialName = exact;
                                                 }
-
                                                 if (officialName) {
                                                     if (input) input.value = officialName;  // подставляем официальное название в поле
-
                                                     const id = `manuf-${officialName.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
                                                     const card = document.getElementById(id);
-
                                                     if (card) {
                                                         // Подсветка карточки
                                                         card.style.transition = 'background 1.2s';
@@ -2513,7 +2209,6 @@
                                                         if (input) input.value = '';
                                                     } else {
                                                     }
-
                                                     const listDiv = document.getElementById('manufacturerList');
                                                     if (listDiv) listDiv.style.display = 'none';
                                                 }
@@ -2525,7 +2220,6 @@
                                                     manufacturers = parseManufacturers(data);
                                                     renderManufacturers(manufacturers);
                                                     fillDatalist();
-
                                                     const input = document.getElementById('searchInput');
                                                     if (input) {
                                                         // Срабатывает при выборе из списка или нажатии Enter
@@ -2536,30 +2230,24 @@
                                                                 findAndScroll();
                                                             }
                                                         });
-
                                                         input.addEventListener('focus', function () {
                                                             if (this.value.trim()) {
                                                                 this.dispatchEvent(new Event('input'));
                                                             }
                                                         });
-
                                                         input.addEventListener('input', function () {
                                                             // Берём то, что ввёл пользователь
                                                             let typed = this.value.trim();
                                                             const listDiv = document.getElementById('manufacturerList');
-
                                                             // Если ничего не ввели — прячем список и возвращаем все варианты
                                                             if (!typed) {
                                                                 fillDatalist();
                                                                 if (listDiv) listDiv.style.display = 'none';
                                                                 return;
                                                             }
-
                                                             // Приводим к нижнему регистру ОДИН РАЗ
                                                             typed = typed.toLowerCase();
-
                                                             const found = new Set();
-
                                                             // Проходим по всем синонимам
                                                             synonymToOfficial.forEach(function (official, key) {
                                                                 // key уже в нижнем регистре (из parseCSV)
@@ -2567,7 +2255,6 @@
                                                                     found.add(official);
                                                                 }
                                                             });
-
                                                             // Если ничего не нашли — можно показать хотя бы похожие (опционально)
                                                             if (found.size === 0 && typed.length >= 2) {
                                                                 synonymToOfficial.forEach(function (official, key) {
@@ -2576,7 +2263,6 @@
                                                                     }
                                                                 });
                                                             }
-
                                                             // Заполняем кастомный список ниже поля
                                                             if (listDiv) {
                                                                 listDiv.innerHTML = '';
@@ -2603,7 +2289,6 @@
                                                                 }
                                                             }
                                                         });
-
                                                         // Скрываем список подсказок по клику вне поля
                                                         document.addEventListener('click', function (e) {
                                                             const listDiv = document.getElementById('manufacturerList');
@@ -2626,7 +2311,6 @@
                                 <p id="moderation-placeholder" style="text-align:center; color: #888; padding: 50px 0;">
                                     Нет объявлений на модерации.</p>
                             </div>
-
                             <div id="view-form" class="hidden fade-in">
                                 <h3 id="form-title" style="margin-top:0">Новое объявление</h3>
                                 <form id="main-form"> <input type="hidden" id="edit-row-index" />
@@ -2787,7 +2471,6 @@
                             </div>
                             <div id="auth-step-2" class="hidden">
                                 <div class="modal-close" onclick="closeAuthModal()">×</div>
-
                                 <div id="auth-title-step2" style="font-size:20px;font-weight:700;margin-bottom:15px;">
                                     Введите код</div>
                                 <div id="auth-code-block">
@@ -2874,8 +2557,6 @@
                         let currentItemType = 'ad';
                         let currentPhotoIndex = 0; let currentPhotos = [];
                         let userFavorites = []; // Массив ID избранных объявлений
-
-
                         function rebuildSelect(selectId, options, getValue, getLabel) {
                             const select = document.getElementById(selectId);
                             if (!select) return;
@@ -2896,13 +2577,11 @@
                                 existingValues.add(value);
                             });
                         }
-
                         async function loadFilters() {
                             try {
                                 const response = await fetch(FILTERS_API_URL);
                                 const data = await response.json();
                                 if (!data) return;
-
                                 const chassis = data.chassis || [];
                                 const transmission = data.transmission || [];
                                 const fuel = data.fuel || [];
@@ -2910,24 +2589,17 @@
                                 const vehicleType = data.vehicleType || [];
                                 const constructionType = data.constructionType || [];
                                 const sellerType = data.sellerType || [];
-
                                 rebuildSelect('f-wheels', chassis, (item) => item.name, (item) => item.name);
                                 rebuildSelect('inp-wheel-f', chassis, (item) => item.name, (item) => item.name);
-
                                 rebuildSelect('f-trans', transmission, (item) => item.name, (item) => item.name);
                                 rebuildSelect('inp-trans', transmission, (item) => item.name, (item) => item.name);
-
                                 rebuildSelect('f-fuel', fuel, (item) => item.name, (item) => item.name);
                                 rebuildSelect('inp-fuel', fuel, (item) => item.name, (item) => item.name);
-
                                 rebuildSelect('f-docs', docs, (item) => item.name, (item) => item.name);
                                 rebuildSelect('inp-docs', docs, (item) => item.name, (item) => item.name);
-
                                 rebuildSelect('f-construction', constructionType, (item) => item.name, (item) => item.name);
                                 rebuildSelect('inp-construction', constructionType, (item) => item.name, (item) => item.name);
-
                                 rebuildSelect('inp-seller-type', sellerType, (item) => String(item.id), (item) => item.name);
-
                                 rebuildSelect(
                                     'f-tech-type',
                                     vehicleType,
@@ -2943,7 +2615,6 @@
                             } catch (error) {
                             }
                         }
-
                         function resetAdsFiltersOnStartup() {
                             const defaults = {
                                 'f-sort': 'default',
@@ -2961,7 +2632,6 @@
                                 'f-construction': '',
                                 'f-color': ''
                             };
-
                             Object.entries(defaults).forEach(([id, value]) => {
                                 const el = document.getElementById(id);
                                 if (el) {
@@ -2970,33 +2640,28 @@
                                 }
                             });
                         }
-
                         function enforceCleanFiltersState() {
                             resetAdsFiltersOnStartup();
                             if (Array.isArray(allAds) && allAds.length > 0 && typeof applyFilters === 'function') {
                                 applyFilters();
                             }
                         }
-
                         function setupFilterInteractionTracking() {
                             const markAsAdjusted = () => {
                                 hasUserAdjustedFilters = true;
                             };
-
                             document.addEventListener('pointerdown', (event) => {
                                 const target = event.target;
                                 if (target && target.closest && target.closest('#view-filters')) {
                                     markAsAdjusted();
                                 }
                             }, true);
-
                             document.addEventListener('touchstart', (event) => {
                                 const target = event.target;
                                 if (target && target.closest && target.closest('#view-filters')) {
                                     markAsAdjusted();
                                 }
                             }, { capture: true, passive: true });
-
                             document.addEventListener('keydown', (event) => {
                                 const target = event.target;
                                 if (target && target.closest && target.closest('#view-filters')) {
@@ -3004,17 +2669,14 @@
                                 }
                             }, true);
                         }
-
                         function goToMainFromProfile() {
                             const targetTab = profileReturnTab || 'ads';
                             const targetTabLink = document.querySelector(`.tab-link[onclick*="${targetTab}"]`);
                             showTab(targetTabLink, targetTab);
                         }
-
                         function syncProfileButton(tabName) {
                             const btnProfile = document.getElementById('btn-profile');
                             if (!btnProfile) return;
-
                             if (tabName === 'profile') {
                                 btnProfile.innerText = 'На главную';
                                 btnProfile.onclick = goToMainFromProfile;
@@ -3023,7 +2685,6 @@
                                 btnProfile.onclick = openProfile;
                             }
                         }
-
                         function showTab(element, tabName) {
                             try {
                                 sessionStorage.setItem('lastTab', tabName);
@@ -3035,7 +2696,6 @@
                                 content.classList.remove('active');
                             });
                             document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
-
                             // Show target
                             const target = document.getElementById(`tab-content-${tabName}`);
                             if (target) {
@@ -3043,21 +2703,17 @@
                                 setTimeout(() => target.classList.add('active'), 10); // Small delay for fade
                             }
                             if (element) element.classList.add('active');
-
                             syncProfileButton(tabName);
-
                             // Admin Refresh
                             if (tabName === 'admin' && typeof isAdmin !== 'undefined' && isAdmin && typeof allAds !== 'undefined') {
                                 if (typeof renderModerationGrid === 'function') {
                                     renderModerationGrid(getPendingModerationItems());
                                 }
                             }
-
                             // Profile Refresh
                             if (tabName === 'profile') {
                                 renderProfile();
                             }
-
                             // Refresh lists to keep favorites state in sync across tabs
                             if (tabName === 'ads' && typeof applyFilters === 'function') {
                                 applyFilters();
@@ -3065,7 +2721,6 @@
                             if (tabName === 'parts' && typeof renderPartsGrid === 'function' && Array.isArray(allParts)) {
                                 renderPartsGrid(allParts);
                             }
-
                             // Кнопка видна только когда пользователь авторизован и не на вкладке профиля
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) {
@@ -3139,20 +2794,16 @@
                                     name: localStorage.getItem('vezdehod_username') || "Пользователь"
                                 };
                                 currentUserName = localStorage.getItem('vezdehod_username') || "Пользователь";
-
                                 const normPhone = savedPhone.replace(/\D/g, '');
                                 const normAdmin = ADMIN_PHONE.replace(/\D/g, '');
                                 isAdmin = (normPhone === normAdmin);
-
                                 updateAuthUI(currentUser);
-
                                 if (isAdmin) {
                                     const adminTab = document.getElementById('admin-tab-link');
                                     if (adminTab) adminTab.classList.remove('hidden');
                                 }
                             }
                         }
-
                         document.addEventListener('DOMContentLoaded', () => {
                             const allRecords = document.getElementById('allrecords');
                             if (allRecords) {
@@ -3179,13 +2830,11 @@
                                 .then(() => enforceCleanFiltersState())
                             loadAds();
                             loadParts();
-
                             // Firefox может восстанавливать значения полей с задержкой (особенно на проде)
                             setTimeout(enforceCleanFiltersState, 100);
                             setTimeout(enforceCleanFiltersState, 600);
                             setTimeout(enforceCleanFiltersState, 1500);
                         });
-
                         window.addEventListener('pageshow', () => {
                             setTimeout(enforceCleanFiltersState, 0);
                         });
@@ -3194,24 +2843,18 @@
                         function handlePhoneInput(input) {
                             // Оставляем только цифры и +
                             let value = input.value.replace(/[^0-9+]/g, '');
-
                             // Извлекаем только цифры
                             let digits = value.replace(/[^0-9]/g, '');
-
                             // Если начинается с 7 (и не +7), удаляем первую 7
                             if (digits.startsWith('7')) {
                                 digits = digits.substring(1);
                             }
-
                             // Ограничиваем максимум 10 цифр (после +7)
                             digits = digits.substring(0, 10);
-
                             // Форматируем в +7XXXXXXXXXX
                             input.value = '+7' + digits;
-
                             updateSmsButtonState();
                         }
-
                         function handlePhoneInputPaste(input) {
                             // Получаем текст из буфера обмена
                             navigator.clipboard.readText().then(text => {
@@ -3228,13 +2871,10 @@
                         function updateSmsButtonState() {
                             const phoneInput = document.getElementById('auth-phone');
                             const sendBtn = document.querySelector('#auth-step-1 .btn-black');
-
                             if (!phoneInput || !sendBtn) return;
-
                             // Проверяем: номер должен быть +7 + 10 цифр = 12 символов всего
                             const digitCount = phoneInput.value.replace(/[^0-9]/g, '').length;
                             const isValid = phoneInput.value.startsWith('+7') && digitCount === 11;
-
                             sendBtn.disabled = !isValid;
                             sendBtn.style.opacity = isValid ? '1' : '0.5';
                             sendBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
@@ -3347,9 +2987,7 @@
                         }
                         function applyFilters() {
                             let approvedAds = allAds;
-
                             const useUiFilters = hasUserAdjustedFilters;
-
                             const minStr = useUiFilters ? getPriceValue('f-price-min') : '';
                             const maxStr = useUiFilters ? getPriceValue('f-price-max') : '';
                             const min = minStr ? parseInt(minStr, 10) : 0;
@@ -3366,8 +3004,6 @@
                             const tender = useUiFilters ? safeVal('f-tender') : '';
                             const techType = useUiFilters ? safeVal('f-tech-type') : '';
                             const constr = useUiFilters ? safeVal('f-construction') : '';
-
-
                             let filtered = approvedAds.filter(ad => {
                                 const adPrice = Number(ad.price || 0);
                                 if (min && adPrice < min) return false;
@@ -3388,8 +3024,6 @@
                                 if (geo) { const adGeo = ((ad.region || "") + " " + (ad.city || "")).toLowerCase(); if (!adGeo.includes(geo)) return false; }
                                 return true;
                             });
-
-
                             if (sortType === 'asc') {
                                 filtered.sort((a, b) => getPriceVal(a.price) - getPriceVal(b.price));
                             } else if (sortType === 'desc') {
@@ -3397,17 +3031,13 @@
                             } else {
                                 filtered.sort((a, b) => Number(b.rowIndex) - Number(a.rowIndex));
                             }
-
                             renderGrid(filtered);
-
                             if (isAdmin) {
                                 renderModerationGrid(getPendingModerationItems());
                             }
                         }
-
                         async function fetchJsonNoCacheWithRetry(endpoint, retryOnEmptyArray = false) {
                             let lastError = null;
-
                             for (let attempt = 0; attempt < 2; attempt++) {
                                 try {
                                     const separator = endpoint.includes('?') ? '&' : '?';
@@ -3421,34 +3051,27 @@
                                             'Expires': '0'
                                         }
                                     });
-
                                     const json = await response.json();
-
                                     if (retryOnEmptyArray && Array.isArray(json) && json.length === 0 && attempt === 0) {
                                         continue;
                                     }
-
                                     return json;
                                 } catch (e) {
                                     lastError = e;
                                 }
                             }
-
                             throw lastError || new Error('Не удалось получить данные');
                         }
-
                         function xhrGetJsonNoCache(endpoint) {
                             return new Promise((resolve, reject) => {
                                 const separator = endpoint.includes('?') ? '&' : '?';
                                 const cacheBust = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
                                 const url = `${endpoint}${separator}_=${cacheBust}`;
-
                                 const xhr = new XMLHttpRequest();
                                 xhr.open('GET', url, true);
                                 xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
                                 xhr.setRequestHeader('Pragma', 'no-cache');
                                 xhr.setRequestHeader('Expires', '0');
-
                                 xhr.onload = function () {
                                     if (xhr.status >= 200 && xhr.status < 300) {
                                         try {
@@ -3460,21 +3083,17 @@
                                         reject(new Error(`HTTP ${xhr.status}`));
                                     }
                                 };
-
                                 xhr.onerror = function () {
                                     reject(new Error('XHR network error'));
                                 };
-
                                 xhr.send();
                             });
                         }
-
                         async function fetchDatasetWithFallback(endpoint) {
                             const primary = await fetchJsonNoCacheWithRetry(endpoint, true);
                             if (Array.isArray(primary) && primary.length > 0) {
                                 return primary;
                             }
-
                             try {
                                 const fallback = await xhrGetJsonNoCache(endpoint);
                                 if (Array.isArray(fallback)) {
@@ -3482,14 +3101,12 @@
                                 }
                             } catch (e) {
                             }
-
                             try {
                                 const queryEndpoint = endpoint === '/api/listings'
                                     ? '/api/listings/query'
                                     : endpoint === '/api/spares'
                                         ? '/api/spares/query'
                                         : null;
-
                                 if (queryEndpoint) {
                                     const postResponse = await fetch(queryEndpoint, {
                                         method: 'POST',
@@ -3502,7 +3119,6 @@
                                         },
                                         body: JSON.stringify({ _ts: Date.now() })
                                     });
-
                                     const postJson = await postResponse.json();
                                     if (Array.isArray(postJson)) {
                                         return postJson;
@@ -3510,7 +3126,6 @@
                                 }
                             } catch (e) {
                             }
-
                             return Array.isArray(primary) ? primary : [];
                         }
                         function buildAdSearchIndex(ads) {
@@ -3531,13 +3146,11 @@
                             const listDiv = document.getElementById('adsSearchList');
                             let val = value ? String(value).trim() : (input ? input.value.trim() : '');
                             if (!val) return;
-
                             const lower = val.toLowerCase();
                             let match = adSearchIndex.find(item => item.titleLower === lower);
                             if (!match) {
                                 match = adSearchIndex.find(item => item.titleLower.includes(lower));
                             }
-
                             if (match) {
                                 if (input) input.value = match.title;
                                 const card = document.getElementById(`ad-${match.id}`);
@@ -3556,7 +3169,6 @@
                             const listDiv = document.getElementById('adsSearchList');
                             if (!input || !listDiv) return;
                             adsSearchInitialized = true;
-
                             input.addEventListener('change', () => findAdAndScroll());
                             input.addEventListener('keypress', e => {
                                 if (e.key === 'Enter') {
@@ -3564,20 +3176,17 @@
                                     findAdAndScroll();
                                 }
                             });
-
                             input.addEventListener('focus', function () {
                                 if (this.value.trim()) {
                                     this.dispatchEvent(new Event('input'));
                                 }
                             });
-
                             input.addEventListener('input', function () {
                                 let typed = this.value.trim();
                                 if (!typed) {
                                     listDiv.style.display = 'none';
                                     return;
                                 }
-
                                 typed = typed.toLowerCase();
                                 const found = [];
                                 for (const item of adSearchIndex) {
@@ -3592,7 +3201,6 @@
                                         }
                                     }
                                 }
-
                                 listDiv.innerHTML = '';
                                 const uniq = new Set();
                                 const arr = [];
@@ -3603,7 +3211,6 @@
                                     }
                                     if (arr.length >= 5) break;
                                 }
-
                                 if (arr.length === 0) {
                                     listDiv.style.display = 'none';
                                 } else {
@@ -3623,7 +3230,6 @@
                                     listDiv.style.display = 'block';
                                 }
                             });
-
                             document.addEventListener('click', function (e) {
                                 const inputEl = document.getElementById('adsSearchInput');
                                 if (!listDiv || !inputEl) return;
@@ -3652,13 +3258,11 @@
                             const listDiv = document.getElementById('partsSearchList');
                             let val = value ? String(value).trim() : (input ? input.value.trim() : '');
                             if (!val) return;
-
                             const lower = val.toLowerCase();
                             let match = partSearchIndex.find(item => item.titleLower === lower || item.brandLower === lower);
                             if (!match) {
                                 match = partSearchIndex.find(item => item.titleLower.includes(lower) || item.brandLower.includes(lower));
                             }
-
                             if (match) {
                                 if (input) input.value = match.title;
                                 const card = document.getElementById(`part-${match.id}`);
@@ -3677,7 +3281,6 @@
                             const listDiv = document.getElementById('partsSearchList');
                             if (!input || !listDiv) return;
                             partsSearchInitialized = true;
-
                             input.addEventListener('change', () => findPartAndScroll());
                             input.addEventListener('keypress', e => {
                                 if (e.key === 'Enter') {
@@ -3685,20 +3288,17 @@
                                     findPartAndScroll();
                                 }
                             });
-
                             input.addEventListener('focus', function () {
                                 if (this.value.trim()) {
                                     this.dispatchEvent(new Event('input'));
                                 }
                             });
-
                             input.addEventListener('input', function () {
                                 let typed = this.value.trim();
                                 if (!typed) {
                                     listDiv.style.display = 'none';
                                     return;
                                 }
-
                                 typed = typed.toLowerCase();
                                 const found = [];
                                 for (const item of partSearchIndex) {
@@ -3713,7 +3313,6 @@
                                         }
                                     }
                                 }
-
                                 listDiv.innerHTML = '';
                                 const uniq = new Set();
                                 const arr = [];
@@ -3725,7 +3324,6 @@
                                     }
                                     if (arr.length >= 5) break;
                                 }
-
                                 if (arr.length === 0) {
                                     listDiv.style.display = 'none';
                                 } else {
@@ -3745,7 +3343,6 @@
                                     listDiv.style.display = 'block';
                                 }
                             });
-
                             document.addEventListener('click', function (e) {
                                 const inputEl = document.getElementById('partsSearchInput');
                                 if (!listDiv || !inputEl) return;
@@ -3765,42 +3362,34 @@
                             ads.forEach((ad, idx) => {
                                 let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
-
                                 const sellerLabel = getSellerTypeLabel(ad);
                                 let badgesHtml = '';
                                 if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
-
                                 const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
                                     ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
                                     : '';
-
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
                                 if (ad.transmission) infoParts.push(ad.transmission);
-
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `ad-${ad.rowIndex}`;
                                 d.onclick = () => openAd(ad);
-
                                 // Проверяем, в избранном ли объявление
                                 const isFavorite = userFavorites.includes(ad.rowIndex);
                                 const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
-
                                 d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
                             });
-
                             setTimeout(() => {
                                 c.classList.add('loaded');
                                 const stylesAfter = window.getComputedStyle(c);
-
                                 // Проверяем первую карточку
                                 const firstCard = c.querySelector('.ad-card');
                                 if (firstCard) {
@@ -3827,28 +3416,23 @@
                             parts.forEach(part => {
                                 let ph = part.photos ? part.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
-
                                 const sellerLabel = getSellerTypeLabel(part);
                                 let badgesHtml = '';
                                 if (part.condition === 'new') badgesHtml += '<span class="badge-new">НОВАЯ</span>';
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
-
                                 let infoParts = [];
                                 if (part.brand) infoParts.push(part.brand);
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
-
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
-
                                 // Проверяем, в избранном ли запчасть
                                 const isFavorite = userFavorites.includes(part.rowIndex);
                                 const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
-
                                 d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
                             });
@@ -3860,7 +3444,6 @@
                             const editBtn = actions.querySelector('button:nth-child(1)');
                             const deleteBtn = actions.querySelector('button:nth-child(2)');
                             if (!editBtn || !deleteBtn) return;
-
                             if (type === 'part') {
                                 editBtn.classList.add('hidden');
                                 deleteBtn.onclick = deleteCurrentPart;
@@ -3872,157 +3455,22 @@
                                 deleteBtn.innerText = 'Удалить';
                             }
                         }
-
+                        
                         function openAd(ad) {
-                            const btnCreate = document.getElementById('btn-create-ad');
-                            const btnProfile = document.getElementById('btn-profile');
-                            if (btnCreate) btnCreate.classList.add('hidden');
-                            if (btnProfile) btnProfile.classList.add('hidden');
-                            currentItemType = 'ad';
-                            currentAd = ad; currentPhotos = []; currentPhotoIndex = 0;
-                            document.getElementById('modal-title').innerText = ad.title || "";
-                            document.getElementById('modal-price').innerText = Number(ad.price || 0).toLocaleString() + ' ₽';
-                            let cleanDesc = (ad.desc || "").replace(NEW_STATUS_TAG, "").replace(/#COLOR_\S+/g, "").replace(/#WHEELS_\S+/g, "").trim();
-                            document.getElementById('modal-desc').innerText = cleanDesc;
-                            document.getElementById('modal-name').innerText = ad.name || "Продавец";
-                            document.getElementById('modal-location').innerText = ad.city || "";
-                            const phEl = document.getElementById('modal-phone'); if (phEl) { phEl.innerText = ad.phone || ""; phEl.href = "tel:" + (ad.phone || ""); }
-
-                            const sellerLabel = getSellerTypeLabel(ad);
-                            let bgHtml = '';
-                            if (checkIsNew(ad)) bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
-                            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
-                            if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
-                            document.getElementById('modal-badges').innerHTML = bgHtml;
-
-                            const tenderBanner = document.getElementById('modal-tender-banner');
-                            if ((ad.tender || "").toLowerCase() === 'yes') {
-                                tenderBanner.innerText = 'В РЕЕСТРЕ МИНПРОМТОРГА';
-                                tenderBanner.classList.add('visible');
-                            } else {
-                                tenderBanner.classList.remove('visible');
-                            }
-
-                            let phs = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
-                            currentPhotos = phs;
-                            updateGallery();
-                            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
-                            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
-                            let sType = getSellerTypeLabel(ad);
-                            let wf = ad.wheelFormula;
-
-                            let sp = [
-                                { l: "Тип продавца", v: sType },
-                                { l: "Город", v: ad.city },
-                                { l: "Тип техники", v: ad.techType || '' },
-                            ];
-
-                            if (ad.techType === 'Вездеход') {
-                                sp.push({ l: "Конструкция", v: ad.constructionType });
-                            }
-
-                            if (ad.techType === 'Прицеп') {
-                                sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
-                            } else {
-                                sp.push({ l: "Тип шасси", v: wf });
-                                sp.push({ l: "Плавающий", v: ((ad.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
-                                sp.push({ l: "Двигатель", v: ad.engine });
-                                sp.push({ l: "Мощность", v: ad.power ? ad.power + ' л.с.' : '' });
-                                sp.push({ l: "Трансмиссия", v: ad.transmission });
-                                sp.push({ l: "Топливо", v: ad.fuel });
-                                sp.push({ l: "Колеса", v: ad.wheels });
-                                sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
-                            }
-
-                            if (ad.techType !== 'Прицеп') {
-                                sp.push({ l: "Документы", v: ad.docs || 'Без документов' });
-                            }
-                            sp.push({ l: "Цвет", v: ad.color });
-                            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-                            const acts = document.getElementById('modal-owner-actions'); const norm = p => String(p).replace(/[^0-9]/g, '');
-                            if (acts) {
-                                if (currentUser && (norm(currentUser.phoneNumber) === norm(ad.phone) || isAdmin)) {
-                                    acts.classList.add('visible');
-                                    configureModalActions('ad');
-                                } else {
-                                    acts.classList.remove('visible');
-                                }
-                            }
-                            updateModalFavoriteState();
-                            document.getElementById('modal').classList.add('active');
-                            document.body.style.overflow = 'hidden';
-
-                            updateMetaTags(ad);
+                            window.location.href = `ad.html?id=${ad.rowIndex}&type=ad`;
                         }
 
                         function openPart(part) {
-                            const btnCreate = document.getElementById('btn-create-ad');
-                            const btnProfile = document.getElementById('btn-profile');
-                            if (btnCreate) btnCreate.classList.add('hidden');
-                            if (btnProfile) btnProfile.classList.add('hidden');
-                            currentItemType = 'part';
-                            currentAd = part; currentPhotos = []; currentPhotoIndex = 0;
-
-                            document.getElementById('modal-title').innerText = part.title || part.partName || 'Запчасть';
-                            document.getElementById('modal-price').innerText = Number(part.price || 0).toLocaleString() + ' ₽';
-                            let cleanDesc = (part.desc || '').replace(NEW_STATUS_TAG, '').trim();
-                            document.getElementById('modal-desc').innerText = cleanDesc;
-                            document.getElementById('modal-name').innerText = part.name || 'Продавец';
-                            document.getElementById('modal-location').innerText = part.city || '';
-
-                            const phEl = document.getElementById('modal-phone');
-                            if (phEl) { phEl.innerText = part.phone || ''; phEl.href = 'tel:' + (part.phone || ''); }
-
-                            const sellerLabel = getSellerTypeLabel(part);
-                            let bgHtml = '';
-                            if (part.condition === 'new') bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
-                            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
-                            document.getElementById('modal-badges').innerHTML = bgHtml;
-
-                            const tenderBanner = document.getElementById('modal-tender-banner');
-                            tenderBanner.classList.remove('visible');
-
-                            let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
-                            currentPhotos = phs;
-                            updateGallery();
-                            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
-                            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
-
-                            let sp = [
-                                { l: 'Тип', v: 'Запчасть' },
-                                { l: 'Название', v: part.partName || part.title },
-                                { l: 'Бренд', v: part.brand || '' },
-                                { l: 'Состояние', v: part.condition === 'new' ? 'Новая' : 'Б/У' },
-                                { l: 'Тип продавца', v: sellerLabel },
-                                { l: 'Город', v: part.city }
-                            ];
-                            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-
-                            const acts = document.getElementById('modal-owner-actions');
-                            const norm = p => String(p).replace(/[^0-9]/g, '');
-                            if (acts) {
-                                if (currentUser && (norm(currentUser.phoneNumber) === norm(part.phone) || isAdmin)) {
-                                    acts.classList.add('visible');
-                                    configureModalActions('part');
-                                } else {
-                                    acts.classList.remove('visible');
-                                }
-                            }
-                            updateModalFavoriteState();
-                            document.getElementById('modal').classList.add('active');
-                            document.body.style.overflow = 'hidden';
-
-                            updateMetaTags(part);
+                            window.location.href = `ad.html?id=${part.rowIndex}&type=part`;
                         }
+
                         function updateMetaTags(ad) {
                             let existingOgImage = document.querySelector('meta[property="og:image"]');
                             let existingOgTitle = document.querySelector('meta[property="og:title"]');
                             let existingOgDesc = document.querySelector('meta[property="og:description"]');
-
                             const firstPhoto = ad.photos ? ad.photos.split(',')[0] : '';
                             const title = ad.title || 'Вездеход';
                             const price = Number(ad.price || 0).toLocaleString() + ' ₽';
-
                             if (!existingOgImage) {
                                 existingOgImage = document.createElement('meta');
                                 existingOgImage.setAttribute('property', 'og:image');
@@ -4038,7 +3486,6 @@
                                 existingOgDesc.setAttribute('property', 'og:description');
                                 document.head.appendChild(existingOgDesc);
                             }
-
                             existingOgImage.setAttribute('content', firstPhoto || 'https://placehold.co/1200x630?text=Вездеход');
                             existingOgTitle.setAttribute('content', title);
                             existingOgDesc.setAttribute('content', `${title} - ${price}`);
@@ -4140,10 +3587,8 @@
                             const tabs = document.getElementById('tabs-container');
                             const modal = document.getElementById('modal');
                             const formView = document.getElementById('view-form');
-
                             isAdmin = false;
                             adminTab.classList.add('hidden');
-
                             if (user) {
                                 btnLogin.classList.add('hidden');
                                 syncProfileButton('ads');
@@ -4162,19 +3607,15 @@
                                     if (btnCreate) btnCreate.classList.add('hidden');
                                     if (btnProfile) btnProfile.classList.add('hidden');
                                 }
-
                                 let displayName = user.name || currentUserName || "Пользователь";
                                 let displayPhone = user.phoneNumber || user.email || "";
-
                                 let uPhone = String(user.phoneNumber || "").replace(/\D/g, '');
                                 let aPhone = String(ADMIN_PHONE).replace(/\D/g, '');
-
                                 if (uPhone === aPhone) {
                                     isAdmin = true;
                                     adminTab.classList.remove('hidden');
                                     updateAdminCount();
                                 }
-
                                 // Загружаем избранное при авторизации
                                 if (user.id) {
                                     loadFavorites().then(() => {
@@ -4192,29 +3633,23 @@
                                 userFavorites = []; // Очищаем избранное при выходе
                             }
                         }
-
                         function validateForm() {
                             const errors = [];
                             const techType = safeVal('inp-tech-type');
-
                             // Проверяем обязательные поля для всех типов объявлений
                             if (!safeVal('inp-seller-type')) {
                                 errors.push('Выберите тип продавца (Кто вы?)');
                             }
-
                             if (!safeVal('inp-city').trim()) {
                                 errors.push('Укажите город');
                             }
-
                             const priceVal = getPriceValue('inp-price');
                             if (!priceVal || parseInt(priceVal) <= 0) {
                                 errors.push('Укажите цену');
                             }
-
                             if (!safeVal('inp-condition')) {
                                 errors.push('Выберите состояние (Новый/Б/У)');
                             }
-
                             // Проверяем специфичные поля для запчастей
                             if (techType === 'Запчасть') {
                                 if (!safeVal('inp-part-title').trim()) {
@@ -4225,30 +3660,24 @@
                                 if (!safeVal('inp-brand').trim()) {
                                     errors.push('Укажите марку техники');
                                 }
-
                                 if (!safeVal('inp-model').trim()) {
                                     errors.push('Укажите модель техники');
                                 }
                             }
-
                             if (errors.length > 0) {
                                 const errorMessage = 'Пожалуйста, заполните обязательные поля:\n\n' + errors.map((e, i) => `${i + 1}. ${e}`).join('\n');
                                 alert(errorMessage);
                                 return false;
                             }
-
                             return true;
                         }
-
                         document.getElementById('main-form').addEventListener('submit', async (e) => {
                             e.preventDefault();
                             if (!currentUser) return alert("Войдите!");
-
                             // Валидация формы
                             if (!validateForm()) {
                                 return;
                             }
-
                             showLoader("Публикация...");
                             try {
                                 let phU = (currentAd && isEditMode) ? currentAd.photos : "", fI = document.getElementById('inp-photos');
@@ -4264,7 +3693,6 @@
                                 const cond = safeVal('inp-condition');
                                 let desc = safeVal('inp-desc');
                                 if (cond === 'new') desc += NEW_STATUS_TAG;
-
                                 const priceVal = getPriceValue('inp-price');
                                 const techType = safeVal('inp-tech-type');
                                 if (techType === 'Запчасть') {
@@ -4299,11 +3727,9 @@
                                     showTab(document.querySelector('.tab-link[onclick*="parts"]'), 'parts');
                                     return;
                                 }
-
                                 const brand = safeVal('inp-brand');
                                 const model = safeVal('inp-model');
                                 const title = [brand, model].filter(Boolean).join(' ').trim();
-
                                 const pl = {
                                     action: isEditMode ? 'edit' : 'create',
                                     rowIndex: safeVal('edit-row-index'),
@@ -4353,7 +3779,6 @@
                         async function loadAds() {
                             try {
                                 const raw = await fetchDatasetWithFallback('/api/listings');
-
                                 // Преобразуем записи: если есть Brand и Model, комбинируем их в title
                                 allAds = (Array.isArray(raw) ? raw : []).map(ad => {
                                     const brand = String(ad.brand || ad.Brand || ad.Бренд || ad.BrandName || '').trim();
@@ -4364,7 +3789,6 @@
                                     if (typeof ad.title === 'undefined' || ad.title === null) ad.title = '';
                                     return ad;
                                 });
-
                                 applyFilters();
                                 buildAdSearchIndex(allAds);
                                 initAdsSearch();
@@ -4372,12 +3796,10 @@
                                     renderModerationGrid(getPendingModerationItems());
                                     updateAdminCount();
                                 }
-
                                 // Загружаем избранное если пользователь авторизован
                                 if (currentUser && currentUser.id) {
                                     await loadFavorites();
                                 }
-
                                 const urlParams = new URLSearchParams(window.location.search);
                                 const adId = urlParams.get('id');
                                 if (adId) {
@@ -4386,9 +3808,7 @@
                                         openAd(found);
                                     }
                                 }
-
                                 if (typeof currentUser !== 'undefined' && currentUser) updateAuthUI(currentUser);
-
                             } catch (e) {
                                 const adsContainer = document.getElementById('vehicles-container');
                                 if (adsContainer) {
@@ -4453,7 +3873,6 @@
                         function editCurrentAd() { closeModalDirect(); openEditMode(currentAd) }
                         function deleteCurrentAd() { closeModalDirect(); sendDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); }
                         function deleteCurrentPart() { closeModalDirect(); sendPartDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); }
-
                         // Функция открытия личного кабинета
                         function openProfile() {
                             // Скрываем форму если открыта
@@ -4463,7 +3882,6 @@
                                 document.getElementById('tabs-nav').style.display = 'flex';
                                 document.getElementById('tabs-container').style.display = 'block';
                             }
-
                             const activeTabContent = document.querySelector('.tab-content.active');
                             if (activeTabContent && activeTabContent.id) {
                                 const activeTabName = activeTabContent.id.replace('tab-content-', '');
@@ -4471,7 +3889,6 @@
                                     profileReturnTab = activeTabName;
                                 }
                             }
-
                             // Only proceed if user is logged in
                             if (!currentUser) {
                                 alert('Пожалуйста, войдите в аккаунт');
@@ -4484,14 +3901,12 @@
                             // Переключаемся на вкладку профиля
                             showTab(null, 'profile');
                         }
-
                         // Функции работы с избранным
                         async function loadFavorites() {
                             if (!currentUser || !currentUser.id) {
                                 userFavorites = [];
                                 return;
                             }
-
                             try {
                                 const response = await fetch(`/api/favorites?userId=${currentUser.id}`);
                                 if (response.ok) {
@@ -4503,16 +3918,13 @@
                                 userFavorites = [];
                             }
                         }
-
                         async function toggleFavorite(advertisementId) {
                             if (!currentUser || !currentUser.id) {
                                 alert('Войдите в аккаунт, чтобы добавлять в избранное');
                                 return;
                             }
-
                             const isFavorite = userFavorites.includes(advertisementId);
                             const endpoint = isFavorite ? '/api/favorites/remove' : '/api/favorites/add';
-
                             try {
                                 const response = await fetch(endpoint, {
                                     method: 'POST',
@@ -4522,9 +3934,7 @@
                                         advertisementId: advertisementId
                                     })
                                 });
-
                                 const result = await response.json();
-
                                 if (result.status === 'success') {
                                     // Обновляем локальный список избранного
                                     if (isFavorite) {
@@ -4532,16 +3942,13 @@
                                     } else {
                                         userFavorites.push(advertisementId);
                                     }
-
                                     // Проверяем, на какой вкладке мы находимся
                                     const adsTab = document.getElementById('tab-content-ads');
                                     const partsTab = document.getElementById('tab-content-parts');
                                     const profileTab = document.getElementById('tab-content-profile');
-
                                     const isOnAdsTab = adsTab && adsTab.classList.contains('active');
                                     const isOnPartsTab = partsTab && partsTab.classList.contains('active');
                                     const isOnProfileTab = profileTab && profileTab.classList.contains('active');
-
                                     if (isOnProfileTab) {
                                         // Если на вкладке личного кабинета - обновляем личный кабинет
                                         renderProfile();
@@ -4552,7 +3959,6 @@
                                         // Если на вкладке запчастей - обновляем запчасти
                                         renderPartsGrid(allParts);
                                     }
-
                                     updateModalFavoriteState();
                                 } else {
                                     alert(result.message || 'Ошибка');
@@ -4561,7 +3967,6 @@
                                 alert('Ошибка: ' + e.message);
                             }
                         }
-
                         async function sendDelete(r, p, uId) {
                             showLoader("Удаление...");
                             try {
@@ -4644,7 +4049,6 @@
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
                             document.getElementById('view-form').classList.remove('hidden'); // Show form
                         }
-
                         // --- NEW ADMIN FUNCTIONS ---
                         function getPendingModerationItems() {
                             const isPending = (item) => {
@@ -4686,21 +4090,17 @@
                             const placeholder = document.getElementById('moderation-placeholder');
                             if (!container || !placeholder) return;
                             container.innerHTML = '';
-
                             if (!items || items.length === 0) {
                                 placeholder.style.display = 'block';
                                 return;
                             }
-
                             placeholder.style.display = 'none';
                             items.forEach((ad) => {
                                 const card = document.createElement('div');
                                 card.className = 'moderation-card';
                                 card.dataset.rowIndex = ad.rowIndex;
-
                                 const ph = ad.photos ? ad.photos.split(',') : [];
                                 const imgSrc = ph.length > 0 ? ph[0] : '';
-
                                 card.innerHTML = `
                                     <img class="moderation-card-img" src="${imgSrc}" onerror="this.src='https://placehold.co/200x150?text=Нет+фото'">
                                     <div class="moderation-card-info">
@@ -4713,7 +4113,6 @@
                                         <button class="btn btn-reject" onclick="rejectAd(${ad.rowIndex})">Отклонить</button>
                                     </div>
                                 `;
-
                                 container.appendChild(card);
                             });
                         }
@@ -4723,130 +4122,101 @@
                             if (!container || !placeholder) return;
                             placeholder.style.display = container.children.length ? 'none' : 'block';
                         }
-
                         function renderFavorites() {
                             const authPrompt = document.getElementById('favorites-auth-prompt');
                             const content = document.getElementById('favorites-content');
                             const grid = document.getElementById('favorites-grid');
                             const placeholder = document.getElementById('favorites-placeholder');
-
                             // Проверяем авторизацию
                             if (!currentUser || !currentUser.id) {
                                 authPrompt.style.display = 'block';
                                 content.style.display = 'none';
                                 return;
                             }
-
                             authPrompt.style.display = 'none';
                             content.style.display = 'block';
-
                             // Получаем избранные объявления из техники и запчастей
                             const favoriteAds = allAds.filter(ad => userFavorites.includes(ad.rowIndex));
                             const favoriteParts = allParts.filter(part => userFavorites.includes(part.rowIndex));
                             const allFavorites = [...favoriteAds, ...favoriteParts];
-
                             if (allFavorites.length === 0) {
                                 placeholder.style.display = 'block';
                                 grid.style.display = 'none';
                                 return;
                             }
-
                             placeholder.style.display = 'none';
                             grid.style.display = 'grid';
-
                             grid.innerHTML = '';
-
                             // Рендерим избранную технику
                             favoriteAds.forEach(ad => {
                                 let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
-
                                 const sellerLabel = getSellerTypeLabel(ad);
                                 let badgesHtml = '';
                                 if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
-
                                 const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
                                     ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
                                     : '';
-
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
                                 if (ad.transmission) infoParts.push(ad.transmission);
-
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `ad-${ad.rowIndex}`;
                                 d.onclick = () => openAd(ad);
-
                                 const heartClass = 'favorite-heart active';
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
-
                                 d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
-
                                 grid.appendChild(d);
                             });
-
                             // Рендерим избранные запчасти
                             favoriteParts.forEach(part => {
                                 let ph = part.photos ? part.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
-
                                 const sellerLabel = getSellerTypeLabel(part);
                                 let badgesHtml = '';
                                 if (part.condition === 'new') badgesHtml += '<span class="badge-new">НОВАЯ</span>';
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
-
                                 let infoParts = [];
                                 if (part.brand) infoParts.push(part.brand);
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
-
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
-
                                 const heartClass = 'favorite-heart active';
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
-
                                 d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
-
                                 grid.appendChild(d);
                             });
                         }
-
                         function renderProfile() {
                             const authPrompt = document.getElementById('profile-auth-prompt');
                             const content = document.getElementById('profile-content');
-
                             // Проверяем авторизацию
                             if (!currentUser || !currentUser.id) {
                                 authPrompt.style.display = 'block';
                                 content.style.display = 'none';
                                 return;
                             }
-
                             authPrompt.style.display = 'none';
                             content.style.display = 'block';
-
                             // Обновляем информацию пользователя
                             document.getElementById('profile-user-name').innerText = currentUser.name || 'Пользователь';
                             document.getElementById('profile-user-phone').innerText = currentUser.phoneNumber || '';
-
                             // Рендерим мои объявления
                             profileShowAllAds = false;
                             renderUserAds();
-
                             // Рендерим избранное
                             renderProfileFavorites();
                         }
-
                         function renderUserAds() {
                             const grid = document.getElementById('profile-my-ads-grid');
                             const placeholder = document.getElementById('profile-my-ads-placeholder');
@@ -4854,7 +4224,6 @@
                             const toggleWrap = document.getElementById('profile-my-ads-toggle-wrap');
                             const toggleBtn = document.getElementById('profile-my-ads-toggle');
                             if (!grid || !placeholder || !countEl) return;
-
                             if (!currentUser || !currentUser.id) {
                                 grid.innerHTML = '';
                                 placeholder.style.display = 'block';
@@ -4862,11 +4231,9 @@
                                 if (toggleWrap) toggleWrap.style.display = 'none';
                                 return;
                             }
-
                             // Получаем объявления пользователя (техника + запчасти)
                             const normalizePhone = (phone) => String(phone || '').replace(/\D/g, '');
                             const userPhone = normalizePhone(currentUser.phoneNumber);
-
                             const userAds = allAds.filter(ad => {
                                 return ad.userId === currentUser.id || normalizePhone(ad.phone) === userPhone;
                             });
@@ -4877,96 +4244,76 @@
                                 ...userAds.map(ad => ({ type: 'ad', data: ad })),
                                 ...userParts.map(part => ({ type: 'part', data: part }))
                             ];
-
                             countEl.innerText = `(${allUserItems.length})`;
-
                             if (allUserItems.length === 0) {
                                 placeholder.style.display = 'block';
                                 grid.style.display = 'none';
                                 if (toggleWrap) toggleWrap.style.display = 'none';
                                 return;
                             }
-
                             const shouldShowToggle = allUserItems.length > 2;
                             if (toggleWrap) toggleWrap.style.display = shouldShowToggle ? 'block' : 'none';
                             if (!shouldShowToggle) profileShowAllAds = false;
                             if (toggleBtn) {
                                 toggleBtn.innerText = profileShowAllAds ? 'Показать меньше' : 'Показать все';
                             }
-
                             placeholder.style.display = 'none';
                             grid.style.display = 'grid';
                             grid.innerHTML = '';
                             grid.classList.remove('loaded');
-
                             const itemsToRender = profileShowAllAds ? allUserItems : allUserItems.slice(0, 2);
                             itemsToRender.forEach(entry => {
                                 if (entry.type === 'ad') {
                                     const ad = entry.data;
                                     let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                     if (mI && !mI.startsWith('http')) mI = '';
-
                                     const sellerLabel = getSellerTypeLabel(ad);
                                     let badgesHtml = '';
                                     if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
                                     if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                     if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
-
                                     const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
                                         ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
                                         : '';
-
                                     let infoParts = [];
                                     if (ad.city) infoParts.push(ad.city);
                                     else if (ad.region) infoParts.push(ad.region);
                                     if (ad.power) infoParts.push(ad.power + ' л.с.');
                                     if (ad.transmission) infoParts.push(ad.transmission);
-
                                     const d = document.createElement('div');
                                     d.className = 'ad-card';
                                     d.id = `ad-${ad.rowIndex}`;
                                     d.onclick = () => openAd(ad);
-
                                     const isFavorite = userFavorites.includes(ad.rowIndex);
                                     const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
                                     const heartFill = isFavorite ? '#ff4757' : 'none';
                                     const heartStroke = isFavorite ? '#ff4757' : '#ccc';
-
                                     d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
-
                                     grid.appendChild(d);
                                     return;
                                 }
-
                                 const part = entry.data;
                                 let ph = part.photos ? part.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
-
                                 const sellerLabel = getSellerTypeLabel(part);
                                 let badgesHtml = '';
                                 if (part.condition === 'new') badgesHtml += '<span class="badge-new">НОВАЯ</span>';
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
-
                                 let infoParts = [];
                                 if (part.brand) infoParts.push(part.brand);
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
-
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
-
                                 const isFavorite = userFavorites.includes(part.rowIndex);
                                 const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
-
                                 d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
-
                                 grid.appendChild(d);
                             });
-
                             // Добавляем класс loaded для показа карточек с анимацией
                             setTimeout(() => grid.classList.add('loaded'), 50);
                         }
@@ -4974,105 +4321,82 @@
                             profileShowAllAds = !profileShowAllAds;
                             renderUserAds();
                         }
-
                         function renderProfileFavorites() {
                             const grid = document.getElementById('profile-favorites-grid');
                             const placeholder = document.getElementById('profile-favorites-placeholder');
                             const countEl = document.getElementById('profile-favorites-count');
-
                             if (!currentUser || !currentUser.id) {
                                 grid.innerHTML = '';
                                 placeholder.style.display = 'block';
                                 countEl.innerText = '(0)';
                                 return;
                             }
-
                             // Получаем избранные объявления
                             const favoriteAds = allAds.filter(ad => userFavorites.includes(ad.rowIndex));
                             const favoriteParts = allParts.filter(part => userFavorites.includes(part.rowIndex));
                             const allFavorites = [...favoriteAds, ...favoriteParts];
-
                             countEl.innerText = `(${allFavorites.length})`;
-
                             if (allFavorites.length === 0) {
                                 placeholder.style.display = 'block';
                                 grid.style.display = 'none';
                                 return;
                             }
-
                             placeholder.style.display = 'none';
                             grid.style.display = 'grid';
                             grid.innerHTML = '';
                             grid.classList.remove('loaded');
-
                             // Рендерим избранную технику
                             favoriteAds.forEach(ad => {
                                 let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
-
                                 const sellerLabel = getSellerTypeLabel(ad);
                                 let badgesHtml = '';
                                 if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
-
                                 const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
                                     ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
                                     : '';
-
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
                                 if (ad.transmission) infoParts.push(ad.transmission);
-
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `ad-${ad.rowIndex}`;
                                 d.onclick = () => openAd(ad);
-
                                 const heartClass = 'favorite-heart active';
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
-
                                 d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
-
                                 grid.appendChild(d);
                             });
-
                             // Рендерим избранные запчасти
                             favoriteParts.forEach(part => {
                                 let ph = part.photos ? part.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
-
                                 const sellerLabel = getSellerTypeLabel(part);
                                 let badgesHtml = '';
                                 if (part.condition === 'new') badgesHtml += '<span class="badge-new">НОВАЯ</span>';
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
-
                                 let infoParts = [];
                                 if (part.brand) infoParts.push(part.brand);
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
-
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
-
                                 const heartClass = 'favorite-heart active';
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
-
                                 d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
-
                                 grid.appendChild(d);
                             });
-
                             // Добавляем класс loaded для показа карточек с анимацией
                             setTimeout(() => grid.classList.add('loaded'), 50);
                         }
-
                         async function approveAd(rowIndex) {
                             try {
                                 showLoader('Одобрение...');
@@ -5116,7 +4440,6 @@
                                 hideLoader();
                             }
                         }
-
                         async function rejectAd(rowIndex) {
                             try {
                                 showLoader('Отклонение...');
@@ -5158,7 +4481,6 @@
                             // Модерация удалена в новой структуре БД
                             alert('Модерация больше не требуется');
                         }
-
                         async function rejectPart(rowIndex) {
                             // Модерация удалена в новой структуре БД
                             alert('Модерация больше не требуется');
@@ -5169,7 +4491,6 @@
         </div>
     </div>
     </div>
-
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
@@ -5211,7 +4532,4 @@
                     onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">К началу ↑</a>
             </div>
         </div>
-    </footer>
-</body>
-
-</html>
+    </footer>I'm ready to provide more information, but I've reached my response limit. Do you have any specific questions you'd like me to address?

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>Объявление - купитьвездеход.рф</title>
+    <link rel="shortcut icon" href="images/logo.svg" type="image/x-icon" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        body, html {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif !important;
+            background-color: #F7F9F8;
+            overflow-x: hidden;
+        }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #ab47bc;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border: 1px solid #d6d6d6;
+            border-radius: 8px;
+            padding: 6px 10px;
+        }
+        .back-link:hover {
+            color: #8e35b7;
+        }
+        .details-window {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.07);
+        }
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ab47bc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .empty-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 16px;
+        }
+        .gallery-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .gallery-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .gallery-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .arrow-left { left: 15px; }
+        .arrow-right { right: 15px; }
+        .details-content { padding: 30px; }
+        .details-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .details-title { font-size: 24px; font-weight: 800; }
+        .details-badges { display: flex; gap: 6px; }
+        .badge-new, .badge-private, .badge-float {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        .badge-new { background: #4caf50; }
+        .badge-private { background: #ff9800; }
+        .badge-float { background: #2196f3; }
+        .details-price { font-size: 20px; font-weight: 600; margin-bottom: 15px; }
+        .seller-info { background: #f9f9f9; padding: 20px; border-radius: 12px; margin-bottom: 30px; }
+        .seller-label { font-size:14px;color:#888;font-weight:bold; }
+        .seller-name { font-size:18px;font-weight:bold; }
+        .seller-location { color:#666;margin-top:5px;font-size:14px; }
+        .seller-phone { font-size:20px;color:#0066cc;text-decoration:none;display:block;margin-top:5px; }
+        .specs-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .specs-table td { padding: 10px 0; border-bottom: 1px solid #eee; }
+        .specs-table td:first-child { color: #888; width: 40%; }
+        .section-title { margin-bottom:15px; font-size: 18px; font-weight: 700; }
+        .description { white-space: pre-wrap; }
+        .tender-banner {
+            background: #ab47bc; color: #fff; text-align: left;
+            padding: 12px 20px; font-weight: 700; font-size: 14px;
+            display: none;
+        }
+        .tender-banner.visible { display: block; }
+        @media (max-width: 600px) {
+            .container { padding: 10px; }
+            .details-content { padding: 20px; }
+            .gallery-wrapper { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a class="back-link" href="javascript:history.back()">← Назад</a>
+        <div id="details-container">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Загрузка объявления...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const NEW_STATUS_TAG = '***STATUS_NEW***';
+        let currentItem = null;
+        let currentPhotos = [];
+        let currentPhotoIndex = 0;
+
+        function normalizeText(value) { return String(value || '').toLowerCase().trim(); }
+        function getSellerTypeLabel(ad) { return ad && (ad.sellerType || ad.sellerTypeName) ? (ad.sellerType || ad.sellerTypeName) : ''; }
+        function isPrivateSellerLabel(label) { return normalizeText(label) === 'владелец'; }
+        function checkIsNew(ad) {
+            if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true;
+            if (ad.condition === 'new') return true;
+            return false;
+        }
+
+        function updateGallery() {
+            const track = document.getElementById('gallery-track');
+            if (!track) return;
+            track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
+        }
+
+        function galleryNext() {
+            currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+            updateGallery();
+        }
+
+        function galleryPrev() {
+            currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+            updateGallery();
+        }
+
+        function renderDetails(item, type) {
+            const container = document.getElementById('details-container');
+            currentItem = item;
+            
+            let badgesHtml = '';
+            const sellerLabel = getSellerTypeLabel(item);
+            
+            let specs = [];
+            let cleanDesc = (item.desc || "").replace(NEW_STATUS_TAG, "").trim();
+
+            if (type === 'ad') {
+                if (checkIsNew(item)) badgesHtml += '<span class="badge-new">Новый</span>';
+                if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">Владелец</span>';
+                if ((item.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
+                
+                specs.push({ l: "Тип продавца", v: sellerLabel });
+                specs.push({ l: "Город", v: item.city });
+                specs.push({ l: "Тип техники", v: item.techType || '' });
+
+                if (item.techType === 'Вездеход') {
+                    specs.push({ l: "Конструкция", v: item.constructionType });
+                }
+                if (item.techType === 'Прицеп') {
+                    specs.push({ l: "Грузоподъемность", v: item.capacity ? item.capacity + ' кг' : '' });
+                } else {
+                    specs.push({ l: "Тип шасси", v: item.wheelFormula });
+                    specs.push({ l: "Плавающий", v: ((item.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
+                    specs.push({ l: "Двигатель", v: item.engine });
+                    specs.push({ l: "Мощность", v: item.power ? item.power + ' л.с.' : '' });
+                    specs.push({ l: "Трансмиссия", v: item.transmission });
+                    specs.push({ l: "Топливо", v: item.fuel });
+                    specs.push({ l: "Колеса", v: item.wheels });
+                    specs.push({ l: "Пробег", v: item.mileage ? item.mileage + ' м.ч.' : '' });
+                }
+                 if (item.techType !== 'Прицеп') {
+                    specs.push({ l: "Документы", v: item.docs || 'Без документов' });
+                }
+                specs.push({ l: "Цвет", v: item.color });
+
+            } else if (type === 'part') {
+                if (item.condition === 'new') badgesHtml += '<span class="badge-new">Новый</span>';
+                if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">Владелец</span>';
+
+                specs.push({ l: 'Тип', v: 'Запчасть' });
+                specs.push({ l: 'Название', v: item.partName || item.title });
+                specs.push({ l: 'Бренд', v: item.brand || '' });
+                specs.push({ l: 'Состояние', v: item.condition === 'new' ? 'Новая' : 'Б/У' });
+                specs.push({ l: 'Тип продавца', v: sellerLabel });
+                specs.push({ l: 'Город', v: item.city });
+            }
+
+            currentPhotos = item.photos ? item.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+
+            const specsHtml = specs.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+            const gallerySlidesHtml = currentPhotos.map(url => `<div class="gallery-slide"><img class="gallery-img" src="${url}"></div>`).join('');
+            
+            const isTender = type === 'ad' && (item.tender || "").toLowerCase() === 'yes';
+
+            container.innerHTML = `
+                <div class="details-window">
+                    <div class="gallery-wrapper">
+                        ${currentPhotos.length > 1 ? '<div id="arrow-prev" class="gallery-arrow arrow-left" onclick="galleryPrev()">‹</div>' : ''}
+                        <div class="gallery-track" id="gallery-track">${gallerySlidesHtml}</div>
+                        ${currentPhotos.length > 1 ? '<div id="arrow-next" class="gallery-arrow arrow-right" onclick="galleryNext()">›</div>' : ''}
+                    </div>
+                    <div class="tender-banner ${isTender ? 'visible' : ''}">В РЕЕСТРЕ МИНПРОМТОРГА</div>
+                    <div class="details-content">
+                        <div class="details-title-row">
+                            <div class="details-title">${item.title || item.partName || 'Объявление'}</div>
+                            <div class="details-badges">${badgesHtml}</div>
+                        </div>
+                        <div class="details-price">${Number(item.price || 0).toLocaleString()} ₽</div>
+                        <div class="seller-info">
+                            <div class="seller-label">Продавец</div>
+                            <div class="seller-name">${item.name || "Продавец"}</div>
+                            <div class="seller-location">${item.city || ""}</div>
+                            <a class="seller-phone" href="tel:${item.phone || ""}">${item.phone || ""}</a>
+                        </div>
+                        <h4 class="section-title">Характеристики</h4>
+                        <table class="specs-table"><tbody>${specsHtml}</tbody></table>
+                        <h4 class="section-title">Описание</h4>
+                        <div class="description">${cleanDesc}</div>
+                    </div>
+                </div>
+            `;
+            document.title = `${item.title || item.partName} - купитьвездеход.рф`;
+        }
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const itemId = params.get('id');
+            const itemType = params.get('type');
+            const container = document.getElementById('details-container');
+
+            if (!itemId || !itemType) {
+                container.innerHTML = '<div class="empty-message">Ошибка: ID или тип объявления не указан.</div>';
+                return;
+            }
+
+            const apiUrl = itemType === 'ad' ? '/api/ads' : '/api/parts';
+            
+            try {
+                const response = await fetch(apiUrl + '?t=' + new Date().getTime());
+                const allItems = await response.json();
+                const item = allItems.find(i => String(i.rowIndex) === String(itemId));
+
+                if (item) {
+                    renderDetails(item, itemType);
+                } else {
+                    container.innerHTML = '<div class="empty-message">Объявление не найдено.</div>';
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки:', e);
+                container.innerHTML = '<div class="empty-message">Не удалось загрузить данные. Пожалуйста, попробуйте обновить страницу.</div>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
