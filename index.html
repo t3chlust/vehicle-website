@@ -1979,12 +1979,15 @@
                                         onclick="openCreateMode()">Подать объявление</button>
                                 </div>
                             </div>
-                            <div class="tabs-nav" id="tabs-nav"> <button class="tab-link active"
-                                    onclick="showTab(this, 'ads')">Техника</button> <button class="tab-link"
-                                    onclick="showTab(this, 'parts')">Запчасти</button> <button class="tab-link"
-                                    onclick="showTab(this, 'manufacturers')">Производители</button> <button
-                                    id="admin-tab-link" class="tab-link hidden"
-                                    onclick="showTab(this, 'admin')">Админка</button> </div>
+                            <div class="tabs-nav" id="tabs-nav">
+                                <button class="tab-link active" onclick="showTab(this, 'ads')">Техника</button>
+                                <button class="tab-link" onclick="showTab(this, 'parts')">Запчасти</button>
+                                <button class="tab-link" onclick="showTab(this, 'tender')">В реестре
+                                    Минпромторга</button>
+                                <button class="tab-link" onclick="showTab(this, 'manufacturers')">Производители</button>
+                                <button id="admin-tab-link" class="tab-link hidden"
+                                    onclick="showTab(this, 'admin')">Админка</button>
+                            </div>
                             <div id="tabs-container">
                                 <div id="tab-content-ads" class="tab-content active">
                                     <div style="margin-bottom: 25px; max-width: 500px;">
@@ -2145,6 +2148,15 @@
                                             <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
                                         </div>
                                         <div id="parts-container" class="ad-grid"></div>
+                                    </div>
+                                </div>
+                                <div id="tab-content-tender" class="tab-content">
+                                    <div id="view-tender-list" style="min-height: 400px; margin-top:30px;">
+                                        <div id="loading-tender"
+                                            style="text-align:center; padding: 60px; color:#888; display:none;">
+                                            <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
+                                        </div>
+                                        <div id="tender-container" class="ad-grid"></div>
                                     </div>
                                 </div>
                                 <div id="tab-content-profile" class="tab-content">
@@ -2935,39 +2947,46 @@
                             try {
                                 sessionStorage.setItem('lastTab', tabName);
                             } catch (e) {
+                                // Ignore session storage errors
                             }
-                            // Force hide all tabs first
+
                             document.querySelectorAll('.tab-content').forEach(content => {
                                 content.style.display = 'none';
                                 content.classList.remove('active');
                             });
                             document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
-                            // Show target
+
                             const target = document.getElementById(`tab-content-${tabName}`);
                             if (target) {
                                 target.style.display = 'block';
-                                setTimeout(() => target.classList.add('active'), 10); // Small delay for fade
+                                setTimeout(() => target.classList.add('active'), 10);
                             }
                             if (element) element.classList.add('active');
+
                             syncProfileButton(tabName);
-                            // Admin Refresh
+
                             if (tabName === 'admin' && typeof isAdmin !== 'undefined' && isAdmin && typeof allAds !== 'undefined') {
                                 if (typeof renderModerationGrid === 'function') {
                                     renderModerationGrid(getPendingModerationItems());
                                 }
                             }
-                            // Profile Refresh
+
                             if (tabName === 'profile') {
                                 renderProfile();
                             }
-                            // Refresh lists to keep favorites state in sync across tabs
+
+                            // Обновление списков для синхронизации "избранного"
                             if (tabName === 'ads' && typeof applyFilters === 'function') {
                                 applyFilters();
                             }
                             if (tabName === 'parts' && typeof renderPartsGrid === 'function' && Array.isArray(allParts)) {
                                 renderPartsGrid(allParts);
                             }
-                            // Кнопка видна только когда пользователь авторизован и не на вкладке профиля
+                            // ДОБАВЬТЕ ЭТО УСЛОВИЕ
+                            if (tabName === 'tender') {
+                                renderTenderAds();
+                            }
+
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) {
                                 if (typeof currentUser !== 'undefined' && currentUser && tabName !== 'profile') {
@@ -2977,6 +2996,7 @@
                                 }
                             }
                         }
+
                         function formatPriceInput(input) {
                             let val = input.value.replace(/\s/g, '');
                             if (val === '') { input.value = ''; return; }
@@ -3689,6 +3709,61 @@
                             });
                             setTimeout(() => c.classList.add('loaded'), 50);
                         }
+                        function renderTenderAds() {
+                            const container = document.getElementById('tender-container');
+                            const loadingDiv = document.getElementById('loading-tender');
+
+                            if (!container || !loadingDiv) return;
+
+                            // Фильтруем объявления, у которых есть флаг 'tender'
+                            const tenderAds = allAds.filter(ad => (ad.tender || "").toLowerCase() === 'yes');
+
+                            loadingDiv.style.display = 'none';
+                            container.innerHTML = '';
+                            container.classList.remove('loaded');
+
+                            if (!tenderAds || tenderAds.length === 0) {
+                                container.innerHTML = '<div style="color:#999;grid-column:1/-1;text-align:center;">Объявлений в реестре не найдено.</div>';
+                                return;
+                            }
+
+                            // Создаем карточки, используя ту же логику, что и в других разделах
+                            tenderAds.forEach((ad) => {
+                                let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
+                                if (mI && !mI.startsWith('http')) mI = '';
+
+                                const sellerLabel = getSellerTypeLabel(ad);
+                                let badgesHtml = '';
+                                if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
+                                if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
+                                if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
+
+                                const tenderBadgeHtml = '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>';
+
+                                let infoParts = [];
+                                if (ad.city) infoParts.push(ad.city);
+                                if (ad.power) infoParts.push(ad.power + ' л.с.');
+                                if (ad.transmission) infoParts.push(ad.transmission);
+
+                                const d = document.createElement('div');
+                                d.className = 'ad-card';
+                                d.id = `ad-tender-${ad.rowIndex}`; // Уникальный ID для карточки
+                                d.onclick = () => openAd(ad);
+
+                                const isFavorite = userFavorites.includes(ad.rowIndex);
+                                const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
+                                const heartFill = isFavorite ? '#ff4757' : 'none';
+                                const heartStroke = isFavorite ? '#ff4757' : '#ccc';
+
+                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                container.appendChild(d);
+                            });
+
+                            setTimeout(() => {
+                                container.classList.add('loaded');
+                            }, 50);
+                        }
+
                         function configureModalActions(type) {
                             const actions = document.getElementById('modal-owner-actions');
                             if (!actions) return;
@@ -4187,28 +4262,30 @@
                                 });
                                 const result = await response.json();
                                 if (result.status === 'success') {
-                                    // Обновляем локальный список избранного
                                     if (isFavorite) {
                                         userFavorites = userFavorites.filter(id => id !== advertisementId);
                                     } else {
                                         userFavorites.push(advertisementId);
                                     }
-                                    // Проверяем, на какой вкладке мы находимся
+
                                     const adsTab = document.getElementById('tab-content-ads');
                                     const partsTab = document.getElementById('tab-content-parts');
                                     const profileTab = document.getElementById('tab-content-profile');
+                                    const tenderTab = document.getElementById('tab-content-tender'); // Добавлено
+
                                     const isOnAdsTab = adsTab && adsTab.classList.contains('active');
                                     const isOnPartsTab = partsTab && partsTab.classList.contains('active');
                                     const isOnProfileTab = profileTab && profileTab.classList.contains('active');
+                                    const isOnTenderTab = tenderTab && tenderTab.classList.contains('active'); // Добавлено
+
                                     if (isOnProfileTab) {
-                                        // Если на вкладке личного кабинета - обновляем личный кабинет
                                         renderProfile();
                                     } else if (isOnAdsTab) {
-                                        // Если на вкладке техники - обновляем технику
                                         applyFilters();
                                     } else if (isOnPartsTab) {
-                                        // Если на вкладке запчастей - обновляем запчасти
                                         renderPartsGrid(allParts);
+                                    } else if (isOnTenderTab) { // ДОБАВЬТЕ ЭТО УСЛОВИЕ
+                                        renderTenderAds();
                                     }
                                     updateModalFavoriteState();
                                 } else {
@@ -4218,6 +4295,7 @@
                                 alert('Ошибка: ' + e.message);
                             }
                         }
+
                         async function sendDelete(r, p, uId) {
                             showLoader("Удаление...");
                             try {
