@@ -303,6 +303,28 @@
                                 padding: 0;
                                 font-family: 'Roboto', sans-serif !important;
                                 background-color: #F7F9F8;
+                                transition: background-color 0.3s ease;
+                            }
+
+                            /* Page background colors for different tabs */
+                            html.tab-ads {
+                                background-color: #E0F2F1;
+                            }
+
+                            html.tab-parts {
+                                background-color: #FFF8E1;
+                            }
+
+                            html.tab-manufacturers {
+                                background-color: #E3F2FD;
+                            }
+
+                            html.tab-tender {
+                                background-color: #F7F9F8;
+                            }
+
+                            html.tab-admin {
+                                background-color: #F7F9F8;
                             }
 
                             body {
@@ -1724,27 +1746,6 @@
                                 animation: fadeIn 0.5s;
                             }
 
-                            /* Цвета для разных вкладок */
-                            #tab-content-ads {
-                                background-color: #E0F2F1;
-                            }
-
-                            #tab-content-parts {
-                                background-color: #FFF8E1;
-                            }
-
-                            #tab-content-manufacturers {
-                                background-color: #E3F2FD;
-                            }
-
-                            #tab-content-tender {
-                                background-color: #f3f3f3;
-                            }
-
-                            #tab-content-admin {
-                                background-color: #f3f3f3;
-                            }
-
                             .manufacturer-grid {
                                 display: flex;
                                 flex-direction: column;
@@ -3128,6 +3129,11 @@
                             }
                             if (element) element.classList.add('active');
 
+                            // Update page background color based on active tab
+                            const html = document.documentElement;
+                            html.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
+                            html.classList.add(`tab-${tabName}`);
+
                             syncProfileButton(tabName);
 
                             if (tabName === 'admin' && typeof isAdmin !== 'undefined' && isAdmin && typeof allAds !== 'undefined') {
@@ -3254,6 +3260,9 @@
                                     });
                                     showTab(tabLink || null, lastTab);
                                     sessionStorage.removeItem('lastTab');
+                                } else {
+                                    // Set initial background for default 'ads' tab
+                                    document.documentElement.classList.add('tab-ads');
                                 }
                             } catch (e) {
                             }
