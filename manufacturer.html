@@ -281,19 +281,15 @@
             width: 100%;
             max-width: 720px;
             max-height: calc(100vh - 20px);
-            min-height: 200px;
             border-radius: 0;
             position: relative;
             display: flex;
             flex-direction: column;
             margin: 10px auto;
             overflow-y: auto;
-            overflow-x: hidden;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             scrollbar-width: none;
             -ms-overflow-style: none;
-            -webkit-overflow-scrolling: touch;
-            touch-action: auto;
         }
 
         .modal-window::-webkit-scrollbar {
@@ -344,9 +340,6 @@
 
         .modal-content {
             padding: 30px;
-            width: 100%;
-            overflow: visible;
-            pointer-events: auto;
         }
 
         @media (max-width: 600px) {
@@ -483,24 +476,30 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 8px;
+            font-size: 24px;
             cursor: pointer;
-            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 5;
+            transition: background 0.2s;
+        }
+
+        .gallery-arrow:hover {
+            background: rgba(255, 255, 255, 1);
         }
 
         .arrow-left {
-            left: 15px;
+            left: 10px;
         }
 
         .arrow-right {
-            right: 15px;
+            right: 10px;
         }
 
         .specs-table {
@@ -527,16 +526,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #FFFFFF;
-            z-index: 10000;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9998;
             display: none;
-            justify-content: center;
             align-items: center;
-            overflow: hidden;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s;
         }
 
         .lightbox-overlay.active {
             display: flex;
+            opacity: 1;
+            pointer-events: all;
         }
 
         .lightbox-img-wrapper {
@@ -575,6 +578,20 @@
 
         .lightbox-close:hover {
             background: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .gallery-wrapper {
+                height: 300px;
+            }
+
+            .lightbox-close {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 28px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -664,7 +681,6 @@
                 </table>
                 <h4 style="margin-bottom:15px; font-size: 18px; font-weight: 700;">Описание</h4>
                 <div id="modal-desc" style="white-space: pre-wrap;"></div>
-                <div id="modal-owner-actions" class="action-buttons-group" style="display:none; flex-direction: row; gap:10px; margin-top:20px;"><button class="btn btn-black" style="flex:1; padding:12px; border:none; background:#333; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;" onclick="editCurrentAd()">Редактировать</button><button class="btn btn-red" style="flex:1; padding:12px; border:none; background:#ff4444; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;" onclick="deleteCurrentAd()">Удалить</button></div>
             </div>
         </div>
     </div>
@@ -714,20 +730,6 @@
 
         function closeLightbox() {
             document.getElementById('lightbox').classList.remove('active');
-        }
-
-        function debugModalScroll() {
-            const modalWindow = document.getElementById('modal');
-            const window_el = modalWindow.querySelector('.modal-window');
-            if (window_el) {
-                console.log('Modal Window Debug:');
-                console.log('  clientHeight:', window_el.clientHeight);
-                console.log('  scrollHeight:', window_el.scrollHeight);
-                console.log('  overflow-y:', getComputedStyle(window_el).overflowY);
-                console.log('  max-height:', getComputedStyle(window_el).maxHeight);
-                console.log('  Can scroll?', window_el.scrollHeight > window_el.clientHeight);
-                console.log('  Current scrollTop:', window_el.scrollTop);
-            }
         }
 
         function updateGallery() {
@@ -792,14 +794,24 @@
 
         // Показать объявление в модальном окне
         function openAd(ad) {
-            currentAd = ad; currentPhotos = []; currentPhotoIndex = 0;
+            currentAd = ad;
+            currentPhotos = [];
+            currentPhotoIndex = 0;
+            
             document.getElementById('modal-title').innerText = ad.title || "";
             document.getElementById('modal-price').innerText = Number(ad.price || 0).toLocaleString() + ' ₽';
+            
             let cleanDesc = (ad.desc || "").replace(NEW_STATUS_TAG, "").replace(/#COLOR_\S+/g, "").replace(/#WHEELS_\S+/g, "").trim();
             document.getElementById('modal-desc').innerText = cleanDesc;
+            
             document.getElementById('modal-name').innerText = ad.name || "Продавец";
             document.getElementById('modal-location').innerText = ad.city || "";
-            const phEl = document.getElementById('modal-phone'); if (phEl) { phEl.innerText = ad.phone || ""; phEl.href = "tel:" + (ad.phone || ""); }
+            
+            const phEl = document.getElementById('modal-phone');
+            if (phEl) {
+                phEl.innerText = ad.phone || "";
+                phEl.href = "tel:" + (ad.phone || "");
+            }
 
             const sellerLabel = getSellerTypeLabel(ad);
             let bgHtml = '';
@@ -821,22 +833,24 @@
             updateGallery();
             document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
             document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
-            let sType = getSellerTypeLabel(ad);
-            let wf = ad.wheelFormula;
+            
+            const techTypeLabel = ad.techType || '';
+            const techTypeNormalized = normalizeText(techTypeLabel);
 
             let sp = [
-                { l: "Тип продавца", v: sType },
+                { l: "Тип продавца", v: sellerLabel },
                 { l: "Город", v: ad.city },
-                { l: "Тип техники", v: ad.techType || '' },
+                { l: "Тип техники", v: techTypeLabel },
             ];
 
-            if (ad.techType === 'Вездеход') {
+            if (techTypeNormalized === 'вездеход') {
                 sp.push({ l: "Конструкция", v: ad.constructionType });
             }
 
-            if (ad.techType === 'Прицеп') {
+            if (techTypeNormalized === 'прицеп') {
                 sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
             } else {
+                let wf = ad.wheelFormula;
                 sp.push({ l: "Тип шасси", v: wf });
                 sp.push({ l: "Плавающий", v: ((ad.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
                 sp.push({ l: "Двигатель", v: ad.engine });
@@ -847,44 +861,31 @@
                 sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
             }
 
-            if (ad.techType !== 'Прицеп') {
-                sp.push({ l: "Документы", v: ad.docs || 'Без документов' });
-            }
+            sp.push({ l: "Документы", v: ad.docs || 'Нет' });
             sp.push({ l: "Цвет", v: ad.color });
-            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
             
-            const acts = document.getElementById('modal-owner-actions');
-            const norm = p => String(p).replace(/[^0-9]/g, '');
-            if (acts) {
-                if (typeof currentUser !== 'undefined' && currentUser && (norm(currentUser.phoneNumber) === norm(ad.phone) || (typeof isAdmin !== 'undefined' && isAdmin))) {
-                    acts.style.display = 'flex';
-                } else {
-                    acts.style.display = 'none';
-                }
-            }
+            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
             
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // Reset scroll and enable it
-            const modalWindow = document.getElementById('modal').querySelector('.modal-window');
-            modalWindow.scrollTop = 0;
-            modalWindow.style.overflowY = 'auto';
-            
-            // Debug scroll
-            setTimeout(() => debugModalScroll(), 100);
         }
-
         function openPart(part) {
-            currentAd = part; currentPhotos = []; currentPhotoIndex = 0;
+            currentAd = part;
+            currentPhotos = [];
+            currentPhotoIndex = 0;
 
             document.getElementById('modal-title').innerText = part.title || 'Запчасть';
             document.getElementById('modal-price').innerText = Number(part.price || 0).toLocaleString() + ' ₽';
             document.getElementById('modal-desc').innerText = '';
+
             document.getElementById('modal-name').innerText = part.name || 'Продавец';
             document.getElementById('modal-location').innerText = part.city || '';
+
             const phEl = document.getElementById('modal-phone');
-            if (phEl) { phEl.innerText = part.phone || ""; phEl.href = "tel:" + (part.phone || ""); }
+            if (phEl) {
+                phEl.innerText = part.phone || '';
+                phEl.href = 'tel:' + (part.phone || '');
+            }
 
             const sellerLabel = getSellerTypeLabel(part);
             let bgHtml = '';
@@ -892,8 +893,15 @@
             if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
             document.getElementById('modal-badges').innerHTML = bgHtml;
 
-            const tenderBanner = document.getElementById('modal-tender-banner');
-            tenderBanner.classList.remove('visible');
+            let sp = [
+                { l: 'Тип', v: 'Запчасть' },
+                { l: 'Название', v: part.partName || part.title },
+                { l: 'Бренд', v: part.brand || '' },
+                { l: 'Состояние', v: part.condition === 'new' ? 'Новая' : 'Б/У' },
+                { l: 'Тип продавца', v: sellerLabel },
+                { l: 'Город', v: part.city }
+            ];
+            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
 
             let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
             currentPhotos = phs;
@@ -901,39 +909,9 @@
             document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
             document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
 
-            let sp = [
-                { l: "Тип", v: 'Запчасть' },
-                { l: "Название", v: part.partName || part.title },
-                { l: "Бренд", v: part.brand || '' },
-                { l: "Состояние", v: part.condition === 'new' ? 'Новая' : 'Б/У' },
-                { l: "Тип продавца", v: sellerLabel },
-                { l: "Город", v: part.city }
-            ];
-
-            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-            
-            const acts = document.getElementById('modal-owner-actions');
-            const norm = p => String(p).replace(/[^0-9]/g, '');
-            if (acts) {
-                if (typeof currentUser !== 'undefined' && currentUser && (norm(currentUser.phoneNumber) === norm(part.phone) || (typeof isAdmin !== 'undefined' && isAdmin))) {
-                    acts.style.display = 'flex';
-                } else {
-                    acts.style.display = 'none';
-                }
-            }
-            
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // Reset scroll and enable it
-            const modalWindow = document.getElementById('modal').querySelector('.modal-window');
-            modalWindow.scrollTop = 0;
-            modalWindow.style.overflowY = 'auto';
-            
-            // Debug scroll
-            setTimeout(() => debugModalScroll(), 100);
         }
-
 
         // Функция для проверки новизны объявления
         function checkIsNew(ad) {
@@ -1222,29 +1200,6 @@
                     : [];
                 return { name, city, logo, vk, youtube, website, rutube, telegram, altNames };
             });
-        }
-
-        function editCurrentAd() {
-            if (!currentAd) return;
-            closeModalDirect();
-            // Открываем профиль на главной странице для редактирования
-            if (typeof window.parent !== 'undefined') {
-                window.parent.location.href = '/#profile';
-            } else {
-                window.location.href = '/#profile';
-            }
-        }
-
-        function deleteCurrentAd() {
-            if (!currentAd) return;
-            if (!confirm('Вы уверены, что хотите удалить это объявление?')) return;
-            closeModalDirect();
-            // Открываем профиль на главной странице для удаления
-            if (typeof window.parent !== 'undefined') {
-                window.parent.location.href = '/#profile';
-            } else {
-                window.location.href = '/#profile';
-            }
         }
 
         // Запустить при загрузке страницы
