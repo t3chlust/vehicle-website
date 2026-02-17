@@ -281,15 +281,19 @@
             width: 100%;
             max-width: 720px;
             max-height: calc(100vh - 20px);
+            min-height: 200px;
             border-radius: 0;
             position: relative;
             display: flex;
             flex-direction: column;
             margin: 10px auto;
             overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             scrollbar-width: none;
             -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+            touch-action: auto;
         }
 
         .modal-window::-webkit-scrollbar {
@@ -340,6 +344,9 @@
 
         .modal-content {
             padding: 30px;
+            width: 100%;
+            overflow: visible;
+            pointer-events: auto;
         }
 
         @media (max-width: 600px) {
@@ -657,7 +664,7 @@
                 </table>
                 <h4 style="margin-bottom:15px; font-size: 18px; font-weight: 700;">Описание</h4>
                 <div id="modal-desc" style="white-space: pre-wrap;"></div>
-                <div id="modal-owner-actions" class="action-buttons-group" style="display:none; gap:10px; margin-top:20px;"><button class="btn btn-black" style="flex:1; padding:12px; border:none; background:#333; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;" onclick="editCurrentAd()">Редактировать</button><button class="btn btn-red" style="flex:1; padding:12px; border:none; background:#ff4444; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;" onclick="deleteCurrentAd()">Удалить</button></div>
+                <div id="modal-owner-actions" class="action-buttons-group" style="display:none; flex-direction: row; gap:10px; margin-top:20px;"><button class="btn btn-black" style="flex:1; padding:12px; border:none; background:#333; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;" onclick="editCurrentAd()">Редактировать</button><button class="btn btn-red" style="flex:1; padding:12px; border:none; background:#ff4444; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;" onclick="deleteCurrentAd()">Удалить</button></div>
             </div>
         </div>
     </div>
@@ -707,6 +714,20 @@
 
         function closeLightbox() {
             document.getElementById('lightbox').classList.remove('active');
+        }
+
+        function debugModalScroll() {
+            const modalWindow = document.getElementById('modal');
+            const window_el = modalWindow.querySelector('.modal-window');
+            if (window_el) {
+                console.log('Modal Window Debug:');
+                console.log('  clientHeight:', window_el.clientHeight);
+                console.log('  scrollHeight:', window_el.scrollHeight);
+                console.log('  overflow-y:', getComputedStyle(window_el).overflowY);
+                console.log('  max-height:', getComputedStyle(window_el).maxHeight);
+                console.log('  Can scroll?', window_el.scrollHeight > window_el.clientHeight);
+                console.log('  Current scrollTop:', window_el.scrollTop);
+            }
         }
 
         function updateGallery() {
@@ -844,6 +865,14 @@
             
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Reset scroll and enable it
+            const modalWindow = document.getElementById('modal').querySelector('.modal-window');
+            modalWindow.scrollTop = 0;
+            modalWindow.style.overflowY = 'auto';
+            
+            // Debug scroll
+            setTimeout(() => debugModalScroll(), 100);
         }
 
         function openPart(part) {
@@ -895,6 +924,14 @@
             
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Reset scroll and enable it
+            const modalWindow = document.getElementById('modal').querySelector('.modal-window');
+            modalWindow.scrollTop = 0;
+            modalWindow.style.overflowY = 'auto';
+            
+            // Debug scroll
+            setTimeout(() => debugModalScroll(), 100);
         }
 
 
