@@ -150,6 +150,35 @@
             display: none;
         }
         .tender-banner.visible { display: block; }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .btn-edit, .btn-delete {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-edit {
+            background: #222;
+            color: white;
+        }
+        .btn-edit:hover {
+            background: #000;
+        }
+        .btn-delete {
+            background: #c62828;
+            color: white;
+        }
+        .btn-delete:hover {
+            background: #b71c1c;
+        }
         @media (max-width: 600px) {
             .container { padding: 10px; }
             .details-content { padding: 20px; }
@@ -169,10 +198,35 @@
     </div>
 
     <script>
+        const ADMIN_PHONE = "+79829817369";
         const NEW_STATUS_TAG = '***STATUS_NEW***';
         let currentItem = null;
         let currentPhotos = [];
         let currentPhotoIndex = 0;
+        let currentUser = null;
+        let currentItemType = null;
+
+        function normalizePhone(phone) { 
+            return String(phone || '').replace(/\D/g, ''); 
+        }
+
+        function getCurrentUserFromStorage() {
+            const phone = localStorage.getItem('vezdehod_auth_phone');
+            if (!phone) return null;
+            return {
+                phone: phone,
+                name: localStorage.getItem('vezdehod_username') || 'Пользователь',
+                id: localStorage.getItem('vezdehod_user_id') || ''
+            };
+        }
+
+        function canEditOrDelete() {
+            if (!currentUser || !currentItem) return false;
+            const userPhoneNorm = normalizePhone(currentUser.phone);
+            const adminPhoneNorm = normalizePhone(ADMIN_PHONE);
+            const itemPhoneNorm = normalizePhone(currentItem.phone);
+            return userPhoneNorm === itemPhoneNorm || userPhoneNorm === adminPhoneNorm;
+        }
 
         function normalizeText(value) { return String(value || '').toLowerCase().trim(); }
         function getSellerTypeLabel(ad) { return ad && (ad.sellerType || ad.sellerTypeName) ? (ad.sellerType || ad.sellerTypeName) : ''; }
@@ -199,9 +253,46 @@
             updateGallery();
         }
 
+        async function editAd() {
+            if (!currentItem) return;
+            window.location.href = `index.html?editId=${currentItem.rowIndex}&editType=${currentItemType}`;
+        }
+
+        async function deleteAd() {
+            if (!currentItem || !currentUser) {
+                alert('Вы не авторизированы');
+                return;
+            }
+            if (!confirm('Вы уверены, что хотите удалить это объявление?')) return;
+            
+            try {
+                const apiUrl = currentItemType === 'ad' ? '/api/ads/delete' : '/api/parts/delete';
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        rowIndex: currentItem.rowIndex,
+                        phone: currentUser.phone,
+                        userId: currentUser.id
+                    })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Объявление удалено успешно');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Ошибка: ' + (result.message || 'Не удалось удалить объявление'));
+                }
+            } catch (e) {
+                console.error('Ошибка удаления:', e);
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
         function renderDetails(item, type) {
             const container = document.getElementById('details-container');
             currentItem = item;
+            currentItemType = type;
             
             let badgesHtml = '';
             const sellerLabel = getSellerTypeLabel(item);
@@ -256,6 +347,13 @@
             const gallerySlidesHtml = currentPhotos.map(url => `<div class="gallery-slide"><img class="gallery-img" src="${url}"></div>`).join('');
             
             const isTender = type === 'ad' && (item.tender || "").toLowerCase() === 'yes';
+            const showActionButtons = canEditOrDelete();
+            const actionButtonsHtml = showActionButtons ? `
+                <div class="action-buttons">
+                    <button class="btn-edit" onclick="editAd()">Редактировать</button>
+                    <button class="btn-delete" onclick="deleteAd()">Удалить</button>
+                </div>
+            ` : '';
 
             container.innerHTML = `
                 <div class="details-window">
@@ -281,6 +379,7 @@
                         <table class="specs-table"><tbody>${specsHtml}</tbody></table>
                         <h4 class="section-title">Описание</h4>
                         <div class="description">${cleanDesc}</div>
+                        ${actionButtonsHtml}
                     </div>
                 </div>
             `;
@@ -292,6 +391,8 @@
             const itemId = params.get('id');
             const itemType = params.get('type');
             const container = document.getElementById('details-container');
+
+            currentUser = getCurrentUserFromStorage();
 
             if (!itemId || !itemType) {
                 container.innerHTML = '<div class="empty-message">Ошибка: ID или тип объявления не указан.</div>';

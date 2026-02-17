@@ -713,11 +713,12 @@ app.post('/api/ads', async (req, res) => {
 app.post('/api/ads/delete', async (req, res) => {
   try {
     const { rowIndex, phone, userId } = req.body;
+    const ADMIN_PHONE = '79829817369';
 
     const connection = await pool.getConnection();
 
     try {
-      // Проверяем, что объявление принадлежит пользователю
+      // Проверяем, что объявление принадлежит пользователю или пользователь админ
       const [ads] = await connection.query(
         `SELECT a.userId, u.phone
          FROM advertisement a
@@ -735,7 +736,9 @@ app.post('/api/ads/delete', async (req, res) => {
       const storedPhone = normalizePhoneDigits(ads[0].phone);
       const requestPhone = normalizePhoneDigits(phone);
       const requestUserId = userId ? Number(userId) : null;
-      if ((requestUserId && storedUserId !== requestUserId) || (!requestUserId && storedPhone !== requestPhone)) {
+      const isAdmin = requestPhone === ADMIN_PHONE;
+      
+      if (!isAdmin && ((requestUserId && storedUserId !== requestUserId) || (!requestUserId && storedPhone !== requestPhone))) {
         connection.release();
         return res.status(403).json({ status: 'error', message: 'Доступ запрещен' });
       }
@@ -977,6 +980,7 @@ app.post('/api/parts', async (req, res) => {
 app.post('/api/parts/delete', async (req, res) => {
   try {
     const { rowIndex, phone, userId } = req.body;
+    const ADMIN_PHONE = '79829817369';
 
     const connection = await pool.getConnection();
 
@@ -998,7 +1002,9 @@ app.post('/api/parts/delete', async (req, res) => {
       const storedPhone = normalizePhoneDigits(parts[0].phone);
       const requestPhone = normalizePhoneDigits(phone);
       const requestUserId = userId ? Number(userId) : null;
-      if ((requestUserId && storedUserId !== requestUserId) || (!requestUserId && storedPhone !== requestPhone)) {
+      const isAdmin = requestPhone === ADMIN_PHONE;
+      
+      if (!isAdmin && ((requestUserId && storedUserId !== requestUserId) || (!requestUserId && storedPhone !== requestPhone))) {
         connection.release();
         return res.status(403).json({ status: 'error', message: 'Доступ запрещен' });
       }

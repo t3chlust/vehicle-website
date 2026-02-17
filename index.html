@@ -292,6 +292,10 @@
                                 visibility: hidden !important;
                             }
 
+                            html {
+                                height: 100%;
+                            }
+
                             body,
                             html {
                                 width: 100%;
@@ -301,10 +305,17 @@
                                 background-color: #F7F9F8;
                             }
 
+                            body {
+                                display: flex;
+                                flex-direction: column;
+                                min-height: 100vh;
+                            }
+
                             .t-records,
                             .t-records_animated,
                             .t-records_visible {
                                 opacity: 1 !important;
+                                flex: 1;
                             }
 
                             * {
@@ -1886,8 +1897,8 @@
                                 background-color: #3a3a3a;
                                 color: #fff;
                                 padding: 30px 20px;
-                                margin-top: 50px;
                                 border-top: 1px solid #2a2a2a;
+                                margin-top: auto;
                             }
 
                             .footer-content {
@@ -2296,7 +2307,7 @@
                                     <div style="margin-bottom: 25px; max-width: 500px;">
                                         <div class="search-container">
                                             <input type="text" id="searchInput" class="form-input filter-input"
-                                                placeholder="Поиск производителя" autocomplete="off">
+                                                placeholder="Поиск" autocomplete="off">
                                         </div>
                                         <div id="manufacturerList" class="search-suggestions"></div>
                                     </div>
@@ -2472,28 +2483,56 @@
                                                 let val = name ? name : (input ? input.value.trim() : '');
                                                 if (!val) return;
                                                 const lower = val.toLowerCase();
-                                                let officialName = synonymToOfficial.get(lower);
-                                                // Если прямого соответствия нет, попробуем найти точное совпадение среди официальных названий
-                                                if (!officialName) {
-                                                    const officialSet = new Set();
-                                                    synonymToOfficial.forEach(official => officialSet.add(official));
-                                                    const exact = [...officialSet].find(n => n.toLowerCase() === val.toLowerCase());
-                                                    if (exact) officialName = exact;
-                                                }
-                                                if (officialName) {
-                                                    if (input) input.value = officialName;  // подставляем официальное название в поле
-                                                    const id = `manuf-${officialName.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
-                                                    const card = document.getElementById(id);
-                                                    if (card) {
-                                                        // Подсветка карточки
-                                                        card.style.transition = 'background 1.2s';
-                                                        card.style.background = 'rgba(171, 71, 188, 0.6)';
-                                                        setTimeout(() => { card.style.background = ''; }, 1600);
-                                                        if (input) input.value = '';
-                                                    } else {
+                                                
+                                                // Проверяем, является ли это городом
+                                                let cityFound = null;
+                                                manufacturers.forEach(m => {
+                                                    if (m.city && m.city.toLowerCase() === lower) {
+                                                        cityFound = m.city;
                                                     }
+                                                });
+                                                
+                                                if (cityFound) {
+                                                    // Это город - ищем секцию города и скроллим к ней
+                                                    const sections = document.querySelectorAll('.manufacturer-section-title');
+                                                    sections.forEach(section => {
+                                                        if (section.textContent === cityFound) {
+                                                            // Подсвечиваем и скроллим
+                                                            section.parentElement.style.transition = 'background 1.2s';
+                                                            section.parentElement.style.background = 'rgba(171, 71, 188, 0.1)';
+                                                            section.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                            setTimeout(() => { section.parentElement.style.background = ''; }, 1600);
+                                                            if (input) input.value = '';
+                                                        }
+                                                    });
                                                     const listDiv = document.getElementById('manufacturerList');
                                                     if (listDiv) listDiv.style.display = 'none';
+                                                } else {
+                                                    // Это производитель - работаем как раньше
+                                                    let officialName = synonymToOfficial.get(lower);
+                                                    // Если прямого соответствия нет, попробуем найти точное совпадение среди официальных названий
+                                                    if (!officialName) {
+                                                        const officialSet = new Set();
+                                                        synonymToOfficial.forEach(official => officialSet.add(official));
+                                                        const exact = [...officialSet].find(n => n.toLowerCase() === val.toLowerCase());
+                                                        if (exact) officialName = exact;
+                                                    }
+                                                    if (officialName) {
+                                                        if (input) input.value = officialName;  // подставляем официальное название в поле
+                                                        const id = `manuf-${officialName.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-')}`;
+                                                        const card = document.getElementById(id);
+                                                        if (card) {
+                                                            // Подсветка карточки
+                                                            card.style.transition = 'background 1.2s';
+                                                            card.style.background = 'rgba(171, 71, 188, 0.6)';
+                                                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                            setTimeout(() => { card.style.background = ''; }, 1600);
+                                                            if (input) input.value = '';
+                                                        } else {
+                                                        }
+                                                        const listDiv = document.getElementById('manufacturerList');
+                                                        if (listDiv) listDiv.style.display = 'none';
+                                                    }
                                                 }
                                             }
                                             // Загрузка
@@ -2546,11 +2585,27 @@
                                                                     }
                                                                 });
                                                             }
+                                                            // Поиск по городам
+                                                            let foundByCity = new Set();
+                                                            manufacturers.forEach(function (m) {
+                                                                if (m.city && m.city.toLowerCase().includes(typed)) {
+                                                                    foundByCity.add(m.city);
+                                                                }
+                                                            });
                                                             // Заполняем кастомный список ниже поля
                                                             if (listDiv) {
                                                                 listDiv.innerHTML = '';
                                                                 const all = [...found].sort();
-                                                                const arr = all.slice(0, 5); // показываем максимум 5 подсказок
+                                                                const cities = [...foundByCity].sort();
+                                                                let arr;
+                                                                
+                                                                // Если нашли города, показываем их первыми
+                                                                if (cities.length > 0) {
+                                                                    arr = cities;
+                                                                } else {
+                                                                    arr = all.slice(0, 5); // показываем максимум 5 подсказок
+                                                                }
+                                                                
                                                                 if (arr.length === 0) {
                                                                     listDiv.style.display = 'none';
                                                                 } else {
@@ -2561,9 +2616,10 @@
                                                                         item.textContent = name;
                                                                         item.addEventListener('click', function (e) {
                                                                             e.preventDefault();
-                                                                            // Подставляем официальное название и скроллим
+                                                                            // Подставляем название
                                                                             input.value = name;
                                                                             listDiv.style.display = 'none';
+                                                                            // Если это город, скроллим к производителям из этого города
                                                                             findAndScroll(name);
                                                                         });
                                                                         listDiv.appendChild(item);
@@ -4157,6 +4213,23 @@
                                     const found = allAds.find(a => String(a.rowIndex) === String(adId));
                                     if (found) {
                                         openAd(found);
+                                    }
+                                }
+                                // Обработка редактирования объявления из ad.html
+                                const editId = urlParams.get('editId');
+                                const editType = urlParams.get('editType');
+                                if (editId && editType) {
+                                    let found = null;
+                                    if (editType === 'ad') {
+                                        found = allAds.find(a => String(a.rowIndex) === String(editId));
+                                    } else if (editType === 'part') {
+                                        found = allParts.find(p => String(p.rowIndex) === String(editId));
+                                    }
+                                    if (found) {
+                                        currentAd = found;
+                                        openEditMode(found);
+                                        // Очищаем параметры из URL
+                                        window.history.replaceState({}, document.title, window.location.pathname);
                                     }
                                 }
                                 if (typeof currentUser !== 'undefined' && currentUser) updateAuthUI(currentUser);
