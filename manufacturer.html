@@ -263,12 +263,11 @@
             justify-content: center;
             align-items: center;
             padding: 10px;
-            padding-top: 0;
-            padding-bottom: 0;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.6s;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-overlay.active {
@@ -287,6 +286,7 @@
             flex-direction: column;
             margin: 10px auto;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -300,8 +300,6 @@
         @media (min-width: 600px) {
             .modal-overlay {
                 padding: 20px;
-                padding-top: 20px;
-                padding-bottom: 20px;
             }
 
             .modal-window {
@@ -476,18 +474,17 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.8);
-            border: none;
-            border-radius: 8px;
-            font-size: 24px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
             cursor: pointer;
+            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 5;
-            transition: background 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: none;
         }
 
         .gallery-arrow:hover {
@@ -495,11 +492,11 @@
         }
 
         .arrow-left {
-            left: 10px;
+            left: 15px;
         }
 
         .arrow-right {
-            right: 10px;
+            right: 15px;
         }
 
         .specs-table {
@@ -681,6 +678,7 @@
                 </table>
                 <h4 style="margin-bottom:15px; font-size: 18px; font-weight: 700;">Описание</h4>
                 <div id="modal-desc" style="white-space: pre-wrap;"></div>
+                <div id="modal-owner-actions" class="action-buttons-group" style="display:none; gap:10px; margin-top:20px;"><button class="btn btn-black" style="flex:1; padding:12px; border:none; background:#333; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;" onclick="editCurrentAd()">Редактировать</button><button class="btn btn-red" style="flex:1; padding:12px; border:none; background:#ff4444; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;" onclick="deleteCurrentAd()">Удалить</button></div>
             </div>
         </div>
     </div>
@@ -1186,6 +1184,14 @@
                     : [];
                 return { name, city, logo, vk, youtube, website, rutube, telegram, altNames };
             });
+        }
+
+        function editCurrentAd() {
+            alert('Редактирование доступно только на главной странице');
+        }
+
+        function deleteCurrentAd() {
+            alert('Удаление доступно только на главной странице');
         }
 
         // Запустить при загрузке страницы
