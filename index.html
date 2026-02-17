@@ -902,6 +902,12 @@
                             }
 
                             @media (max-width: 600px) {
+                                .filter-item-clear {
+                                    order: 99;
+                                    grid-column: 1 / -1;
+                                    margin-top: 10px;
+                                }
+
                                 .filters-grid {
                                     grid-template-columns: 1fr 1fr;
                                     padding: 0 5px;
@@ -2109,7 +2115,7 @@
                                                             <option value="Золотой">Золотой</option>
                                                             <option value="Серебристый">Серебристый</option>
                                                         </select></div>
-                                                    <div class="filter-item">
+                                                    <div class="filter-item filter-item-clear">
                                                         <label class="filter-label" style="opacity:0;">&nbsp;</label>
                                                         <button type="button" class="btn btn-black"
                                                             style="width:100%; height:42px;"
@@ -3079,9 +3085,9 @@
                             setTimeout(enforceCleanFiltersState, 0);
                         });
                         function clearAllFilters() {
-    resetAdsFiltersOnStartup(); // Эта функция у вас уже есть, она сбрасывает поля
-    applyFilters();           // А эта применяет "пустые" фильтры и обновляет список
-}
+                            resetAdsFiltersOnStartup(); // Эта функция у вас уже есть, она сбрасывает поля
+                            applyFilters();           // А эта применяет "пустые" фильтры и обновляет список
+                        }
 
                         function toggleFilters() { const fw = document.getElementById('filters-wrapper'); if (fw.classList.contains('open')) { fw.classList.remove('open'); } else { fw.classList.add('open'); } }
                         function checkIsNew(ad) { if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true; if (ad.condition === 'new') return true; return false; }
