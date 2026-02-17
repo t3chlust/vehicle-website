@@ -714,7 +714,7 @@
         
         function closeModalDirect() { 
             document.getElementById('modal').classList.remove('active'); 
-            document.body.style.overflow = 'auto'; 
+            document.body.style.overflow = '';
         }
 
         function openLightbox(url) {
@@ -863,14 +863,18 @@
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
+
+        // *** ИСПРАВЛЕНО: openPart теперь идентична openAd по структуре ***
         function openPart(part) {
             currentAd = part;
             currentPhotos = [];
             currentPhotoIndex = 0;
 
-            document.getElementById('modal-title').innerText = part.title || 'Запчасть';
+            document.getElementById('modal-title').innerText = part.title || part.partName || 'Запчасть';
             document.getElementById('modal-price').innerText = Number(part.price || 0).toLocaleString() + ' ₽';
-            document.getElementById('modal-desc').innerText = '';
+
+            let cleanDesc = (part.desc || '').replace(NEW_STATUS_TAG, '').trim();
+            document.getElementById('modal-desc').innerText = cleanDesc;
 
             document.getElementById('modal-name').innerText = part.name || 'Продавец';
             document.getElementById('modal-location').innerText = part.city || '';
@@ -887,6 +891,17 @@
             if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
             document.getElementById('modal-badges').innerHTML = bgHtml;
 
+            // Сбрасываем тендерный баннер (как в openAd)
+            const tenderBanner = document.getElementById('modal-tender-banner');
+            tenderBanner.innerText = '';
+            tenderBanner.classList.remove('visible');
+
+            let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+            currentPhotos = phs;
+            updateGallery();
+            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
+            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
+
             let sp = [
                 { l: 'Тип', v: 'Запчасть' },
                 { l: 'Название', v: part.partName || part.title },
@@ -896,12 +911,6 @@
                 { l: 'Город', v: part.city }
             ];
             document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-
-            let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
-            currentPhotos = phs;
-            updateGallery();
-            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
-            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
 
             document.getElementById('modal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -947,7 +956,7 @@
             if (ad.power) infoParts.push(ad.power + ' л.с.');
             if (ad.transmission) infoParts.push(ad.transmission);
 
-            const adTitle =[ad.brand, ad.model].filter(Boolean).join(' ').trim() || "Без названия";
+            const adTitle = [ad.brand, ad.model].filter(Boolean).join(' ').trim() || "Без названия";
 
             const card = document.createElement('div');
             card.className = 'ad-card';
@@ -963,6 +972,7 @@
             `;
             return card;
         }
+
         function createPartCard(part) {
             let photos = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : [];
             let mainImage = photos.length > 0 ? photos[0] : 'https://placehold.co/400?text=Нет+фото';
@@ -992,6 +1002,7 @@
             `;
             return card;
         }
+
         function matchesManufacturer(value, namesLower) {
             if (!value) return false;
             const text = String(value).toLowerCase();
@@ -1034,10 +1045,7 @@
 
             container.innerHTML = headerHtml;
 
-            // Нормализуем альтернативные названия производителя к нижнему регистру
             const altNamesLower = (manufacturer.altNames || []).map(n => n.toLowerCase().trim());
-            
-            // Добавляем и основное название
             altNamesLower.push(manufacturer.name.toLowerCase().trim());
 
             console.log('=== DEBUG renderManufacturerPage ===');
@@ -1045,8 +1053,7 @@
             console.log('Альтернативные названия (оригинальные):', manufacturer.altNames);
             console.log('Все названия для сравнения (нижний регистр):', altNamesLower);
             console.log('Всего объявлений:', manufacturerAds.length);
-            
-            // Показываем ВСЕ объявления с matching brand
+
             console.log('\nВсе объявления с matching brand:');
             const matchingBrand = manufacturerAds.filter(ad => {
                 const adBrand = (ad.brand || '').toLowerCase().trim();
@@ -1057,20 +1064,15 @@
             });
             console.log(`Найдено объявлений с matching brand: ${matchingBrand.length}`);
 
-            // Фильтруем объявления этого производителя
             const approvedAds = manufacturerAds.filter(ad => {
                 const adBrand = (ad.brand || '').toLowerCase().trim();
                 const brandMatches = altNamesLower.includes(adBrand);
-                
                 if (!brandMatches) return false;
-                
                 const statusOk = ad.confirmed === true;
                 const sellerTypeOk = isFactorySellerLabel(getSellerTypeLabel(ad));
-                
                 if (!statusOk || !sellerTypeOk) {
                     console.log(`  ✗ Объявление "${ad.brand} ${ad.model}" отфильтровано: confirmed="${ad.confirmed}" (ok=${statusOk}), sellerType="${ad.sellerType}" (ok=${sellerTypeOk})`);
                 }
-                
                 return statusOk && sellerTypeOk;
             });
 
@@ -1102,9 +1104,6 @@
             });
             console.log(`Всего для отображения: ${approvedAds.length}`);
             console.log('====================================');
-
-            // Добавляем заголовок объявлений
-            const adsSection = document.createElement('div');
 
             if (combined.length > 0) {
                 const title = document.createElement('h2');
@@ -1142,27 +1141,19 @@
                 return;
             }
 
-            // Загружаем объявления
             const allAds = await loadAds();
             const allParts = await loadParts();
 
-            // Загружаем информацию о производителях
             try {
                 const response = await fetch(MANUFACTURERS_API_URL);
                 const data = await response.json();
                 const manufacturers = parseManufacturers(data);
                 
-                // Нормализуем поисковое название
                 const searchNameLower = decodeURIComponent(manufacturerName).toLowerCase().trim();
                 
-                // Находим производителя по основному названию или по альтернативным названиям
                 const manufacturer = manufacturers.find(m => {
                     const mainNameLower = m.name.toLowerCase().trim();
-                    
-                    // Проверяем основное название
                     if (mainNameLower === searchNameLower) return true;
-                    
-                    // Проверяем альтернативные названия
                     return (m.altNames || []).some(alt => 
                         alt.toLowerCase().trim() === searchNameLower
                     );
@@ -1174,9 +1165,7 @@
                     return;
                 }
 
-                // Обновляем заголовок страницы
                 document.title = `${manufacturer.name} - купитьвездеход.рф`;
-
                 renderManufacturerPage(manufacturer, allAds, allParts);
             } catch (e) {
                 console.error('Ошибка загрузки производителей:', e);
@@ -1185,7 +1174,7 @@
             }
         }
 
-        // Парсер CSV
+        // Парсер
         function parseManufacturers(data) {
             return (Array.isArray(data) ? data : []).map(entry => {
                 const { name, city, logo, vk, youtube, website, rutube, telegram, aliases } = entry;
