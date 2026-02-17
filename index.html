@@ -3168,7 +3168,10 @@
                         }
                         function showTab(element, tabName) {
                             try {
-                                sessionStorage.setItem('lastTab', tabName);
+                                // Don't save 'tender' or 'admin' tabs to sessionStorage to ensure page reload goes to 'ads'
+                                if (tabName !== 'tender' && tabName !== 'admin') {
+                                    sessionStorage.setItem('lastTab', tabName);
+                                }
                             } catch (e) {
                                 // Ignore session storage errors
                             }
@@ -3311,7 +3314,8 @@
                             tryAutoLogin();
                             try {
                                 const lastTab = sessionStorage.getItem('lastTab');
-                                if (lastTab) {
+                                // Don't restore 'tender' or 'admin' tabs on page reload, always start with 'ads'
+                                if (lastTab && lastTab !== 'tender' && lastTab !== 'admin') {
                                     const tabLinks = Array.from(document.querySelectorAll('.tab-link'));
                                     const tabLink = tabLinks.find(link => {
                                         const handler = link.getAttribute('onclick') || '';
@@ -3325,6 +3329,7 @@
                                     if (tRecords) {
                                         tRecords.classList.add('tab-ads');
                                     }
+                                    sessionStorage.removeItem('lastTab');
                                 }
                             } catch (e) {
                             }
