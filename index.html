@@ -712,77 +712,40 @@
                                     transition: all 0.2s ease;
                                 }
 
-                                /* Запчасти - желтый */
-                                .tab-link[onclick*="parts"] {
-                                    background-color: #FFC107;
-                                    color: #fff;
-                                }
+                                /* Убираем цвет фона, возвращаем темный текст */
+.tab-link[onclick*="parts"],
+.tab-link[onclick*="manufacturers"],
+.tab-link[onclick*="ads"],
+#tender-tab-link {
+    background-color: transparent !important;
+    color: #666;
+}
+/* Стили для наведения (можно оставить легкий фон или убрать) */
+.tab-link[onclick*="parts"]:hover,
+.tab-link[onclick*="manufacturers"]:hover,
+.tab-link[onclick*="ads"]:hover,
+#tender-tab-link:hover {
+    background-color: #fafafa !important;
+    color: #222;
+}
+/* Стили для АКТИВНЫХ вкладок - меняем цвет ТЕКСТА, а не фона */
+.tab-link[onclick*="parts"].active {
+    background-color: transparent !important;
+    color: #FFC107; /* Желтый текст */
+}
+.tab-link[onclick*="manufacturers"].active {
+    background-color: transparent !important;
+    color: #1E88E5; /* Синий текст */
+}
+.tab-link[onclick*="ads"].active {
+    background-color: transparent !important;
+    color: #26A69A; /* Зеленый текст */
+}
+#tender-tab-link.active {
+    background-color: transparent !important;
+    color: #ab47bc; /* Фиолетовый текст */
+}
 
-                                .tab-link[onclick*="parts"]:hover {
-                                    background-color: #FFA000;
-                                    color: #fff;
-                                }
-
-                                .tab-link[onclick*="parts"].active {
-                                    background-color: #FFA000;
-                                    color: #fff;
-                                }
-
-                                /* Производители - синий */
-                                .tab-link[onclick*="manufacturers"] {
-                                    background-color: #1E88E5;
-                                    color: #fff;
-                                }
-
-                                .tab-link[onclick*="manufacturers"]:hover {
-                                    background-color: #1565C0;
-                                    color: #fff;
-                                }
-
-                                .tab-link[onclick*="manufacturers"].active {
-                                    background-color: #1565C0;
-                                    color: #fff;
-                                }
-
-                                /* Техника - зелено-бирюзовый */
-                                .tab-link[onclick*="ads"] {
-                                    background-color: #26A69A;
-                                    color: #fff;
-                                }
-
-                                .tab-link[onclick*="ads"]:hover {
-                                    background-color: #00897B;
-                                    color: #fff;
-                                }
-
-                                .tab-link[onclick*="ads"].active {
-                                    background-color: #00897B;
-                                    color: #fff;
-                                }
-
-                                /* Стиль для кнопки-вкладки "Минпромторг" */
-                                #tender-tab-link {
-                                    background-color: #ab47bc;
-                                    /* Фиолетовый фон */
-                                    color: #fff;
-                                    /* Белый текст */
-                                    border-color: transparent;
-                                    /* Убираем рамку */
-                                }
-
-                                /* Стиль при наведении */
-                                #tender-tab-link:hover {
-                                    background-color: #8e24aa;
-                                    /* Более темный фиолетовый */
-                                    color: #fff;
-                                }
-
-                                /* Стиль, когда вкладка активна (чтобы она оставалась фиолетовой) */
-                                #tender-tab-link.active {
-                                    background-color: #8e24aa;
-                                    color: #fff;
-                                    border-color: transparent;
-                                }
 
 
                                 .manufacturer-grid {
