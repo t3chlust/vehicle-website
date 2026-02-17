@@ -645,6 +645,31 @@
                                     margin-right: 6px;
                                 }
 
+                                /* Стиль для кнопки-вкладки "Минпромторг" */
+                                #tender-tab-link {
+                                    background-color: #ab47bc;
+                                    /* Фиолетовый фон */
+                                    color: #fff;
+                                    /* Белый текст */
+                                    border-color: transparent;
+                                    /* Убираем рамку */
+                                }
+
+                                /* Стиль при наведении */
+                                #tender-tab-link:hover {
+                                    background-color: #8e24aa;
+                                    /* Более темный фиолетовый */
+                                    color: #fff;
+                                }
+
+                                /* Стиль, когда вкладка активна (чтобы она оставалась фиолетовой) */
+                                #tender-tab-link.active {
+                                    background-color: #8e24aa;
+                                    color: #fff;
+                                    border-color: transparent;
+                                }
+
+
                                 .manufacturer-grid {
                                     grid-template-columns: repeat(2, 1fr) !important;
                                     gap: 10px;
@@ -1982,8 +2007,8 @@
                             <div class="tabs-nav" id="tabs-nav">
                                 <button class="tab-link active" onclick="showTab(this, 'ads')">Техника</button>
                                 <button class="tab-link" onclick="showTab(this, 'parts')">Запчасти</button>
-                                <button class="tab-link" onclick="showTab(this, 'tender')">В реестре
-                                    Минпромторга</button>
+                                <button id="tender-tab-link" class="tab-link" onclick="showTab(this, 'tender')">В
+                                    реестре Минпромторга</button>
                                 <button class="tab-link" onclick="showTab(this, 'manufacturers')">Производители</button>
                                 <button id="admin-tab-link" class="tab-link hidden"
                                     onclick="showTab(this, 'admin')">Админка</button>
