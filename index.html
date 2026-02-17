@@ -513,6 +513,24 @@
                                 background: #0052a3;
                             }
 
+                            .btn-yellow {
+                                background: #FFC107;
+                                color: #fff;
+                            }
+
+                            .btn-yellow:hover {
+                                background: #FFA000;
+                            }
+
+                            .btn-green {
+                                background: #26A69A;
+                                color: #fff;
+                            }
+
+                            .btn-green:hover {
+                                background: #00897B;
+                            }
+
                             /* Make profile button black specifically */
                             #btn-profile {
                                 background: #222 !important;
@@ -654,6 +672,57 @@
                                     border-radius: 8px;
                                     color: #222;
                                     margin-right: 6px;
+                                    cursor: pointer;
+                                    border: none;
+                                    transition: all 0.2s ease;
+                                }
+
+                                /* Запчасти - желтый */
+                                .tab-link[onclick*="parts"] {
+                                    background-color: #FFC107;
+                                    color: #fff;
+                                }
+
+                                .tab-link[onclick*="parts"]:hover {
+                                    background-color: #FFA000;
+                                    color: #fff;
+                                }
+
+                                .tab-link[onclick*="parts"].active {
+                                    background-color: #FFA000;
+                                    color: #fff;
+                                }
+
+                                /* Производители - синий */
+                                .tab-link[onclick*="manufacturers"] {
+                                    background-color: #1E88E5;
+                                    color: #fff;
+                                }
+
+                                .tab-link[onclick*="manufacturers"]:hover {
+                                    background-color: #1565C0;
+                                    color: #fff;
+                                }
+
+                                .tab-link[onclick*="manufacturers"].active {
+                                    background-color: #1565C0;
+                                    color: #fff;
+                                }
+
+                                /* Техника - зелено-бирюзовый */
+                                .tab-link[onclick*="ads"] {
+                                    background-color: #26A69A;
+                                    color: #fff;
+                                }
+
+                                .tab-link[onclick*="ads"]:hover {
+                                    background-color: #00897B;
+                                    color: #fff;
+                                }
+
+                                .tab-link[onclick*="ads"].active {
+                                    background-color: #00897B;
+                                    color: #fff;
                                 }
 
                                 /* Стиль для кнопки-вкладки "Минпромторг" */
@@ -1655,6 +1724,27 @@
                                 animation: fadeIn 0.5s;
                             }
 
+                            /* Цвета для разных вкладок */
+                            #tab-content-ads {
+                                background-color: #E0F2F1;
+                            }
+
+                            #tab-content-parts {
+                                background-color: #FFF8E1;
+                            }
+
+                            #tab-content-manufacturers {
+                                background-color: #E3F2FD;
+                            }
+
+                            #tab-content-tender {
+                                background-color: #f3f3f3;
+                            }
+
+                            #tab-content-admin {
+                                background-color: #f3f3f3;
+                            }
+
                             .manufacturer-grid {
                                 display: flex;
                                 flex-direction: column;
@@ -1757,15 +1847,6 @@
                                 object-fit: cover;
                                 display: block;
                                 margin: 0;
-                            }
-
-                            .tab-content {
-                                display: none;
-                            }
-
-                            .tab-content.active {
-                                display: block;
-                                animation: fadeIn 0.5s;
                             }
 
                             .moderation-grid {
@@ -2014,7 +2095,7 @@
                                 <div class="header-bottom">
                                     <button id="btn-profile" class="btn btn-blue hidden" onclick="openProfile()">Личный
                                         кабинет</button>
-                                    <button id="btn-create-ad" class="btn btn-purple hidden"
+                                    <button id="btn-create-ad" class="btn btn-green hidden"
                                         onclick="openCreateMode()">Подать объявление</button>
                                 </div>
                             </div>
@@ -3323,7 +3404,24 @@
                             checkTenderVisibility();
                             checkConditionVisibility();
                             checkChassisTypeVisibility();
+                            updateSubmitButtonColor();
                         }
+
+                        function updateSubmitButtonColor() {
+                            const type = document.getElementById('inp-tech-type').value;
+                            const submitBtn = document.getElementById('submit-btn');
+                            if (!submitBtn) return;
+                            
+                            // Remove all color classes
+                            submitBtn.classList.remove('btn-purple', 'btn-yellow', 'btn-green');
+                            
+                            if (type === 'Запчасть') {
+                                submitBtn.classList.add('btn-yellow');
+                            } else {
+                                submitBtn.classList.add('btn-green');
+                            }
+                        }
+
                         function checkChassisTypeVisibility() {
                             const type = document.getElementById('inp-tech-type').value;
                             const wheelType = safeVal('inp-wheel-f');
@@ -4290,6 +4388,7 @@
                             document.getElementById('inp-tech-type').disabled = false;
                             checkTechTypeVisibility();
                             checkConditionVisibility();
+                            updateSubmitButtonColor();
                         }
                         function showList() {
                             // Убедимся что inp-tech-type включен (не disabled)
