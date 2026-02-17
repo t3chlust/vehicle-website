@@ -4503,9 +4503,11 @@
                             } else {
                                 setSellerTypeSelectByLabel(getSellerTypeLabel(part));
                             }
-                            // Установка типа как "Запчасть" и отключение его изменения
+                            // Установка типа как "Запчасть" (id=4) и отключение его изменения
+                            const techTypeSelect = document.getElementById('inp-tech-type');
+                            techTypeSelect.disabled = false;
                             setVal('inp-tech-type', 'Запчасть');
-                            document.getElementById('inp-tech-type').disabled = true;
+                            techTypeSelect.disabled = true;
                             setVal('inp-part-brand', part.brand || "");
                             setVal('inp-part-title', part.partName || part.title || "");
                             // Очищаем поля техники
