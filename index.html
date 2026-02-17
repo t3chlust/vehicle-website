@@ -1756,6 +1756,7 @@
                                 cursor: pointer;
                                 border: 1px solid #e6e6e6;
                                 background: #fff;
+                                /* Эту строку нужно изменить */
                                 font-size: 16px;
                                 font-weight: 600;
                                 color: #666;
@@ -1765,11 +1766,13 @@
 
                             .tab-link:hover {
                                 background: #fafafa;
+                                /* Эту строку нужно изменить */
                             }
 
                             .tab-link.active {
                                 border-color: #d9cfe0;
                                 background: #fff;
+                                /* Эту строку нужно изменить */
                                 box-shadow: none;
                             }
 
@@ -2142,8 +2145,10 @@
                                 <div class="header-top"
                                     style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                                     <div class="header-title">
-                                        <h2 style="margin:0; font-size: 22px; display:flex; align-items:center; gap:10px;">
-                                            <img src="images/logo.svg" alt="logo" style="height:1em; width:auto; border-radius:4px;">
+                                        <h2
+                                            style="margin:0; font-size: 22px; display:flex; align-items:center; gap:10px;">
+                                            <img src="images/logo.svg" alt="logo"
+                                                style="height:1em; width:auto; border-radius:4px;">
                                             КупитьВездеход.рф
                                         </h2>
                                     </div>
@@ -2625,7 +2630,7 @@
                                                 let val = name ? name : (input ? input.value.trim() : '');
                                                 if (!val) return;
                                                 const lower = val.toLowerCase();
-                                                
+
                                                 // Проверяем, является ли это городом
                                                 let cityFound = null;
                                                 manufacturers.forEach(m => {
@@ -2633,7 +2638,7 @@
                                                         cityFound = m.city;
                                                     }
                                                 });
-                                                
+
                                                 if (cityFound) {
                                                     // Это город - ищем секцию города и скроллим к ней
                                                     const sections = document.querySelectorAll('.manufacturer-section-title');
@@ -2740,14 +2745,14 @@
                                                                 const all = [...found].sort();
                                                                 const cities = [...foundByCity].sort();
                                                                 let arr;
-                                                                
+
                                                                 // Если нашли города, показываем их первыми
                                                                 if (cities.length > 0) {
                                                                     arr = cities;
                                                                 } else {
                                                                     arr = all.slice(0, 5); // показываем максимум 5 подсказок
                                                                 }
-                                                                
+
                                                                 if (arr.length === 0) {
                                                                     listDiv.style.display = 'none';
                                                                 } else {
@@ -3487,10 +3492,10 @@
                             const type = document.getElementById('inp-tech-type').value;
                             const submitBtn = document.getElementById('submit-btn');
                             if (!submitBtn) return;
-                            
+
                             // Remove all color classes
                             submitBtn.classList.remove('btn-purple', 'btn-yellow', 'btn-green');
-                            
+
                             if (type === 'Запчасть') {
                                 submitBtn.classList.add('btn-yellow');
                             } else {
@@ -3663,7 +3668,7 @@
                             const activeTab = document.querySelector('.tab-link.active');
                             const activeTabName = activeTab ? activeTab.getAttribute('onclick')?.match(/'([^']+)'/) : null;
                             const tabName = activeTabName ? activeTabName[1] : 'ads';
-                            
+
                             let rgb;
                             if (tabName === 'ads') {
                                 rgb = '38, 166, 154'; // #26A69A - green
@@ -5185,7 +5190,8 @@
                 </a>
                 <a href="https://vk.ru/predel.prochnosti" target="_blank" class="footer-icon" title="ВКонтакте">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                        <path d="M19.968 7.866c0.278 0.003 0.545-0.087 0.767-0.262 0.194-0.152 0.312-0.381 0.326-0.633 0.025-0.43-0.27-0.8-0.666-0.872-0.05-0.008-0.1-0.012-0.15-0.012h-1.575v4.875h1.557c0.388 0 0.726-0.282 0.782-0.657 0.058-0.41-0.223-0.793-0.634-0.851-0.042-0.006-0.084-0.009-0.127-0.009h-0.733v-2.578h0.733zm-8.718-0.872c0.388 0 0.726-0.282 0.782-0.657 0.058-0.41-0.223-0.793-0.634-0.851-0.042-0.006-0.084-0.009-0.127-0.009h-1.557v4.875h1.575c0.278 0.003 0.545-0.087 0.767-0.262 0.194-0.152 0.312-0.381 0.326-0.633 0.025-0.43-0.27-0.8-0.666-0.872-0.05-0.008-0.1-0.012-0.15-0.012h-0.733v-2.578h0.733zm10.75-5.094c0 0 1.8 0 1.8 1.8v16.4c0 0 0 1.8-1.8 1.8h-16.4c0 0-1.8 0-1.8-1.8v-16.4c0 0 0-1.8 1.8-1.8h16.4zm-10.268 7.125c0.058-0.41-0.223-0.793-0.634-0.851-0.042-0.006-0.084-0.009-0.127-0.009h-1.575v4.875h1.557c0.278 0.003 0.545-0.087 0.767-0.262 0.194-0.152 0.312-0.381 0.326-0.633 0.025-0.43-0.27-0.8-0.666-0.872-0.05-0.008-0.1-0.012-0.15-0.012h-0.733v-2.578h0.733c0.388 0 0.726-0.282 0.782-0.657z" />
+                        <path
+                            d="M19.968 7.866c0.278 0.003 0.545-0.087 0.767-0.262 0.194-0.152 0.312-0.381 0.326-0.633 0.025-0.43-0.27-0.8-0.666-0.872-0.05-0.008-0.1-0.012-0.15-0.012h-1.575v4.875h1.557c0.388 0 0.726-0.282 0.782-0.657 0.058-0.41-0.223-0.793-0.634-0.851-0.042-0.006-0.084-0.009-0.127-0.009h-0.733v-2.578h0.733zm-8.718-0.872c0.388 0 0.726-0.282 0.782-0.657 0.058-0.41-0.223-0.793-0.634-0.851-0.042-0.006-0.084-0.009-0.127-0.009h-1.557v4.875h1.575c0.278 0.003 0.545-0.087 0.767-0.262 0.194-0.152 0.312-0.381 0.326-0.633 0.025-0.43-0.27-0.8-0.666-0.872-0.05-0.008-0.1-0.012-0.15-0.012h-0.733v-2.578h0.733zm10.75-5.094c0 0 1.8 0 1.8 1.8v16.4c0 0 0 1.8-1.8 1.8h-16.4c0 0-1.8 0-1.8-1.8v-16.4c0 0 0-1.8 1.8-1.8h16.4zm-10.268 7.125c0.058-0.41-0.223-0.793-0.634-0.851-0.042-0.006-0.084-0.009-0.127-0.009h-1.575v4.875h1.557c0.278 0.003 0.545-0.087 0.767-0.262 0.194-0.152 0.312-0.381 0.326-0.633 0.025-0.43-0.27-0.8-0.666-0.872-0.05-0.008-0.1-0.012-0.15-0.012h-0.733v-2.578h0.733c0.388 0 0.726-0.282 0.782-0.657z" />
                     </svg>
                 </a>
             </div>
