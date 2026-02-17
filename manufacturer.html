@@ -8,7 +8,6 @@
     <link rel="shortcut icon" href="images/logo.svg" type="image/x-icon" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
         body, html {
             width: 100%;
             margin: 0;
@@ -17,18 +16,15 @@
             background-color: #F7F9F8;
             overflow-x: hidden;
         }
-
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
-
         .container {
             max-width: 1440px;
             margin: 0 auto;
             padding: 20px;
         }
-
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -42,11 +38,9 @@
             border-radius: 8px;
             padding: 6px 10px;
         }
-
         .back-link:hover {
             color: #8e35b7;
         }
-
         .manufacturer-header {
             background: white;
             padding: 30px 20px;
@@ -56,7 +50,6 @@
             align-items: center;
             gap: 30px;
         }
-
         .manufacturer-logo-large {
             width: 150px;
             height: 150px;
@@ -65,29 +58,24 @@
             flex-shrink: 0;
             background: #f0f0f0;
         }
-
         .manufacturer-info {
             flex: 1;
         }
-
         .manufacturer-name-large {
             font-size: 32px;
             font-weight: 700;
             color: #2a2a2a;
             margin: 0 0 10px 0;
         }
-
         .manufacturer-city-large {
             font-size: 16px;
             color: #666;
             margin-bottom: 15px;
         }
-
         .manufacturer-socials-large {
             display: flex;
             gap: 10px;
         }
-
         .manufacturer-socials-large a {
             display: flex !important;
             align-items: center;
@@ -102,22 +90,9 @@
             flex-shrink: 0;
             text-decoration: none;
         }
-
-        @media (max-width: 600px) {
-            .manufacturer-socials-large a {
-                width: 48px !important;
-                height: 48px !important;
-            }
-            .manufacturer-socials-large img {
-                width: 100% !important;
-                height: 100% !important;
-            }
-        }
-
         .manufacturer-socials-large a:hover {
             transform: scale(1.1);
         }
-
         .manufacturer-socials-large img {
             width: 100% !important;
             height: 100% !important;
@@ -126,21 +101,18 @@
             display: block;
             margin: 0;
         }
-
         .ads-title {
             font-size: 24px;
             font-weight: 700;
             color: #2a2a2a;
             margin-bottom: 20px;
         }
-
         .ad-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
-
         .ad-card {
             background: white;
             border-radius: 12px;
@@ -149,22 +121,18 @@
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-
         .ad-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
         }
-
         .ad-card-img {
             width: 100%;
             height: 240px;
             object-fit: cover;
         }
-
         .ad-card-content {
             padding: 15px;
         }
-
         .ad-card-title {
             font-weight: 600;
             font-size: 16px;
@@ -174,67 +142,44 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-
         .ad-card-price {
             font-size: 18px;
             font-weight: 700;
             color: #ab47bc;
             margin-bottom: 10px;
         }
-
         .ad-card-info {
             font-size: 13px;
             color: #666;
             line-height: 1.4;
         }
-
         .badge-wrap {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
             margin-top: 10px;
         }
-
-        .badge-new {
-            background: #4caf50;
+        .badge-new, .badge-private, .badge-float {
             color: white;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 11px;
             font-weight: 600;
         }
-
-        .badge-private {
-            background: #ff9800;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .badge-float {
-            background: #2196f3;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
+        .badge-new { background: #4caf50; }
+        .badge-private { background: #ff9800; }
+        .badge-float { background: #2196f3; }
         .empty-message {
             text-align: center;
             padding: 60px 20px;
             color: #999;
             font-size: 16px;
         }
-
         .loading {
             text-align: center;
             padding: 40px 20px;
             color: #666;
         }
-
         .spinner {
             display: inline-block;
             width: 40px;
@@ -244,390 +189,27 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 9000;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.6s;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-window {
-            background: #fff;
-            width: 100%;
-            max-width: 720px;
-            max-height: 100vh;
-            border-radius: 0;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            margin: auto;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .modal-window::-webkit-scrollbar {
-            width: 0;
-            height: 0;
-        }
-
-        @media (min-width: 600px) {
-            .modal-overlay {
-                padding: 20px;
-                padding-top: calc(20px + env(safe-area-inset-top));
-                padding-bottom: calc(20px + env(safe-area-inset-bottom));
-            }
-
-            .modal-window {
-                border-radius: 16px;
-            }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-            cursor: pointer;
-            line-height: 1;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.7);
-            transition: background 0.2s;
-            z-index: 1001;
-        }
-
-        .modal-close:hover {
-            background: rgba(240, 240, 240, 0.9);
-        }
-
-        .modal-content {
-            padding: 30px;
-        }
-
-        @media (max-width: 600px) {
-            .modal-content {
-                padding: 20px;
-            }
-        }
-
-        .modal-tender-banner {
-            background: #ab47bc;
-            color: #fff;
-            text-align: left;
-            padding: 12px 20px;
-            font-weight: 700;
-            font-size: 14px;
-            display: none;
-            line-height: 1.1;
-            white-space: normal;
-            word-break: normal;
-            overflow-wrap: break-word;
-        }
-
-        .modal-tender-banner.visible {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-        }
-
-        @media (max-width: 600px) {
-            .modal-tender-banner {
-                font-size: 11px;
-                padding: 10px 15px;
-            }
-        }
-
-        .modal-title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .modal-title-text {
-            font-size: 24px;
-            font-weight: 800;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .modal-badges-row {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-wrap: wrap;
-            flex-shrink: 0;
-        }
-
-        @media (min-width: 600px) {
-            .modal-title-row {
-                align-items: center;
-            }
-
-            .modal-badges-row {
-                margin-left: auto;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .modal-title-text {
-                font-size: 20px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .modal-title-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .modal-badges-row {
-                width: 100%;
-                justify-content: flex-start;
-            }
-        }
-
-        .gallery-wrapper {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            background: #000;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        @media (max-width: 600px) {
-            .gallery-wrapper {
-                height: 300px;
-            }
-        }
-
-        .gallery-track {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .gallery-slide {
-            width: 100% !important;
-            min-width: 100% !important;
-            flex: 0 0 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-            overflow: hidden;
-        }
-
-        .modal-gallery-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .gallery-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.8);
-            border: none;
-            border-radius: 8px;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 5;
-            transition: background 0.2s;
-        }
-
-        .gallery-arrow:hover {
-            background: rgba(255, 255, 255, 1);
-        }
-
-        .arrow-left {
-            left: 10px;
-        }
-
-        .arrow-right {
-            right: 10px;
-        }
-
-        .specs-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-
-        .specs-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .specs-table td:first-child {
-            font-weight: 600;
-            width: 40%;
-            color: #666;
-        }
-
-        /* Lightbox Styles */
-        .lightbox-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 9998;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.6s;
-        }
-
-        .lightbox-overlay.active {
-            display: flex;
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .lightbox-img-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .lightbox-img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-        }
-
-        .lightbox-close {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 8px;
-            font-size: 36px;
-            cursor: pointer;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10001;
-            transition: background 0.2s;
-        }
-
-        .lightbox-close:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        @media (max-width: 600px) {
-            .gallery-wrapper {
-                height: 300px;
-            }
-
-            .lightbox-close {
-                top: 10px;
-                right: 10px;
-                width: 40px;
-                height: 40px;
-                font-size: 28px;
-            }
-        }
-
         @media (max-width: 768px) {
             .manufacturer-header {
                 flex-direction: column;
                 text-align: center;
             }
-
-            .manufacturer-name-large {
-                font-size: 24px;
-            }
-
+            .manufacturer-name-large { font-size: 24px; }
             .ad-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px;
             }
-
-            .ad-card-img {
-                height: 140px;
-            }
-
-            .ad-card-title {
-                font-size: 14px;
-            }
-
-            .ad-card-price {
-                font-size: 15px;
-            }
-
-            .ad-card-info {
-                font-size: 11px;
-            }
-
-            .modal-content {
-                padding: 20px;
-            }
+            .ad-card-img { height: 140px; }
+            .ad-card-title { font-size: 14px; }
+            .ad-card-price { font-size: 15px; }
+            .ad-card-info { font-size: 11px; }
         }
-
         @media (max-width: 480px) {
-            .gallery-wrapper {
-                height: 250px;
-            }
+            .gallery-wrapper { height: 250px; }
         }
     </style>
 </head>
@@ -643,60 +225,12 @@
         </div>
     </div>
 
-    <!-- Modal Window -->
-    <div id="modal" class="modal-overlay" onclick="closeModal(event)">
-        <div class="modal-window" onclick="event.stopPropagation()">
-            <div class="modal-close" onclick="closeModalDirect()">×</div>
-            <div class="gallery-wrapper" id="gallery-wrapper">
-                <div id="arrow-prev" class="gallery-arrow arrow-left" onclick="galleryPrev(event)">‹</div>
-                <div class="gallery-track" id="gallery-track"></div>
-                <div id="arrow-next" class="gallery-arrow arrow-right" onclick="galleryNext(event)">›</div>
-            </div>
-            <div id="modal-tender-banner" class="modal-tender-banner"></div>
-            <div class="modal-content">
-                <div class="modal-title-row">
-                    <div class="modal-title-text" id="modal-title"></div>
-                    <div class="modal-badges-row">
-                        <div id="modal-badges" style="display:flex; align-items:center; gap: 6px; flex-wrap: wrap;"></div>
-                    </div>
-                </div>
-                <div style="margin-bottom:15px;">
-                    <div id="modal-price" style="font-size: 20px; font-weight: 600;"></div>
-                </div>
-                <div style="background:#f9f9f9; padding:20px; border-radius:12px; margin-bottom:30px;">
-                    <div style="font-size:14px;color:#888;font-weight:bold;">Продавец</div>
-                    <div id="modal-name" style="font-size:18px;font-weight:bold;"></div>
-                    <div id="modal-location" style="color:#666;margin-top:5px;font-size:14px;"></div>
-                    <a id="modal-phone" href="#" style="font-size:20px;color:#0066cc;text-decoration:none;display:block;margin-top:5px;"></a>
-                </div>
-                <h4 style="margin-bottom:15px; font-size: 18px; font-weight: 700;">Характеристики</h4>
-                <table class="specs-table">
-                    <tbody id="modal-specs"></tbody>
-                </table>
-                <h4 style="margin-bottom:15px; font-size: 18px; font-weight: 700;">Описание</h4>
-                <div id="modal-desc" style="white-space: pre-wrap;"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lightbox for zooming images -->
-    <div id="lightbox" class="lightbox-overlay" onclick="closeLightbox()">
-        <div class="lightbox-close" onclick="closeLightbox()">×</div>
-        <div class="lightbox-img-wrapper" id="lightbox-wrapper">
-            <img id="lightbox-img" class="lightbox-img" src="" onclick="event.stopPropagation()">
-        </div>
-    </div>
-
     <script>
         // Глобальные переменные
         const ADS_API_URL = '/api/ads';
         const PARTS_API_URL = '/api/parts';
         const MANUFACTURERS_API_URL = '/api/manufacturer-synonyms';
         const NEW_STATUS_TAG = '***STATUS_NEW***';
-        
-        let currentAd = null;
-        let currentPhotos = [];
-        let currentPhotoIndex = 0;
         
         // Иконки соцсетей
         const ICONS = {
@@ -707,64 +241,15 @@
             RUTUBE: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Rutube_icon.svg'
         };
 
-        // Modal functions
-        function closeModal(e) { 
-            if (e.target.id === 'modal') closeModalDirect(); 
-        }
-        
-        function closeModalDirect() { 
-            document.getElementById('modal').classList.remove('active'); 
-            document.body.style.overflow = '';
-        }
-
-        function openLightbox(url) {
-            document.getElementById('lightbox-img').src = url;
-            document.getElementById('lightbox').classList.add('active');
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox').classList.remove('active');
-        }
-
-        function updateGallery() {
-            const track = document.getElementById('gallery-track');
-            if (track.getAttribute('data-ad-id') !== String(currentAd.rowIndex)) {
-                track.innerHTML = currentPhotos.map(url => `
-                    <div class="gallery-slide">
-                        <img class="modal-gallery-img" src="${url}" onclick="openLightbox('${url}')">
-                    </div>
-                `).join('');
-                track.setAttribute('data-ad-id', currentAd.rowIndex);
-            }
-            track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
-        }
-
-        function galleryNext(e) { 
-            if (e) e.stopPropagation(); 
-            currentPhotoIndex++; 
-            if (currentPhotoIndex >= currentPhotos.length) currentPhotoIndex = 0; 
-            updateGallery(); 
-        }
-
-        function galleryPrev(e) { 
-            if (e) e.stopPropagation(); 
-            currentPhotoIndex--; 
-            if (currentPhotoIndex < 0) currentPhotoIndex = currentPhotos.length - 1; 
-            updateGallery(); 
-        }
-
-        // Получить название производителя из URL
         function getManufacturerNameFromUrl() {
             const params = new URLSearchParams(window.location.search);
             return params.get('name');
         }
 
-        // Вернуться назад
         function goBack() {
             window.location.href = '/';
         }
 
-        // Загрузить объявления
         async function loadAds() {
             try {
                 const response = await fetch(ADS_API_URL + '?t=' + new Date().getTime());
@@ -786,181 +271,41 @@
             }
         }
 
-        // Показать объявление в модальном окне
-        function openAd(ad) {
-            currentAd = ad;
-            currentPhotos = [];
-            currentPhotoIndex = 0;
-            
-            document.getElementById('modal-title').innerText = ad.title || "";
-            document.getElementById('modal-price').innerText = Number(ad.price || 0).toLocaleString() + ' ₽';
-            
-            let cleanDesc = (ad.desc || "").replace(NEW_STATUS_TAG, "").replace(/#COLOR_\S+/g, "").replace(/#WHEELS_\S+/g, "").trim();
-            document.getElementById('modal-desc').innerText = cleanDesc;
-            
-            document.getElementById('modal-name').innerText = ad.name || "Продавец";
-            document.getElementById('modal-location').innerText = ad.city || "";
-            
-            const phEl = document.getElementById('modal-phone');
-            if (phEl) {
-                phEl.innerText = ad.phone || "";
-                phEl.href = "tel:" + (ad.phone || "");
-            }
-
-            const sellerLabel = getSellerTypeLabel(ad);
-            let bgHtml = '';
-            if (checkIsNew(ad)) bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
-            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
-            if ((ad.amphibious || "").toLowerCase() === 'yes') bgHtml += '<span class="badge-float" style="font-size:12px; padding:4px 8px;">ПЛАВАЮЩИЙ</span>';
-            document.getElementById('modal-badges').innerHTML = bgHtml;
-
-            const tenderBanner = document.getElementById('modal-tender-banner');
-            if ((ad.tender || "").toLowerCase() === 'yes') {
-                tenderBanner.innerText = 'В РЕЕСТРЕ МИНПРОМТОРГА';
-                tenderBanner.classList.add('visible');
-            } else {
-                tenderBanner.classList.remove('visible');
-            }
-
-            let phs = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
-            currentPhotos = phs;
-            updateGallery();
-            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
-            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
-            
-            const techTypeLabel = ad.techType || '';
-            const techTypeNormalized = normalizeText(techTypeLabel);
-
-            let sp = [
-                { l: "Тип продавца", v: sellerLabel },
-                { l: "Город", v: ad.city },
-                { l: "Тип техники", v: techTypeLabel },
-            ];
-
-            if (techTypeNormalized === 'вездеход') {
-                sp.push({ l: "Конструкция", v: ad.constructionType });
-            }
-
-            if (techTypeNormalized === 'прицеп') {
-                sp.push({ l: "Грузоподъемность", v: ad.capacity ? ad.capacity + ' кг' : '' });
-            } else {
-                let wf = ad.wheelFormula;
-                sp.push({ l: "Тип шасси", v: wf });
-                sp.push({ l: "Плавающий", v: ((ad.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
-                sp.push({ l: "Двигатель", v: ad.engine });
-                sp.push({ l: "Мощность", v: ad.power ? ad.power + ' л.с.' : '' });
-                sp.push({ l: "Трансмиссия", v: ad.transmission });
-                sp.push({ l: "Топливо", v: ad.fuel });
-                sp.push({ l: "Колеса", v: ad.wheels });
-                sp.push({ l: "Пробег", v: ad.mileage ? ad.mileage + ' м.ч.' : '' });
-            }
-
-            sp.push({ l: "Документы", v: ad.docs || 'Нет' });
-            sp.push({ l: "Цвет", v: ad.color });
-            
-            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-            
-            document.getElementById('modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // *** ИСПРАВЛЕНО: openPart теперь идентична openAd по структуре ***
-        function openPart(part) {
-            currentAd = part;
-            currentPhotos = [];
-            currentPhotoIndex = 0;
-
-            document.getElementById('modal-title').innerText = part.title || part.partName || 'Запчасть';
-            document.getElementById('modal-price').innerText = Number(part.price || 0).toLocaleString() + ' ₽';
-
-            let cleanDesc = (part.desc || '').replace(NEW_STATUS_TAG, '').trim();
-            document.getElementById('modal-desc').innerText = cleanDesc;
-
-            document.getElementById('modal-name').innerText = part.name || 'Продавец';
-            document.getElementById('modal-location').innerText = part.city || '';
-
-            const phEl = document.getElementById('modal-phone');
-            if (phEl) {
-                phEl.innerText = part.phone || '';
-                phEl.href = 'tel:' + (part.phone || '');
-            }
-
-            const sellerLabel = getSellerTypeLabel(part);
-            let bgHtml = '';
-            if (part.condition === 'new') bgHtml += '<span class="badge-new" style="font-size:12px; padding:4px 8px;">Новый</span>';
-            if (isPrivateSellerLabel(sellerLabel)) bgHtml += '<span class="badge-private" style="font-size:12px; padding:4px 8px;">Владелец</span>';
-            document.getElementById('modal-badges').innerHTML = bgHtml;
-
-            // Сбрасываем тендерный баннер (как в openAd)
-            const tenderBanner = document.getElementById('modal-tender-banner');
-            tenderBanner.innerText = '';
-            tenderBanner.classList.remove('visible');
-
-            let phs = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
-            currentPhotos = phs;
-            updateGallery();
-            document.getElementById('arrow-prev').style.display = phs.length > 1 ? 'flex' : 'none';
-            document.getElementById('arrow-next').style.display = phs.length > 1 ? 'flex' : 'none';
-
-            let sp = [
-                { l: 'Тип', v: 'Запчасть' },
-                { l: 'Название', v: part.partName || part.title },
-                { l: 'Бренд', v: part.brand || '' },
-                { l: 'Состояние', v: part.condition === 'new' ? 'Новая' : 'Б/У' },
-                { l: 'Тип продавца', v: sellerLabel },
-                { l: 'Город', v: part.city }
-            ];
-            document.getElementById('modal-specs').innerHTML = sp.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-
-            document.getElementById('modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Функция для проверки новизны объявления
         function checkIsNew(ad) {
             if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true;
             if (ad.condition === 'new') return true;
             return false;
         }
-
         function normalizeText(value) {
             return String(value || '').toLowerCase().trim();
         }
-
         function getSellerTypeLabel(ad) {
             if (!ad) return '';
             return ad.sellerType || ad.sellerTypeName || '';
         }
-
         function isPrivateSellerLabel(label) {
             return normalizeText(label) === 'владелец';
         }
-
         function isFactorySellerLabel(label) {
             return normalizeText(label) === 'производитель';
         }
-
-        // Отрендерить карточку объявления
+        
         function createAdCard(ad) {
             let photos = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : [];
             let mainImage = photos.length > 0 ? photos[0] : 'https://placehold.co/400?text=Нет+фото';
-
             const sellerLabel = getSellerTypeLabel(ad);
             let badgesHtml = '';
             if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
             if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
             if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
-
             let infoParts = [];
             if (ad.city) infoParts.push(ad.city);
             if (ad.power) infoParts.push(ad.power + ' л.с.');
             if (ad.transmission) infoParts.push(ad.transmission);
-
             const adTitle = [ad.brand, ad.model].filter(Boolean).join(' ').trim() || "Без названия";
-
             const card = document.createElement('div');
             card.className = 'ad-card';
-            card.onclick = () => openAd(ad);
+            card.onclick = () => { window.location.href = `/ad.html?id=${ad.rowIndex}&type=ad`; };
             card.innerHTML = `
                 <img class="ad-card-img" src="${mainImage}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">
                 <div class="ad-card-content">
@@ -976,21 +321,17 @@
         function createPartCard(part) {
             let photos = part.photos ? part.photos.split(',').filter(p => p.startsWith('http')) : [];
             let mainImage = photos.length > 0 ? photos[0] : 'https://placehold.co/400?text=Нет+фото';
-
             const sellerLabel = getSellerTypeLabel(part);
             let badgesHtml = '';
             if (part.condition === 'new') badgesHtml += '<span class="badge-new">НОВАЯ</span>';
             if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
-
             let infoParts = [];
             if (part.city) infoParts.push(part.city);
             if (sellerLabel) infoParts.push(sellerLabel);
-
             const partTitle = part.partName || part.title || 'Запчасть';
-
             const card = document.createElement('div');
             card.className = 'ad-card';
-            card.onclick = () => openPart(part);
+            card.onclick = () => { window.location.href = `/ad.html?id=${part.rowIndex}&type=part`; };
             card.innerHTML = `
                 <img class="ad-card-img" src="${mainImage}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">
                 <div class="ad-card-content">
@@ -1009,7 +350,6 @@
             return namesLower.some(n => text.includes(n));
         }
 
-        // Отрендерить страницу производителя
         function renderManufacturerPage(manufacturer, manufacturerAds, manufacturerParts) {
             const container = document.getElementById('manufacturer-content');
             
@@ -1017,19 +357,16 @@
                 container.innerHTML = '<div class="empty-message">Производитель не найден</div>';
                 return;
             }
-
             let socialsHtml = '';
             const addSocial = (url, icon) => {
                 if (!url) return;
                 socialsHtml += `<a href="${url}" target="_blank"><img src="${icon}" alt="social"></a>`;
             };
-
             addSocial(manufacturer.website, ICONS.WEB);
             addSocial(manufacturer.vk, ICONS.VK);
             addSocial(manufacturer.youtube, ICONS.YT);
             addSocial(manufacturer.rutube, ICONS.RUTUBE);
             addSocial(manufacturer.telegram, ICONS.TG);
-
             let headerHtml = `
                 <div class="manufacturer-header">
                     <img src="${manufacturer.logo || ''}" alt="${manufacturer.name}" class="manufacturer-logo-large" onerror="this.src='https://placehold.co/150x150?text=нет+лого'">
@@ -1042,37 +379,17 @@
                     </div>
                 </div>
             `;
-
             container.innerHTML = headerHtml;
 
             const altNamesLower = (manufacturer.altNames || []).map(n => n.toLowerCase().trim());
             altNamesLower.push(manufacturer.name.toLowerCase().trim());
-
-            console.log('=== DEBUG renderManufacturerPage ===');
-            console.log('Производитель:', manufacturer.name);
-            console.log('Альтернативные названия (оригинальные):', manufacturer.altNames);
-            console.log('Все названия для сравнения (нижний регистр):', altNamesLower);
-            console.log('Всего объявлений:', manufacturerAds.length);
-
-            console.log('\nВсе объявления с matching brand:');
-            const matchingBrand = manufacturerAds.filter(ad => {
-                const adBrand = (ad.brand || '').toLowerCase().trim();
-                return altNamesLower.includes(adBrand);
-            });
-            matchingBrand.forEach((ad, idx) => {
-                console.log(`  [${idx}] "${ad.brand} ${ad.model}" | rowIndex: ${ad.rowIndex} | confirmed="${ad.confirmed}" | sellerType="${ad.sellerType}"`);
-            });
-            console.log(`Найдено объявлений с matching brand: ${matchingBrand.length}`);
-
+            
             const approvedAds = manufacturerAds.filter(ad => {
                 const adBrand = (ad.brand || '').toLowerCase().trim();
                 const brandMatches = altNamesLower.includes(adBrand);
                 if (!brandMatches) return false;
                 const statusOk = ad.confirmed === true;
                 const sellerTypeOk = isFactorySellerLabel(getSellerTypeLabel(ad));
-                if (!statusOk || !sellerTypeOk) {
-                    console.log(`  ✗ Объявление "${ad.brand} ${ad.model}" отфильтровано: confirmed="${ad.confirmed}" (ok=${statusOk}), sellerType="${ad.sellerType}" (ok=${sellerTypeOk})`);
-                }
                 return statusOk && sellerTypeOk;
             });
 
@@ -1083,13 +400,11 @@
                 return part.confirmed === true && matchesManufacturer(candidate, altNamesLower);
             });
 
-            const combined = [];
-            approvedAds.forEach(ad => {
-                combined.push({ type: 'ad', item: ad, date: ad.creationDate || '' });
-            });
-            approvedParts.forEach(part => {
-                combined.push({ type: 'part', item: part, date: part.date || '' });
-            });
+            const combined = [
+                ...approvedAds.map(item => ({ type: 'ad', item, date: item.creationDate || '' })),
+                ...approvedParts.map(item => ({ type: 'part', item, date: item.date || '' }))
+            ];
+            
             combined.sort((a, b) => {
                 const da = a.date ? Date.parse(a.date) : 0;
                 const db = b.date ? Date.parse(b.date) : 0;
@@ -1097,31 +412,17 @@
                 return Number(b.item.rowIndex || 0) - Number(a.item.rowIndex || 0);
             });
 
-            console.log('\nИтоговые объявления для отображения:');
-            approvedAds.forEach((ad, idx) => {
-                const adTitle = ad.title || [ad.brand, ad.model].filter(Boolean).join(' ').trim() || "Без названия";
-                console.log(`  [${idx}] ${adTitle} | rowIndex: ${ad.rowIndex}`);
-            });
-            console.log(`Всего для отображения: ${approvedAds.length}`);
-            console.log('====================================');
-
             if (combined.length > 0) {
                 const title = document.createElement('h2');
                 title.className = 'ads-title';
                 title.textContent = `Предложения (${combined.length})`;
                 container.appendChild(title);
-
                 const grid = document.createElement('div');
                 grid.className = 'ad-grid';
-
                 combined.forEach(entry => {
-                    if (entry.type === 'part') {
-                        grid.appendChild(createPartCard(entry.item));
-                    } else {
-                        grid.appendChild(createAdCard(entry.item));
-                    }
+                    const card = entry.type === 'part' ? createPartCard(entry.item) : createAdCard(entry.item);
+                    grid.appendChild(card);
                 });
-
                 container.appendChild(grid);
             } else {
                 const empty = document.createElement('div');
@@ -1131,7 +432,6 @@
             }
         }
 
-        // Инициализация страницы
         async function init() {
             const manufacturerName = getManufacturerNameFromUrl();
             
@@ -1140,10 +440,8 @@
                     '<div class="empty-message">Производитель не указан</div>';
                 return;
             }
-
             const allAds = await loadAds();
             const allParts = await loadParts();
-
             try {
                 const response = await fetch(MANUFACTURERS_API_URL);
                 const data = await response.json();
@@ -1158,13 +456,12 @@
                         alt.toLowerCase().trim() === searchNameLower
                     );
                 });
-
+                
                 if (!manufacturer) {
                     document.getElementById('manufacturer-content').innerHTML = 
                         '<div class="empty-message">Производитель не найден</div>';
                     return;
                 }
-
                 document.title = `${manufacturer.name} - купитьвездеход.рф`;
                 renderManufacturerPage(manufacturer, allAds, allParts);
             } catch (e) {
@@ -1174,7 +471,6 @@
             }
         }
 
-        // Парсер
         function parseManufacturers(data) {
             return (Array.isArray(data) ? data : []).map(entry => {
                 const { name, city, logo, vk, youtube, website, rutube, telegram, aliases } = entry;
@@ -1185,7 +481,6 @@
             });
         }
 
-        // Запустить при загрузке страницы
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
