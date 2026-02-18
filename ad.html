@@ -62,6 +62,13 @@
         .back-link.back-manufacturers:hover {
             color: #0d47a1;
         }
+        .back-link.back-tender {
+            color: #9C27B0;
+            border-color: #9C27B0;
+        }
+        .back-link.back-tender:hover {
+            color: #7B1FA2;
+        }
         .details-window {
             background: #fff;
             border-radius: 16px;
@@ -323,6 +330,8 @@
                 bgColor = '#FFF8E1'; // yellow for parts
             } else if (type === 'manufacturer') {
                 bgColor = '#E3F2FD'; // blue for manufacturers
+            } else if (type === 'tender') {
+                bgColor = '#F3E5F5'; // purple for tender/registry
             }
             document.body.style.backgroundColor = bgColor;
             
@@ -420,13 +429,15 @@
             // Set back button color based on type
             const backLink = document.querySelector('.back-link');
             if (backLink) {
-                backLink.classList.remove('back-ads', 'back-parts', 'back-manufacturers');
+                backLink.classList.remove('back-ads', 'back-parts', 'back-manufacturers', 'back-tender');
                 if (type === 'ad') {
                     backLink.classList.add('back-ads');
                 } else if (type === 'part') {
                     backLink.classList.add('back-parts');
                 } else if (type === 'manufacturer') {
                     backLink.classList.add('back-manufacturers');
+                } else if (type === 'tender') {
+                    backLink.classList.add('back-tender');
                 }
             }
         }
