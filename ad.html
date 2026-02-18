@@ -41,6 +41,27 @@
         .back-link:hover {
             color: #8e35b7;
         }
+        .back-link.back-ads {
+            color: #1b8a70;
+            border-color: #1b8a70;
+        }
+        .back-link.back-ads:hover {
+            color: #156956;
+        }
+        .back-link.back-parts {
+            color: #f57f17;
+            border-color: #f57f17;
+        }
+        .back-link.back-parts:hover {
+            color: #e65100;
+        }
+        .back-link.back-manufacturers {
+            color: #1565c0;
+            border-color: #1565c0;
+        }
+        .back-link.back-manufacturers:hover {
+            color: #0d47a1;
+        }
         .details-window {
             background: #fff;
             border-radius: 16px;
@@ -395,6 +416,19 @@
                 </div>
             `;
             document.title = `${item.title || item.partName} - купитьвездеход.рф`;
+            
+            // Set back button color based on type
+            const backLink = document.querySelector('.back-link');
+            if (backLink) {
+                backLink.classList.remove('back-ads', 'back-parts', 'back-manufacturers');
+                if (type === 'ad') {
+                    backLink.classList.add('back-ads');
+                } else if (type === 'part') {
+                    backLink.classList.add('back-parts');
+                } else if (type === 'manufacturer') {
+                    backLink.classList.add('back-manufacturers');
+                }
+            }
         }
 
         async function init() {
