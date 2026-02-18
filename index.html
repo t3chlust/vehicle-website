@@ -2169,7 +2169,7 @@
                                             <input type="text" id="adsSearchInput" class="form-input filter-input"
                                                 placeholder="Поиск техники" autocomplete="off">
                                         </div>
-                                        <div id="adsSearchList" class="search-suggestions"></div>
+                                        <div id="adsSearchList" class="search-suggestions" onclick="console.log('*** HTML onclick on adsSearchList:', event.target.className)"></div>
                                     </div>
                                     <div id="view-filters" class="filters-container">
                                         <div class="filters-toggle-btn" onclick="toggleFilters()">Фильтры</div>
@@ -3029,6 +3029,7 @@
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
                         let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [], profileShowAllAds = false;
+                        let adsSearchListClickListenerAdded = false, partsSearchListClickListenerAdded = false;
                         let profileReturnTab = 'ads';
                         let hasUserAdjustedFilters = false;
                         let currentItemType = 'ad';
@@ -3354,6 +3355,12 @@
                                 .then(() => enforceCleanFiltersState())
                             loadAds();
                             loadParts();
+                            // Логирование всех кликов для отладки
+                            document.addEventListener('click', function(e) {
+                                if (e.target.id === 'adsSearchList' || e.target.parentElement?.id === 'adsSearchList') {
+                                    console.log('*** GLOBAL click on adsSearchList or child:', e.target.className, e.target.textContent.substring(0, 30));
+                                }
+                            }, true); // Capture phase!
                             // Firefox может восстанавливать значения полей с задержкой (особенно на проде)
                             setTimeout(enforceCleanFiltersState, 100);
                             setTimeout(enforceCleanFiltersState, 600);
@@ -3835,26 +3842,31 @@
                                     listDiv.style.display = 'block';
                                 }
                             });
-                            // Event delegation для обработки кликов по элементам поиска
-                            console.log('*** Adding click listener to listDiv');
-                            listDiv.addEventListener('click', function (e) {
-                                console.log('*** listDiv.click FIRED!!! target:', e.target.outerHTML, 'class:', e.target.className);
-                                if (e.target.classList.contains('manufacturer')) {
-                                    e.stopPropagation();
-                                    const clickedId = parseInt(e.target.getAttribute('data-target'), 10);
-                                    const clickedTitle = e.target.getAttribute('data-title');
-                                    console.log('*** MATCHED MANUFACTURER! ID:', clickedId, 'Title:', clickedTitle);
-                                    input.value = clickedTitle;
-                                    listDiv.style.display = 'none';
-                                    findAdAndScroll(null, clickedId);
-                                } else {
-                                    console.log('*** Click but NOT manufacturer, checking parent...');
-                                }
-                            });
+                            // Добавляем click listener только один раз!
+                            if (!adsSearchListClickListenerAdded) {
+                                console.log('*** Adding click listener to listDiv (FIRST TIME)');
+                                adsSearchListClickListenerAdded = true;
+                                listDiv.addEventListener('click', function (e) {
+                                    console.log('*** listDiv.click FIRED!!! target:', e.target.outerHTML, 'class:', e.target.className);
+                                    if (e.target.classList.contains('manufacturer')) {
+                                        e.stopPropagation();
+                                        const clickedId = parseInt(e.target.getAttribute('data-target'), 10);
+                                        const clickedTitle = e.target.getAttribute('data-title');
+                                        console.log('*** MATCHED MANUFACTURER! ID:', clickedId, 'Title:', clickedTitle);
+                                        input.value = clickedTitle;
+                                        listDiv.style.display = 'none';
+                                        findAdAndScroll(null, clickedId);
+                                    } else {
+                                        console.log('*** Click but NOT manufacturer, checking parent...');
+                                    }
+                                });
+                            }
                             document.addEventListener('click', function (e) {
+                                console.log('*** DOCUMENT click detected on:', e.target.className, e.target.tagName);
                                 const inputEl = document.getElementById('adsSearchInput');
                                 if (!listDiv || !inputEl) return;
                                 if (!listDiv.contains(e.target) && e.target !== inputEl) {
+                                    console.log('*** Hiding listDiv from document click');
                                     listDiv.style.display = 'none';
                                 }
                             });
@@ -3964,18 +3976,22 @@
                                     listDiv.style.display = 'block';
                                 }
                             });
-                            // Event delegation для обработки кликов по элементам поиска запчастей
-                            listDiv.addEventListener('click', function (e) {
-                                if (e.target.classList.contains('manufacturer')) {
-                                    e.stopPropagation();
-                                    const clickedId = parseInt(e.target.getAttribute('data-target'), 10);
-                                    const clickedTitle = e.target.getAttribute('data-title');
-                                    console.log('*** EVENT DELEGATION CLICK PARTS - data-target:', e.target.getAttribute('data-target'), 'parsed as:', clickedId, 'Title:', clickedTitle);
-                                    input.value = clickedTitle;
-                                    listDiv.style.display = 'none';
-                                    findPartAndScroll(null, clickedId);
-                                }
-                            });
+                            // Добавляем click listener для запчастей только один раз!
+                            if (!partsSearchListClickListenerAdded) {
+                                console.log('*** Adding click listener to parts listDiv (FIRST TIME)');
+                                partsSearchListClickListenerAdded = true;
+                                listDiv.addEventListener('click', function (e) {
+                                    if (e.target.classList.contains('manufacturer')) {
+                                        e.stopPropagation();
+                                        const clickedId = parseInt(e.target.getAttribute('data-target'), 10);
+                                        const clickedTitle = e.target.getAttribute('data-title');
+                                        console.log('*** PARTS CLICK EVENT - ID:', clickedId, 'Title:', clickedTitle);
+                                        input.value = clickedTitle;
+                                        listDiv.style.display = 'none';
+                                        findPartAndScroll(null, clickedId);
+                                    }
+                                });
+                            }
                             document.addEventListener('click', function (e) {
                                 const inputEl = document.getElementById('partsSearchInput');
                                 if (!listDiv || !inputEl) return;
