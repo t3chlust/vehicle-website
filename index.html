@@ -3731,6 +3731,10 @@
                         function findAdAndScroll(value, itemId) {
                             const input = document.getElementById('adsSearchInput');
                             const listDiv = document.getElementById('adsSearchList');
+                            console.log('*** findAdAndScroll called with value:', value, 'itemId:', itemId);
+                            if (!itemId) {
+                                console.log('*** Stack trace (no itemId):', new Error().stack);
+                            }
                             let match = null;
                             if (itemId !== undefined) {
                                 console.log('*** findAdAndScroll - Searching for ad by ID:', itemId, 'Index size:', adSearchIndex.length);
@@ -3767,9 +3771,11 @@
                         }
                         function initAdsSearch() {
                             if (adsSearchInitialized) return;
+                            console.log('*** initAdsSearch CALLED');
                             const input = document.getElementById('adsSearchInput');
                             const listDiv = document.getElementById('adsSearchList');
                             if (!input || !listDiv) return;
+                            console.log('*** input and listDiv found, setting up listeners');
                             adsSearchInitialized = true;
                             input.addEventListener('change', () => findAdAndScroll());
                             input.addEventListener('keypress', e => {
@@ -3830,16 +3836,19 @@
                                 }
                             });
                             // Event delegation для обработки кликов по элементам поиска
+                            console.log('*** Adding click listener to listDiv');
                             listDiv.addEventListener('click', function (e) {
-                                console.log('*** listDiv click fired, target:', e.target, 'is manufacturer?', e.target.classList.contains('manufacturer'));
+                                console.log('*** listDiv.click FIRED!!! target:', e.target.outerHTML, 'class:', e.target.className);
                                 if (e.target.classList.contains('manufacturer')) {
                                     e.stopPropagation();
                                     const clickedId = parseInt(e.target.getAttribute('data-target'), 10);
                                     const clickedTitle = e.target.getAttribute('data-title');
-                                    console.log('*** EVENT DELEGATION CLICK - data-target:', e.target.getAttribute('data-target'), 'parsed as:', clickedId, 'Title:', clickedTitle);
+                                    console.log('*** MATCHED MANUFACTURER! ID:', clickedId, 'Title:', clickedTitle);
                                     input.value = clickedTitle;
                                     listDiv.style.display = 'none';
                                     findAdAndScroll(null, clickedId);
+                                } else {
+                                    console.log('*** Click but NOT manufacturer, checking parent...');
                                 }
                             });
                             document.addEventListener('click', function (e) {
