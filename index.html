@@ -171,12 +171,13 @@
                                 localStorage.removeItem('vezdehod_auth_phone');
                                 localStorage.removeItem('vezdehod_username');
                                 localStorage.removeItem('vezdehod_user_id');
+                                sessionStorage.clear();
                                 currentUser = null;
                                 currentUserName = "";
                                 isAdmin = false;
                                 updateAuthUI(null);
-                                // Можно сразу переключить на вкладку объявлений
-                                showTab(null, 'ads');
+                                // Reload page to clear any cached state
+                                window.location.href = window.location.pathname;
                             }
                             function sendSmsCode() {
                                 const phoneInput = safeVal('auth-phone');
@@ -3200,6 +3201,13 @@
                             }
 
                             if (tabName === 'profile') {
+                                // Check authorization before accessing profile
+                                if (!currentUser) {
+                                    alert('Пожалуйста, войдите в аккаунт');
+                                    showTab(null, 'ads');
+                                    openAuthModal();
+                                    return;
+                                }
                                 renderProfile();
                             }
 
@@ -3279,26 +3287,50 @@
                         }
                         function tryAutoLogin() {
                             const savedPhone = localStorage.getItem('vezdehod_auth_phone');
-                            if (savedPhone) {
-                                const savedUserId = localStorage.getItem('vezdehod_user_id');
-                                currentUser = {
-                                    phoneNumber: savedPhone,
-                                    uid: savedUserId ? `local-${savedUserId}` : "hardcoded-admin-001",
-                                    id: savedUserId ? Number(savedUserId) : undefined,
-                                    name: localStorage.getItem('vezdehod_username') || "Пользователь"
-                                };
-                                currentUserName = localStorage.getItem('vezdehod_username') || "Пользователь";
-                                const normPhone = savedPhone.replace(/\D/g, '');
-                                const normAdmin = ADMIN_PHONE.replace(/\D/g, '');
-                                isAdmin = (normPhone === normAdmin);
-                                updateAuthUI(currentUser);
-                                if (isAdmin) {
-                                    const adminTab = document.getElementById('admin-tab-link');
-                                    if (adminTab) adminTab.classList.remove('hidden');
-                                }
+                            const savedUserId = localStorage.getItem('vezdehod_user_id');
+                            
+                            // Clear invalid or incomplete auth data
+                            if (!savedPhone || !savedUserId) {
+                                localStorage.removeItem('vezdehod_auth_phone');
+                                localStorage.removeItem('vezdehod_username');
+                                localStorage.removeItem('vezdehod_user_id');
+                                currentUser = null;
+                                currentUserName = "";
+                                isAdmin = false;
+                                return;
+                            }
+                            
+                            // Restore valid session
+                            currentUser = {
+                                phoneNumber: savedPhone,
+                                uid: `local-${savedUserId}`,
+                                id: Number(savedUserId),
+                                name: localStorage.getItem('vezdehod_username') || "Пользователь"
+                            };
+                            currentUserName = localStorage.getItem('vezdehod_username') || "Пользователь";
+                            const normPhone = savedPhone.replace(/\D/g, '');
+                            const normAdmin = ADMIN_PHONE.replace(/\D/g, '');
+                            isAdmin = (normPhone === normAdmin);
+                            updateAuthUI(currentUser);
+                            if (isAdmin) {
+                                const adminTab = document.getElementById('admin-tab-link');
+                                if (adminTab) adminTab.classList.remove('hidden');
                             }
                         }
                         document.addEventListener('DOMContentLoaded', () => {
+                            // Force clear all cached auth data on page load
+                            const savedPhone = localStorage.getItem('vezdehod_auth_phone');
+                            const savedUserId = localStorage.getItem('vezdehod_user_id');
+                            if (!savedPhone || !savedUserId) {
+                                // If incomplete data, clear everything
+                                localStorage.removeItem('vezdehod_auth_phone');
+                                localStorage.removeItem('vezdehod_username');
+                                localStorage.removeItem('vezdehod_user_id');
+                                currentUser = null;
+                                currentUserName = "";
+                                isAdmin = false;
+                            }
+                            
                             const allRecords = document.getElementById('allrecords');
                             if (allRecords) {
                                 allRecords.style.opacity = '1';
@@ -4474,6 +4506,12 @@
                         function showLoader(t) { document.getElementById('loader-text').innerText = t; document.getElementById('global-loader').style.opacity = '1'; document.getElementById('global-loader').style.pointerEvents = 'all'; }
                         function hideLoader() { document.getElementById('global-loader').style.opacity = '0'; document.getElementById('global-loader').style.pointerEvents = 'none'; }
                         function openCreateMode() {
+                            // Check authorization before allowing form access
+                            if (!currentUser) {
+                                alert('Пожалуйста, войдите в аккаунт');
+                                openAuthModal();
+                                return;
+                            }
                             isEditMode = false;
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) btnCreate.classList.add('hidden');
