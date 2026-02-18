@@ -3282,24 +3282,14 @@
                             enforceCleanFiltersState();
                             tryAutoLogin();
                             try {
-                                const lastTab = sessionStorage.getItem('lastTab');
-                                // Don't restore 'tender' or 'admin' tabs on page reload, always start with 'ads'
-                                if (lastTab && lastTab !== 'tender' && lastTab !== 'admin') {
-                                    const tabLinks = Array.from(document.querySelectorAll('.tab-link'));
-                                    const tabLink = tabLinks.find(link => {
-                                        const handler = link.getAttribute('onclick') || '';
-                                        return handler.includes(`'${lastTab}'`) || handler.includes(`"${lastTab}"`);
-                                    });
-                                    showTab(tabLink || null, lastTab);
-                                    sessionStorage.removeItem('lastTab');
-                                } else {
-                                    // Set initial background for default 'ads' tab
-                                    const tRecords = document.querySelector('.t-records');
-                                    if (tRecords) {
-                                        tRecords.classList.add('tab-ads');
-                                    }
-                                    sessionStorage.removeItem('lastTab');
-                                }
+                                // Always show 'ads' (Техника) tab on page load
+                                const tabLinks = Array.from(document.querySelectorAll('.tab-link'));
+                                const tabLink = tabLinks.find(link => {
+                                    const handler = link.getAttribute('onclick') || '';
+                                    return handler.includes(`'ads'`) || handler.includes(`"ads"`);
+                                });
+                                showTab(tabLink || null, 'ads');
+                                sessionStorage.removeItem('lastTab');
                             } catch (e) {
                             }
                             loadFilters()
