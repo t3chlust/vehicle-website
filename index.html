@@ -3992,6 +3992,8 @@
                                     const cardStyles = window.getComputedStyle(firstCard);
                                 }
                             }, 50);
+                            // Перестраиваем индекс поиска на основе отфильтрованных объявлений
+                            buildAdSearchIndex(ads);
                         }
                         function renderPartsGrid(parts) {
                             const c = document.getElementById('parts-container');
@@ -4033,6 +4035,8 @@
                                 c.appendChild(d);
                             });
                             setTimeout(() => c.classList.add('loaded'), 50);
+                            // Перестраиваем индекс поиска на основе отфильтрованных запчастей
+                            buildPartSearchIndex(parts);
                         }
                         function renderTenderAds() {
                             const container = document.getElementById('tender-container');
@@ -4441,7 +4445,6 @@
                                     return ad;
                                 });
                                 applyFilters();
-                                buildAdSearchIndex(allAds);
                                 initAdsSearch();
                                 if (isAdmin) {
                                     renderModerationGrid(getPendingModerationItems());
@@ -4497,7 +4500,6 @@
                                 allParts = Array.isArray(raw) ? raw : [];
                                 const displayParts = allParts;
                                 renderPartsGrid(displayParts);
-                                buildPartSearchIndex(displayParts);
                                 initPartsSearch();
                                 if (isAdmin) {
                                     renderModerationGrid(getPendingModerationItems());
