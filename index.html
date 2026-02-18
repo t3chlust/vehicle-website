@@ -3841,7 +3841,8 @@
                                     listDiv.style.display = 'none';
                                 } else {
                                     console.log('Showing', arr.length, 'search results:', arr.map(a => ({ id: a.id, title: a.title })));
-                                    console.log('listDiv info - ID:', listDiv.id, 'class:', listDiv.className, 'parent:', listDiv.parentElement?.id, 'children count before:', listDiv.children.length);
+                                    console.log('listDiv info - ID:', listDiv.id, 'class:', listDiv.className, 'parent:', listDiv.parentElement?.id || listDiv.parentElement?.tagName, 'children count before:', listDiv.children.length);
+                                    console.log('listDiv boundingRect:', {top: listDiv.getBoundingClientRect().top, left: listDiv.getBoundingClientRect().left, width: listDiv.getBoundingClientRect().width, height: listDiv.getBoundingClientRect().height});
                                     arr.forEach(item => {
                                         const el = document.createElement('div');
                                         el.className = 'manufacturer';
@@ -3850,7 +3851,9 @@
                                         el.setAttribute('data-title', item.title);
                                         console.log('Created element with data-target:', el.getAttribute('data-target'), 'text:', el.textContent, 'className before append:', el.className);
                                         listDiv.appendChild(el);
-                                        console.log('After append - element parent:', el.parentElement?.id, 'is in DOM:', document.body.contains(el));
+                                        console.log('After append - element parent:', el.parentElement?.id, 'is in DOM:', document.body.contains(el), 'boundingRect:', {top: el.getBoundingClientRect().top, left: el.getBoundingClientRect().left, width: el.getBoundingClientRect().width, height: el.getBoundingClientRect().height});
+                                        // Добавим inline click handler для отладки
+                                        el.onclick = function(e) { console.log('*** INLINE onclick on manufacturer element:', this.textContent); };
                                     });
                                     listDiv.style.display = 'block';
                                 }
