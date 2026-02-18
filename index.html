@@ -4443,6 +4443,20 @@
                             document.getElementById('inp-tech-type').disabled = false;
                             checkTechTypeVisibility();
                             checkConditionVisibility();
+                            // Set background color based on which tab was active before opening form
+                            const activeTabContent = document.querySelector('.tab-content.active');
+                            let tabName = 'ads'; // default
+                            if (activeTabContent && activeTabContent.id) {
+                                const tabId = activeTabContent.id.replace('tab-content-', '');
+                                if (tabId === 'parts' || tabId === 'ads') {
+                                    tabName = tabId;
+                                }
+                            }
+                            const tRecords = document.querySelector('.t-records');
+                            if (tRecords) {
+                                tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
+                                tRecords.classList.add(`tab-${tabName}`);
+                            }
                             updateSubmitButtonColor();
                         }
                         function showList() {
@@ -4641,6 +4655,12 @@
                             document.getElementById('file-count').innerText = '';
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
+                            // Set background color for ads section
+                            const tRecords = document.querySelector('.t-records');
+                            if (tRecords) {
+                                tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
+                                tRecords.classList.add('tab-ads');
+                            }
                             document.getElementById('view-form').classList.remove('hidden'); // Show form
                         }
                         function openEditModePart(part) {
@@ -4675,6 +4695,12 @@
                             document.getElementById('file-count').innerText = '';
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
+                            // Set background color for parts section
+                            const tRecords = document.querySelector('.t-records');
+                            if (tRecords) {
+                                tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
+                                tRecords.classList.add('tab-parts');
+                            }
                             document.getElementById('view-form').classList.remove('hidden'); // Show form
                         }
                         // --- NEW ADMIN FUNCTIONS ---
