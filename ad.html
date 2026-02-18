@@ -294,6 +294,17 @@
             currentItem = item;
             currentItemType = type;
             
+            // Set background color based on type
+            let bgColor = '#F7F9F8'; // default
+            if (type === 'ad') {
+                bgColor = '#E0F2F1'; // green for ads
+            } else if (type === 'part') {
+                bgColor = '#FFF8E1'; // yellow for parts
+            } else if (type === 'manufacturer') {
+                bgColor = '#E3F2FD'; // blue for manufacturers
+            }
+            document.body.style.backgroundColor = bgColor;
+            
             let badgesHtml = '';
             const sellerLabel = getSellerTypeLabel(item);
             
