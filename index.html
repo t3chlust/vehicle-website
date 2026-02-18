@@ -3727,15 +3727,20 @@
                                 })
                                 .filter(item => item.title);
                         }
-                        function findAdAndScroll(value) {
+                        function findAdAndScroll(value, itemId) {
                             const input = document.getElementById('adsSearchInput');
                             const listDiv = document.getElementById('adsSearchList');
-                            let val = value ? String(value).trim() : (input ? input.value.trim() : '');
-                            if (!val) return;
-                            const lower = val.toLowerCase();
-                            let match = adSearchIndex.find(item => item.titleLower === lower);
-                            if (!match) {
-                                match = adSearchIndex.find(item => item.titleLower.includes(lower));
+                            let match = null;
+                            if (itemId !== undefined) {
+                                match = adSearchIndex.find(item => item.id === itemId);
+                            } else {
+                                let val = value ? String(value).trim() : (input ? input.value.trim() : '');
+                                if (!val) return;
+                                const lower = val.toLowerCase();
+                                match = adSearchIndex.find(item => item.titleLower === lower);
+                                if (!match) {
+                                    match = adSearchIndex.find(item => item.titleLower.includes(lower));
+                                }
                             }
                             if (match) {
                                 if (input) input.value = match.title;
@@ -3809,7 +3814,7 @@
                                             e.preventDefault();
                                             input.value = item.title;
                                             listDiv.style.display = 'none';
-                                            findAdAndScroll(item.title);
+                                            findAdAndScroll(null, item.id);
                                         });
                                         listDiv.appendChild(el);
                                     });
@@ -3839,15 +3844,20 @@
                                 })
                                 .filter(item => item.title || item.brand);
                         }
-                        function findPartAndScroll(value) {
+                        function findPartAndScroll(value, itemId) {
                             const input = document.getElementById('partsSearchInput');
                             const listDiv = document.getElementById('partsSearchList');
-                            let val = value ? String(value).trim() : (input ? input.value.trim() : '');
-                            if (!val) return;
-                            const lower = val.toLowerCase();
-                            let match = partSearchIndex.find(item => item.titleLower === lower || item.brandLower === lower);
-                            if (!match) {
-                                match = partSearchIndex.find(item => item.titleLower.includes(lower) || item.brandLower.includes(lower));
+                            let match = null;
+                            if (itemId !== undefined) {
+                                match = partSearchIndex.find(item => item.id === itemId);
+                            } else {
+                                let val = value ? String(value).trim() : (input ? input.value.trim() : '');
+                                if (!val) return;
+                                const lower = val.toLowerCase();
+                                match = partSearchIndex.find(item => item.titleLower === lower || item.brandLower === lower);
+                                if (!match) {
+                                    match = partSearchIndex.find(item => item.titleLower.includes(lower) || item.brandLower.includes(lower));
+                                }
                             }
                             if (match) {
                                 if (input) input.value = match.title;
@@ -3922,7 +3932,7 @@
                                             e.preventDefault();
                                             input.value = item.title;
                                             listDiv.style.display = 'none';
-                                            findPartAndScroll(item.title);
+                                            findPartAndScroll(null, item.id);
                                         });
                                         listDiv.appendChild(el);
                                     });
