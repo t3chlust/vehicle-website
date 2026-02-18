@@ -3358,6 +3358,10 @@
                             loadParts();
                             // Логирование всех кликов для отладки
                             document.addEventListener('click', function(e) {
+                                // Логируем ВСЕ клики на manufacturer элементы
+                                if (e.target.classList?.contains('manufacturer')) {
+                                    console.log('*** GLOBAL CAPTURE: Click detected on .manufacturer element!', e.target.textContent, 'data-target:', e.target.getAttribute('data-target'));
+                                }
                                 if (e.target.id === 'adsSearchList' || e.target.parentElement?.id === 'adsSearchList') {
                                     console.log('*** GLOBAL click on adsSearchList or child:', e.target.className, e.target.textContent.substring(0, 30));
                                 }
@@ -3837,14 +3841,17 @@
                                     listDiv.style.display = 'none';
                                 } else {
                                     console.log('Showing', arr.length, 'search results:', arr.map(a => ({ id: a.id, title: a.title })));
+                                    console.log('listDiv info - ID:', listDiv.id, 'class:', listDiv.className, 'parent:', listDiv.parentElement?.id, 'children count before:', listDiv.children.length);
                                     arr.forEach(item => {
                                         const el = document.createElement('div');
                                         el.className = 'manufacturer';
                                         el.setAttribute('data-target', String(item.id));
                                         el.textContent = item.title;
                                         el.setAttribute('data-title', item.title);
-                                        console.log('Created element with data-target:', el.getAttribute('data-target'), 'text:', el.textContent);
+                                        console.log('Created element with data-target:', el.getAttribute('data-target'), 'text:', el.textContent, 'className before append:', el.className);
                                         listDiv.appendChild(el);
+                                        console.log('After append - element parent:', el.parentElement?.id, 'is in DOM:', document.body.contains(el));
+                                    });
                                     });
                                     listDiv.style.display = 'block';
                                 }
@@ -3854,7 +3861,9 @@
                                 console.log('*** Adding click listener to listDiv (FIRST TIME)');
                                 adsSearchListClickListenerAdded = true;
                                 listDiv.addEventListener('click', function (e) {
-                                    console.log('*** listDiv.click FIRED!!! target:', e.target.outerHTML, 'class:', e.target.className);
+                                    console.log('*** listDiv.click FIRED!!! target tag:', e.target.tagName, 'class:', e.target.className, 'text:', e.target.textContent?.substring(0, 30), 'data-target:', e.target.getAttribute('data-target'));
+                                    console.log('*** target.classList.contains("manufacturer"):', e.target.classList?.contains('manufacturer'));
+                                    console.log('*** Full target:', e.target);
                                     if (e.target.classList.contains('manufacturer')) {
                                         e.stopPropagation();
                                         const clickedId = parseInt(e.target.getAttribute('data-target'), 10);
