@@ -712,52 +712,22 @@
                                     transition: all 0.2s ease;
                                 }
 
-                                /* Light background colors for each tab */
-.tab-link[onclick*="ads"] {
-    background-color: #F1F8F7 !important;
-    color: #1b8a70;
-}
-
-.tab-link[onclick*="ads"]:hover {
-    background-color: #E8F5F3 !important;
-    color: #1b8a70;
-}
-
-.tab-link[onclick*="parts"] {
-    background-color: #FFFBF0 !important;
-    color: #f57f17;
-}
-
-.tab-link[onclick*="parts"]:hover {
-    background-color: #FFF8E1 !important;
-    color: #f57f17;
-}
-
-.tab-link[onclick*="manufacturers"] {
-    background-color: #F5F9FF !important;
-    color: #1565c0;
-}
-
-.tab-link[onclick*="manufacturers"]:hover {
-    background-color: #E3F2FD !important;
-    color: #1565c0;
-}
-
+                                /* Simplified tab buttons */
+.tab-link[onclick*="ads"],
+.tab-link[onclick*="parts"],
+.tab-link[onclick*="manufacturers"],
 #tender-tab-link {
-    background-color: #9C27B0 !important;
-    color: #fff;
-    border-bottom: 3px solid transparent;
+    background-color: #f5f5f5 !important;
+    color: #666 !important;
 }
 
-#tender-tab-link:hover {
-    background-color: #9C27B0 !important;
-    color: #fff;
-}
-
+.tab-link[onclick*="ads"].active,
+.tab-link[onclick*="parts"].active,
+.tab-link[onclick*="manufacturers"].active,
 #tender-tab-link.active {
-    background-color: #9C27B0 !important;
-    color: #fff;
-    border-bottom: 3px solid #fff;
+    background-color: #fff !important;
+    color: #333 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
     font-weight: 600;
 }
 
@@ -1784,40 +1754,22 @@
                             }
 
                             .tab-link:hover {
-                                background-color: #fafafa;
-                                /* Можете оставить этот фон для ховера или тоже сделать transparent */
+                                background-color: #f5f5f5;
                             }
 
                             .tab-link.active {
                                 border-color: #d9cfe0;
-                                /* Dynamic background will be set by specific rules below */
-                                box-shadow: none;
+                                box-shadow: 0 4px 12px rgba(0,0,0,0.12);
                             }
 
 
-                            /* Active tab colors with backgrounds */
-                            .tab-link[onclick*="ads"].active {
-                                background-color: #E0F2F1 !important;
-                                color: #1b8a70;
-                                font-weight: 600;
-                            }
-
-                            .tab-link[onclick*="parts"].active {
-                                background-color: #FFF8E1 !important;
-                                color: #f57f17;
-                                font-weight: 600;
-                            }
-
-                            .tab-link[onclick*="manufacturers"].active {
-                                background-color: #E3F2FD !important;
-                                color: #1565c0;
-                                font-weight: 600;
-                            }
-
+                            /* Active tab colors */
+                            .tab-link[onclick*="ads"].active,
+                            .tab-link[onclick*="parts"].active,
+                            .tab-link[onclick*="manufacturers"].active,
                             #tender-tab-link.active {
-                                background-color: #9C27B0 !important;
-                                color: #fff;
-                                border-bottom: 3px solid #fff;
+                                background-color: #fff !important;
+                                color: #333 !important;
                                 font-weight: 600;
                             }
 
