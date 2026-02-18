@@ -2830,7 +2830,7 @@
                                         <label
                                             style="font-weight:bold; color:#ab47bc; font-size:14px; display:block; margin-bottom:10px;">Состоит
                                             в реестре МинПромТорга?</label><select class="form-select" id="inp-tender"
-                                            style="margin-bottom:0">
+                                            style="margin-bottom:0" onchange="updateSubmitButtonColor()">
                                             <option value="no">Нет</option>
                                             <option value="yes">Да</option>
                                         </select>
@@ -3470,16 +3470,36 @@
 
                         function updateSubmitButtonColor() {
                             const type = document.getElementById('inp-tech-type').value;
+                            const tenderVal = document.getElementById('inp-tender').value;
                             const submitBtn = document.getElementById('submit-btn');
+                            const tRecords = document.querySelector('.t-records');
                             if (!submitBtn) return;
 
-                            // Remove all color classes
-                            submitBtn.classList.remove('btn-purple', 'btn-yellow', 'btn-green');
-
-                            if (type === 'Запчасть') {
-                                submitBtn.classList.add('btn-yellow');
+                            // Check if tender is selected
+                            if (tenderVal === 'yes') {
+                                submitBtn.style.backgroundColor = '#9C27B0';
+                                if (tRecords) {
+                                    tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
+                                    tRecords.classList.add('tab-tender');
+                                }
                             } else {
-                                submitBtn.classList.add('btn-green');
+                                submitBtn.style.backgroundColor = '';
+                                // Remove all color classes
+                                submitBtn.classList.remove('btn-purple', 'btn-yellow', 'btn-green');
+
+                                if (type === 'Запчасть') {
+                                    submitBtn.classList.add('btn-yellow');
+                                    if (tRecords) {
+                                        tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
+                                        tRecords.classList.add('tab-parts');
+                                    }
+                                } else {
+                                    submitBtn.classList.add('btn-green');
+                                    if (tRecords) {
+                                        tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
+                                        tRecords.classList.add('tab-ads');
+                                    }
+                                }
                             }
                         }
 
@@ -4683,9 +4703,16 @@
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
                             // Set background color for ads section
                             const tRecords = document.querySelector('.t-records');
+                            const submitBtn = document.getElementById('submit-btn');
                             if (tRecords) {
                                 tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
-                                tRecords.classList.add('tab-ads');
+                                if ((ad.tender || "").toLowerCase() === 'yes') {
+                                    tRecords.classList.add('tab-tender');
+                                    if (submitBtn) submitBtn.style.backgroundColor = '#9C27B0';
+                                } else {
+                                    tRecords.classList.add('tab-ads');
+                                    if (submitBtn) submitBtn.style.backgroundColor = '';
+                                }
                             }
                             document.getElementById('view-form').classList.remove('hidden'); // Show form
                         }
