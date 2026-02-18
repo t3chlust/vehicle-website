@@ -3733,9 +3733,10 @@
                             const listDiv = document.getElementById('adsSearchList');
                             let match = null;
                             if (itemId !== undefined) {
-                                console.log('Searching for ad by ID:', itemId, 'Index size:', adSearchIndex.length);
+                                console.log('*** findAdAndScroll - Searching for ad by ID:', itemId, 'Index size:', adSearchIndex.length);
+                                console.log('Full index:', adSearchIndex.map(a => ({ id: a.id, title: a.title })));
                                 match = adSearchIndex.find(item => item.id === itemId);
-                                console.log('Found match:', match);
+                                console.log('*** Result of find:', match);
                             } else {
                                 let val = value ? String(value).trim() : (input ? input.value.trim() : '');
                                 if (!val) return;
@@ -3746,13 +3747,20 @@
                                 }
                             }
                             if (match) {
+                                console.log('*** About to show card for:', match.id, match.title);
                                 if (input) input.value = match.title;
                                 const card = document.getElementById(`ad-${match.id}`);
+                                console.log('*** Looking for card element with ID: ad-' + match.id, 'Found:', !!card);
                                 if (card) {
                                     card.style.transition = 'background 1.2s';
                                     card.style.background = getHighlightColor(0.35);
                                     setTimeout(() => { card.style.background = ''; }, 1600);
                                     if (input) input.value = '';
+                                } else {
+                                    console.log('*** WARNING: Card element not found! Checking what cards exist:');
+                                    document.querySelectorAll('[id^="ad-"]').forEach(card => {
+                                        console.log('  - Found card with ID:', card.id);
+                                    });
                                 }
                             }
                             if (listDiv) listDiv.style.display = 'none';
@@ -3808,17 +3816,19 @@
                                 if (arr.length === 0) {
                                     listDiv.style.display = 'none';
                                 } else {
+                                    console.log('Showing', arr.length, 'search results:', arr.map(a => ({ id: a.id, title: a.title })));
                                     arr.forEach(item => {
                                         const el = document.createElement('div');
                                         el.className = 'manufacturer';
                                         el.setAttribute('data-target', String(item.id));
                                         el.textContent = item.title;
                                         el.setAttribute('data-title', item.title);
+                                        console.log('Created element with data-target:', el.getAttribute('data-target'), 'text:', el.textContent);
                                         el.addEventListener('click', function (e) {
                                             e.preventDefault();
                                             const clickedId = parseInt(this.getAttribute('data-target'), 10);
                                             const clickedTitle = this.getAttribute('data-title');
-                                            console.log('Clicked ad - ID:', clickedId, 'Title:', clickedTitle);
+                                            console.log('***CLICKED*** - element data-target:', this.getAttribute('data-target'), 'parsed as:', clickedId, 'Title:', clickedTitle);
                                             input.value = clickedTitle;
                                             listDiv.style.display = 'none';
                                             findAdAndScroll(null, clickedId);
