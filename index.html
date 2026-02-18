@@ -712,38 +712,70 @@
                                     transition: all 0.2s ease;
                                 }
 
-                                /* Убираем цвет фона, возвращаем темный текст */
-.tab-link[onclick*="parts"],
-.tab-link[onclick*="manufacturers"],
-.tab-link[onclick*="ads"],
-#tender-tab-link {
-    background-color: transparent !important;
+                                /* Light background colors for each tab */
+.tab-link[onclick*="ads"] {
+    background-color: #F1F8F7 !important;
     color: #666;
 }
-/* Стили для наведения (можно оставить легкий фон или убрать) */
-.tab-link[onclick*="parts"]:hover,
-.tab-link[onclick*="manufacturers"]:hover,
-.tab-link[onclick*="ads"]:hover,
-#tender-tab-link:hover {
-    background-color: #fafafa !important;
+
+.tab-link[onclick*="ads"]:hover {
+    background-color: #E8F5F3 !important;
     color: #222;
 }
-/* Стили для АКТИВНЫХ вкладок - меняем цвет ТЕКСТА, а не фона */
-.tab-link[onclick*="parts"].active {
-    background-color: transparent !important;
-    color: #FFC107; /* Желтый текст */
+
+.tab-link[onclick*="parts"] {
+    background-color: #FFFBF0 !important;
+    color: #666;
 }
-.tab-link[onclick*="manufacturers"].active {
-    background-color: transparent !important;
-    color: #1E88E5; /* Синий текст */
+
+.tab-link[onclick*="parts"]:hover {
+    background-color: #FFF8E1 !important;
+    color: #222;
 }
+
+.tab-link[onclick*="manufacturers"] {
+    background-color: #F5F9FF !important;
+    color: #666;
+}
+
+.tab-link[onclick*="manufacturers"]:hover {
+    background-color: #E3F2FD !important;
+    color: #222;
+}
+
+#tender-tab-link {
+    background-color: #F9F9F9 !important;
+    color: #666;
+}
+
+#tender-tab-link:hover {
+    background-color: #F5F5F5 !important;
+    color: #222;
+}
+
+/* Styles for ACTIVE tabs */
 .tab-link[onclick*="ads"].active {
-    background-color: transparent !important;
-    color: #26A69A; /* Зеленый текст */
+    background-color: #E0F2F1 !important;
+    color: #1b8a70;
+    font-weight: 600;
 }
+
+.tab-link[onclick*="parts"].active {
+    background-color: #FFF8E1 !important;
+    color: #f57f17;
+    font-weight: 600;
+}
+
+.tab-link[onclick*="manufacturers"].active {
+    background-color: #E3F2FD !important;
+    color: #1565c0;
+    font-weight: 600;
+}
+
 #tender-tab-link.active {
-    background-color: transparent !important;
-    color: #ab47bc; /* Фиолетовый текст */
+    background-color: #F5F5F5 !important;
+    color: #666;
+    font-weight: 600;
 }
 
 
