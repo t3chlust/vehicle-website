@@ -3726,13 +3726,16 @@
                                     };
                                 })
                                 .filter(item => item.title);
+                            console.log('Built ad search index with', adSearchIndex.length, 'items:', adSearchIndex.map(a => ({ id: a.id, title: a.title })));
                         }
                         function findAdAndScroll(value, itemId) {
                             const input = document.getElementById('adsSearchInput');
                             const listDiv = document.getElementById('adsSearchList');
                             let match = null;
                             if (itemId !== undefined) {
+                                console.log('Searching for ad by ID:', itemId, 'Index size:', adSearchIndex.length);
                                 match = adSearchIndex.find(item => item.id === itemId);
+                                console.log('Found match:', match);
                             } else {
                                 let val = value ? String(value).trim() : (input ? input.value.trim() : '');
                                 if (!val) return;
@@ -3810,11 +3813,15 @@
                                         el.className = 'manufacturer';
                                         el.setAttribute('data-target', String(item.id));
                                         el.textContent = item.title;
+                                        el.setAttribute('data-title', item.title);
                                         el.addEventListener('click', function (e) {
                                             e.preventDefault();
-                                            input.value = item.title;
+                                            const clickedId = parseInt(this.getAttribute('data-target'), 10);
+                                            const clickedTitle = this.getAttribute('data-title');
+                                            console.log('Clicked ad - ID:', clickedId, 'Title:', clickedTitle);
+                                            input.value = clickedTitle;
                                             listDiv.style.display = 'none';
-                                            findAdAndScroll(null, item.id);
+                                            findAdAndScroll(null, clickedId);
                                         });
                                         listDiv.appendChild(el);
                                     });
@@ -3928,11 +3935,15 @@
                                         el.className = 'manufacturer';
                                         el.setAttribute('data-target', String(item.id));
                                         el.textContent = item.title;
+                                        el.setAttribute('data-title', item.title);
                                         el.addEventListener('click', function (e) {
                                             e.preventDefault();
-                                            input.value = item.title;
+                                            const clickedId = parseInt(this.getAttribute('data-target'), 10);
+                                            const clickedTitle = this.getAttribute('data-title');
+                                            console.log('Clicked part - ID:', clickedId, 'Title:', clickedTitle);
+                                            input.value = clickedTitle;
                                             listDiv.style.display = 'none';
-                                            findPartAndScroll(null, item.id);
+                                            findPartAndScroll(null, clickedId);
                                         });
                                         listDiv.appendChild(el);
                                     });
