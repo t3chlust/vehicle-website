@@ -3789,11 +3789,10 @@
                             if (!input || !listDiv) return;
                             console.log('*** input and listDiv found, setting up listeners');
                             adsSearchInitialized = true;
-                            input.addEventListener('change', () => findAdAndScroll());
                             input.addEventListener('keypress', e => {
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
-                                    findAdAndScroll();
+                                    listDiv.style.display = 'none';
                                 }
                             });
                             input.addEventListener('focus', function () {
