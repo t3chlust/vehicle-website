@@ -4055,7 +4055,8 @@
                                 const found = allAds.filter(ad => {
                                     const brand = (ad.brand || '').toLowerCase();
                                     const title = (ad.title || '').toLowerCase();
-                                    return (ad.tender || ad.Tender) && (brand.includes(typed) || title.includes(typed));
+                                    const isTender = (ad.tender || '').toLowerCase() === 'yes';
+                                    return isTender && (brand.includes(typed) || title.includes(typed));
                                 });
                                 
                                 listDiv.innerHTML = '';
@@ -4091,10 +4092,11 @@
                                     if (input && brand) {
                                         input.value = brand;
                                         listDiv.style.display = 'none';
-                                        // Фильтруем по выбранному бренду
+                                        // Фильтруем по выбранному бренду (только объявления в тендере!)
                                         const filtered = allAds.filter(ad => {
                                             const adBrand = (ad.brand || '').toLowerCase();
-                                            return (ad.tender || ad.Tender) && adBrand === brand.toLowerCase();
+                                            const isTender = (ad.tender || '').toLowerCase() === 'yes';
+                                            return isTender && adBrand === brand.toLowerCase();
                                         });
                                         if (document.getElementById('tenderClearFilterBtn')) {
                                             document.getElementById('tenderClearFilterBtn').style.display = 'inline-flex';
