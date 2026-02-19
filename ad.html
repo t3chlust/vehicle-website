@@ -151,36 +151,6 @@
         }
         .details-title { font-size: 24px; font-weight: 800; color: #1565C0; }
         .details-badges { display: flex; gap: 6px; }
-        .action-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            justify-content: flex-end;
-            margin-bottom: 15px;
-        }
-        .btn-favorite, .btn-share {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border: none;
-            border-radius: 50%;
-            background: #f0f0f0;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 20px;
-        }
-        .btn-favorite:hover {
-            background: #ffe0e0;
-        }
-        .btn-favorite.active {
-            background: #ff4757;
-            color: white;
-        }
-        .btn-share:hover {
-            background: #e0e0ff;
-        }
         .badge-new, .badge-private, .badge-float {
             padding: 4px 8px;
             border-radius: 4px;
@@ -263,7 +233,6 @@
         let currentPhotoIndex = 0;
         let currentUser = null;
         let currentItemType = null;
-        let userFavorites = [];
 
         function normalizePhone(phone) { 
             return String(phone || '').replace(/\D/g, ''); 
@@ -294,62 +263,6 @@
             if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true;
             if (ad.condition === 'new') return true;
             return false;
-        }
-
-        function loadFavorites() {
-            try {
-                const saved = localStorage.getItem('userFavorites');
-                userFavorites = saved ? JSON.parse(saved) : [];
-            } catch (e) {
-                userFavorites = [];
-            }
-        }
-
-        function toggleFavorite(itemId) {
-            const index = userFavorites.indexOf(itemId);
-            if (index > -1) {
-                userFavorites.splice(index, 1);
-            } else {
-                userFavorites.push(itemId);
-            }
-            localStorage.setItem('userFavorites', JSON.stringify(userFavorites));
-            updateFavoriteButton(itemId);
-        }
-
-        function updateFavoriteButton(itemId) {
-            const btn = document.getElementById('favorite-btn');
-            if (btn) {
-                if (userFavorites.includes(itemId)) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            }
-        }
-
-        function shareItem(title) {
-            const url = window.location.href;
-            const text = `${title} - ${url}`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Купитьвездеход.рф',
-                    text: title,
-                    url: url
-                }).catch(() => {
-                    copyToClipboard(text);
-                });
-            } else {
-                copyToClipboard(text);
-            }
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Ссылка скопирована!');
-            }).catch(() => {
-                alert('Не удалось скопировать ссылку');
-            });
         }
 
         function updateGallery() {
@@ -498,10 +411,6 @@
                             <div class="details-title">${item.title || item.partName || 'Объявление'}</div>
                             <div class="details-badges">${badgesHtml}</div>
                         </div>
-                        <div class="action-row">
-                            <button id="favorite-btn" class="btn-favorite" onclick="toggleFavorite(${currentItem.rowIndex})" title="Добавить в избранное">♡</button>
-                            <button class="btn-share" onclick="shareItem('${(item.title || item.partName || 'Объявление').replace(/'/g, "\\'")}')">⤴</button>
-                        </div>
                         <div class="details-price">${Number(item.price || 0).toLocaleString()} ₽</div>
                         <div class="seller-info">
                             <div class="seller-label">Продавец</div>
@@ -536,7 +445,6 @@
         }
 
         async function init() {
-            loadFavorites();
             const params = new URLSearchParams(window.location.search);
             const itemId = params.get('id');
             const itemType = params.get('type');
@@ -558,7 +466,6 @@
 
                 if (item) {
                     renderDetails(item, itemType);
-                    updateFavoriteButton(item.rowIndex);
                 } else {
                     container.innerHTML = '<div class="empty-message">Объявление не найдено.</div>';
                 }
