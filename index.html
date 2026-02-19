@@ -3246,6 +3246,23 @@
                             // Обновление списков для синхронизации "избранного"
                             if (tabName === 'ads' && typeof applyFilters === 'function') {
                                 applyFilters();
+                                // Восстанавливаем фильтр по бренду если он был активен
+                                if (currentBrandFilter) {
+                                    console.log('*** Restoring brand filter:', currentBrandFilter);
+                                    const filterBtn = document.getElementById('adsClearFilterBtn');
+                                    const input = document.getElementById('adsSearchInput');
+                                    
+                                    if (input) input.value = currentBrandFilter;
+                                    if (filterBtn) filterBtn.style.display = 'inline-flex';
+                                    
+                                    const brandLower = currentBrandFilter.toLowerCase();
+                                    const filtered = allAds.filter(ad => {
+                                        const adBrand = (ad.brand || '').toLowerCase();
+                                        return adBrand === brandLower;
+                                    });
+                                    console.log('*** Restored filter showing', filtered.length, 'ads for brand:', currentBrandFilter);
+                                    renderGrid(filtered);
+                                }
                             }
                             if (tabName === 'parts' && typeof renderPartsGrid === 'function' && Array.isArray(allParts)) {
                                 renderPartsGrid(allParts);
