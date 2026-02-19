@@ -4065,7 +4065,8 @@
                                 for (const item of found) {
                                     const brand = (item.brand || '').trim();
                                     if (brand && !uniq.has(brand.toLowerCase())) {
-                                        uniq.add(brand.toLowerCase());\n                                        arr.push({ id: item.rowIndex, title: brand, brand: brand });
+                                        uniq.add(brand.toLowerCase());
+                                        arr.push({ id: item.rowIndex, title: brand, brand: brand });
                                     }
                                     if (arr.length >= 5) break;
                                 }
@@ -4090,9 +4091,10 @@
                                     if (input && brand) {
                                         input.value = brand;
                                         listDiv.style.display = 'none';
-                                        \n                                        // Фильтруем по выбранному бренду
+                                        // Фильтруем по выбранному бренду
                                         const filtered = allAds.filter(ad => {
-                                            const adBrand = (ad.brand || '').toLowerCase();\n                                            return (ad.tender || ad.Tender) && adBrand === brand.toLowerCase();
+                                            const adBrand = (ad.brand || '').toLowerCase();
+                                            return (ad.tender || ad.Tender) && adBrand === brand.toLowerCase();
                                         });
                                         if (document.getElementById('tenderClearFilterBtn')) {
                                             document.getElementById('tenderClearFilterBtn').style.display = 'inline-flex';
