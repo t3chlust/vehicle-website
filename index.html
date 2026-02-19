@@ -2168,6 +2168,7 @@
                                         <div class="search-container">
                                             <input type="text" id="adsSearchInput" class="form-input filter-input"
                                                 placeholder="Поиск техники" autocomplete="off">
+                                            <button id="adsClearFilterBtn" class="clear-filter-btn" onclick="clearAdsBrandFilter()" style="display:none; margin-left: 8px; padding: 8px 12px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">✕ Сброс</button>
                                         </div>
                                         <div id="adsSearchList" class="search-suggestions" onclick="console.log('*** HTML onclick on adsSearchList:', event.target.className)"></div>
                                     </div>
@@ -3031,6 +3032,7 @@
                         let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [], profileShowAllAds = false;
                         let adsSearchListClickListenerAdded = false, partsSearchListClickListenerAdded = false;
                         let skipAdsSearchInput = false, skipPartsSearchInput = false; // Флаги для предотвращения рекурсии
+                        let currentBrandFilter = null; // Отслеживаем активный фильтр по бренду
                         let profileReturnTab = 'ads';
                         let hasUserAdjustedFilters = false;
                         let currentItemType = 'ad';
@@ -3746,12 +3748,15 @@
                         function findAdAndScroll(value, itemId, brandFilter) {
                             const input = document.getElementById('adsSearchInput');
                             const listDiv = document.getElementById('adsSearchList');
+                            const clearBtn = document.getElementById('adsClearFilterBtn');
                             console.log('*** findAdAndScroll called with value:', value, 'itemId:', itemId, 'brandFilter:', brandFilter);
                             
                             // Если это фильтр по бренду - показываем все объявления этого бренда
                             if (brandFilter) {
                                 console.log('*** Filtering by brand:', brandFilter);
+                                currentBrandFilter = brandFilter; // Сохраняем активный фильтр
                                 if (input) input.value = brandFilter;
+                                if (clearBtn) clearBtn.style.display = 'inline-block'; // Показываем кнопку сброса
                                 // Создаём фильтр для отображения всех объявлений этого бренда
                                 const brandLower = brandFilter.toLowerCase();
                                 const filtered = allAds.filter(ad => {
@@ -3797,6 +3802,21 @@
                                 }
                             }
                             if (listDiv) listDiv.style.display = 'none';
+                        }
+                        function clearAdsBrandFilter() {
+                            console.log('*** Clearing brand filter:', currentBrandFilter);
+                            const input = document.getElementById('adsSearchInput');
+                            const clearBtn = document.getElementById('adsClearFilterBtn');
+                            const listDiv = document.getElementById('adsSearchList');
+                            
+                            currentBrandFilter = null; // Очищаем фильтр
+                            if (input) input.value = ''; // Очищаем поле поиска
+                            if (clearBtn) clearBtn.style.display = 'none'; // Скрываем кнопку сброса
+                            if (listDiv) listDiv.style.display = 'none';
+                            
+                            // Показываем все объявления
+                            renderGrid(allAds);
+                            console.log('*** Brand filter cleared, showing all ads');
                         }
                         function initAdsSearch() {
                             if (adsSearchInitialized) return;
