@@ -3071,10 +3071,10 @@
                         const FILTERS_API_URL = "/api/filters";
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
-                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [], profileShowAllAds = false;
-                        let adsSearchListClickListenerAdded = false, partsSearchListClickListenerAdded = false;
-                        let skipAdsSearchInput = false, skipPartsSearchInput = false; // Флаги для предотвращения рекурсии
-                        let currentBrandFilter = null; // Отслеживаем активный фильтр по бренду
+                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [], tenderSearchInitialized = false, tenderSearchIndex = [], profileShowAllAds = false;
+                        let adsSearchListClickListenerAdded = false, partsSearchListClickListenerAdded = false, tenderSearchListClickListenerAdded = false;
+                        let skipAdsSearchInput = false, skipPartsSearchInput = false, skipTenderSearchInput = false; // Флаги для предотвращения рекурсии
+                        let currentBrandFilter = null, currentTenderBrandFilter = null; // Отслеживаем активные фильтры по бренду
                         let profileReturnTab = 'ads';
                         let hasUserAdjustedFilters = false;
                         let currentItemType = 'ad';
@@ -3283,7 +3283,29 @@
                             }
                             // ДОБАВЬТЕ ЭТО УСЛОВИЕ
                             if (tabName === 'tender') {
-                                renderTenderAds();
+                                // Сбрасываем инициализацию поиска для переинициализации при переключении вкладок
+                                tenderSearchInitialized = false;
+                                
+                                // Восстанавливаем фильтр по бренду если он был активен
+                                if (currentTenderBrandFilter) {
+                                    console.log('*** Restoring tender brand filter:', currentTenderBrandFilter);
+                                    const filterBtn = document.getElementById('tenderClearFilterBtn');
+                                    const input = document.getElementById('tenderSearchInput');
+                                    
+                                    if (input) input.value = currentTenderBrandFilter;
+                                    if (filterBtn) filterBtn.style.display = 'inline-flex';
+                                    
+                                    const brandLower = currentTenderBrandFilter.toLowerCase();
+                                    const filtered = allAds.filter(ad => {
+                                        const adBrand = (ad.brand || '').toLowerCase();
+                                        const isTender = (ad.tender || '').toLowerCase() === 'yes';
+                                        return isTender && adBrand === brandLower;
+                                    });
+                                    console.log('*** Restored tender filter showing', filtered.length, 'ads for brand:', currentTenderBrandFilter);
+                                    renderTenderAds(filtered);
+                                } else {
+                                    renderTenderAds();
+                                }
                             }
 
                             const btnCreate = document.getElementById('btn-create-ad');
@@ -3878,13 +3900,14 @@
                             console.log('*** Brand filter cleared, showing all ads');
                         }
                         function clearTenderBrandFilter() {
-                            console.log('*** Clearing tender brand filter');
+                            console.log('*** Clearing tender brand filter:', currentTenderBrandFilter);
                             const input = document.getElementById('tenderSearchInput');
                             const clearBtn = document.getElementById('tenderClearFilterBtn');
                             const listDiv = document.getElementById('tenderSearchList');
                             
-                            if (input) input.value = '';
-                            if (clearBtn) clearBtn.style.display = 'none';
+                            currentTenderBrandFilter = null; // Очищаем фильтр
+                            if (input) input.value = ''; // Очищаем поле поиска
+                            if (clearBtn) clearBtn.style.display = 'none'; // Скрываем кнопку сброса
                             if (listDiv) listDiv.style.display = 'none';
                             
                             // Показываем все объявления тендера
@@ -3892,6 +3915,23 @@
                                 renderTenderAds();
                             }
                             console.log('*** Tender filter cleared');
+                        }
+                        function buildTenderSearchIndex(ads) {
+                            const approved = (ads || []).filter(ad => (ad.tender || '').toLowerCase() === 'yes');
+                            tenderSearchIndex = approved
+                                .map(ad => {
+                                    const title = (ad.title || '').trim();
+                                    const brand = (ad.brand || '').trim();
+                                    return {
+                                        id: ad.rowIndex,
+                                        title: title,
+                                        titleLower: title.toLowerCase(),
+                                        brand: brand,
+                                        brandLower: brand.toLowerCase()
+                                    };
+                                })
+                                .filter(item => item.title);
+                            console.log('Built tender search index with', tenderSearchIndex.length, 'items');
                         }
                         function initAdsSearch() {
                             if (adsSearchInitialized) return;
@@ -4040,72 +4080,150 @@
                             });
                         }
                         function initTenderSearch() {
+                            if (tenderSearchInitialized) return;
+                            console.log('*** initTenderSearch CALLED');
                             const input = document.getElementById('tenderSearchInput');
                             const listDiv = document.getElementById('tenderSearchList');
                             if (!input || !listDiv) return;
-                            
+                            console.log('*** tender input and listDiv found, setting up listeners');
+                            tenderSearchInitialized = true;
+                            input.addEventListener('keypress', e => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    listDiv.style.display = 'none';
+                                }
+                            });
+                            input.addEventListener('focus', function () {
+                                if (this.value.trim()) {
+                                    this.dispatchEvent(new Event('input'));
+                                }
+                            });
                             input.addEventListener('input', function () {
-                                let typed = this.value.trim().toLowerCase();
+                                if (skipTenderSearchInput) {
+                                    console.log('*** Skipping tender input event - programmatic value change');
+                                    skipTenderSearchInput = false;
+                                    return;
+                                }
+                                let typed = this.value.trim();
                                 if (!typed) {
                                     listDiv.style.display = 'none';
                                     return;
                                 }
-                                
-                                // Фильтруем объявления тендера по названию бренда
-                                const found = allAds.filter(ad => {
-                                    const brand = (ad.brand || '').toLowerCase();
-                                    const title = (ad.title || '').toLowerCase();
-                                    const isTender = (ad.tender || '').toLowerCase() === 'yes';
-                                    return isTender && (brand.includes(typed) || title.includes(typed));
-                                });
-                                
+                                typed = typed.toLowerCase();
+                                const found = [];
+                                // Ищем совпадения по названиям моделей
+                                for (const item of tenderSearchIndex) {
+                                    if (item.titleLower.startsWith(typed)) {
+                                        found.push(item);
+                                    }
+                                }
+                                if (found.length === 0 && typed.length >= 2) {
+                                    for (const item of tenderSearchIndex) {
+                                        if (item.titleLower.includes(typed)) {
+                                            found.push(item);
+                                        }
+                                    }
+                                }
                                 listDiv.innerHTML = '';
                                 const uniq = new Set();
+                                const brandSet = new Set();
                                 const arr = [];
+                                let brandMatch = null;
+                                
+                                // Проверяем, есть ли бренд, который начинается с введённого текста
+                                for (const item of found) {
+                                    if (item.brandLower && item.brandLower.startsWith(typed) && !brandSet.has(item.brandLower)) {
+                                        brandSet.add(item.brandLower);
+                                        if (!brandMatch) brandMatch = item.brand;
+                                    }
+                                }
                                 
                                 for (const item of found) {
-                                    const brand = (item.brand || '').trim();
-                                    if (brand && !uniq.has(brand.toLowerCase())) {
-                                        uniq.add(brand.toLowerCase());
-                                        arr.push({ id: item.rowIndex, title: brand, brand: brand });
+                                    if (!uniq.has(item.titleLower)) {
+                                        uniq.add(item.titleLower);
+                                        arr.push(item);
                                     }
                                     if (arr.length >= 5) break;
                                 }
-                                
                                 if (arr.length === 0) {
                                     listDiv.style.display = 'none';
                                 } else {
+                                    console.log('Showing', arr.length, 'tender search results');
+                                    
+                                    // СНАЧАЛА добавляем опцию БРЕНДА если есть совпадение
+                                    if (brandMatch) {
+                                        const brandEl = document.createElement('div');
+                                        brandEl.className = 'manufacturer';
+                                        brandEl.setAttribute('data-target', 'brand:' + brandMatch);
+                                        brandEl.setAttribute('data-brand', brandMatch);
+                                        brandEl.textContent = brandMatch + ' (все объявления)';
+                                        brandEl.style.fontWeight = 'bold';
+                                        brandEl.style.color = '#1E88E5';
+                                        brandEl.style.borderBottom = '2px solid #1E88E5';
+                                        listDiv.appendChild(brandEl);
+                                        console.log('Added tender brand option:', brandMatch);
+                                    }
+                                    
+                                    // Потом добавляем конкретные модели
                                     arr.forEach(item => {
                                         const el = document.createElement('div');
                                         el.className = 'manufacturer';
-                                        el.setAttribute('data-brand', item.brand);
-                                        el.textContent = item.brand;
+                                        el.setAttribute('data-target', String(item.id));
+                                        el.setAttribute('data-title', item.title);
+                                        el.textContent = item.title;
                                         listDiv.appendChild(el);
                                     });
                                     listDiv.style.display = 'block';
                                 }
                             });
-                            
-                            listDiv.addEventListener('click', function (e) {
-                                if (e.target.classList.contains('manufacturer')) {
-                                    const brand = e.target.getAttribute('data-brand');
-                                    if (input && brand) {
-                                        input.value = brand;
-                                        listDiv.style.display = 'none';
-                                        // Фильтруем по выбранному бренду (только объявления в тендере!)
-                                        const filtered = allAds.filter(ad => {
-                                            const adBrand = (ad.brand || '').toLowerCase();
-                                            const isTender = (ad.tender || '').toLowerCase() === 'yes';
-                                            return isTender && adBrand === brand.toLowerCase();
-                                        });
-                                        if (document.getElementById('tenderClearFilterBtn')) {
-                                            document.getElementById('tenderClearFilterBtn').style.display = 'inline-flex';
+                            // Добавляем click listener только один раз!
+                            if (!tenderSearchListClickListenerAdded) {
+                                console.log('*** Adding click listener to tender listDiv (FIRST TIME)');
+                                tenderSearchListClickListenerAdded = true;
+                                listDiv.addEventListener('click', function (e) {
+                                    if (e.target.classList.contains('manufacturer')) {
+                                        e.stopPropagation();
+                                        const dataTarget = e.target.getAttribute('data-target');
+                                        console.log('*** MATCHED TENDER ITEM! data-target:', dataTarget);
+                                        
+                                        // Проверяем, это опция по бренду или конкретное объявление
+                                        if (dataTarget.startsWith('brand:')) {
+                                            const brand = dataTarget.substring(6);
+                                            console.log('*** Selected tender brand filter:', brand);
+                                            currentTenderBrandFilter = brand;
+                                            skipTenderSearchInput = true;
+                                            input.value = brand;
+                                            if (document.getElementById('tenderClearFilterBtn')) {
+                                                document.getElementById('tenderClearFilterBtn').style.display = 'inline-flex';
+                                            }
+                                            // Фильтруем по выбранному бренду (только объявления в тендере!)
+                                            const filtered = allAds.filter(ad => {
+                                                const adBrand = (ad.brand || '').toLowerCase();
+                                                const isTender = (ad.tender || '').toLowerCase() === 'yes';
+                                                return isTender && adBrand === brand.toLowerCase();
+                                            });
+                                            renderTenderAds(filtered);
+                                            listDiv.style.display = 'none';
+                                        } else {
+                                            const clickedId = parseInt(dataTarget, 10);
+                                            const clickedTitle = e.target.getAttribute('data-title');
+                                            console.log('*** Selected specific tender ad! ID:', clickedId);
+                                            skipTenderSearchInput = true;
+                                            input.value = clickedTitle;
+                                            listDiv.style.display = 'none';
+                                            // Найти и выделить карточку тендера
+                                            const card = document.getElementById(`ad-tender-${clickedId}`);
+                                            if (card) {
+                                                card.style.transition = 'background 1.2s';
+                                                card.style.background = 'rgba(30, 136, 229, 0.35)';
+                                                setTimeout(() => { card.style.background = ''; }, 1600);
+                                                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            }
+                                            if (input) input.value = '';
                                         }
-                                        renderTenderAds(filtered);
                                     }
-                                }
-                            });
-                            
+                                });
+                            }
                             document.addEventListener('click', function (e) {
                                 const inputEl = document.getElementById('tenderSearchInput');
                                 if (!listDiv || !inputEl) return;
@@ -4392,6 +4510,9 @@
                                 container.appendChild(d);
                             });
 
+                            // Перестраиваем индекс поиска на основе отфильтрованных объявлений в тендере
+                            buildTenderSearchIndex(tenderAds);
+                            
                             setTimeout(() => {
                                 container.classList.add('loaded');
                                 initTenderSearch();
