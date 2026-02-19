@@ -3731,22 +3731,39 @@
                             adSearchIndex = approved
                                 .map(ad => {
                                     const title = (ad.title || '').trim();
+                                    const brand = (ad.brand || '').trim();
                                     return {
                                         id: ad.rowIndex,
                                         title: title,
-                                        titleLower: title.toLowerCase()
+                                        titleLower: title.toLowerCase(),
+                                        brand: brand,
+                                        brandLower: brand.toLowerCase()
                                     };
                                 })
                                 .filter(item => item.title);
                             console.log('Built ad search index with', adSearchIndex.length, 'items:', adSearchIndex.map(a => ({ id: a.id, title: a.title })));
                         }
-                        function findAdAndScroll(value, itemId) {
+                        function findAdAndScroll(value, itemId, brandFilter) {
                             const input = document.getElementById('adsSearchInput');
                             const listDiv = document.getElementById('adsSearchList');
-                            console.log('*** findAdAndScroll called with value:', value, 'itemId:', itemId);
-                            if (!itemId) {
-                                console.log('*** Stack trace (no itemId):', new Error().stack);
+                            console.log('*** findAdAndScroll called with value:', value, 'itemId:', itemId, 'brandFilter:', brandFilter);
+                            
+                            // Если это фильтр по бренду - показываем все объявления этого бренда
+                            if (brandFilter) {
+                                console.log('*** Filtering by brand:', brandFilter);
+                                if (input) input.value = brandFilter;
+                                // Создаём фильтр для отображения всех объявлений этого бренда
+                                const brandLower = brandFilter.toLowerCase();
+                                const filtered = allAds.filter(ad => {
+                                    const adBrand = (ad.brand || '').toLowerCase();
+                                    return adBrand === brandLower;
+                                });
+                                console.log('*** Found', filtered.length, 'ads for brand:', brandFilter);
+                                renderGrid(filtered);
+                                if (listDiv) listDiv.style.display = 'none';
+                                return;
                             }
+                            
                             let match = null;
                             if (itemId !== undefined) {
                                 console.log('*** findAdAndScroll - Searching for ad by ID:', itemId, 'Index size:', adSearchIndex.length);
@@ -3814,6 +3831,7 @@
                                 }
                                 typed = typed.toLowerCase();
                                 const found = [];
+                                // Ищем совпадения по названиям моделей
                                 for (const item of adSearchIndex) {
                                     if (item.titleLower.startsWith(typed)) {
                                         found.push(item);
@@ -3828,7 +3846,18 @@
                                 }
                                 listDiv.innerHTML = '';
                                 const uniq = new Set();
+                                const brandSet = new Set();
                                 const arr = [];
+                                let brandMatch = null;
+                                
+                                // Проверяем, есть ли бренд, который начинается с введённого текста
+                                for (const item of found) {
+                                    if (item.brandLower && item.brandLower.startsWith(typed) && !brandSet.has(item.brandLower)) {
+                                        brandSet.add(item.brandLower);
+                                        if (!brandMatch) brandMatch = item.brand;
+                                    }
+                                }
+                                
                                 for (const item of found) {
                                     if (!uniq.has(item.titleLower)) {
                                         uniq.add(item.titleLower);
@@ -3842,16 +3871,31 @@
                                     console.log('Showing', arr.length, 'search results:', arr.map(a => ({ id: a.id, title: a.title })));
                                     console.log('listDiv info - ID:', listDiv.id, 'class:', listDiv.className, 'parent:', listDiv.parentElement?.id || listDiv.parentElement?.tagName, 'children count before:', listDiv.children.length);
                                     console.log('listDiv boundingRect:', {top: listDiv.getBoundingClientRect().top, left: listDiv.getBoundingClientRect().left, width: listDiv.getBoundingClientRect().width, height: listDiv.getBoundingClientRect().height});
+                                    
+                                    // СНАЧАЛА добавляем опцию БРЕНДА если есть совпадение
+                                    if (brandMatch) {
+                                        const brandEl = document.createElement('div');
+                                        brandEl.className = 'manufacturer';
+                                        brandEl.setAttribute('data-target', 'brand:' + brandMatch);
+                                        brandEl.setAttribute('data-brand', brandMatch);
+                                        brandEl.textContent = brandMatch + ' (все объявления)';
+                                        brandEl.style.fontWeight = 'bold';
+                                        brandEl.style.color = '#1E88E5';
+                                        brandEl.style.borderBottom = '2px solid #1E88E5';
+                                        listDiv.appendChild(brandEl);
+                                        console.log('Added brand option:', brandMatch);
+                                    }
+                                    
+                                    // Потом добавляем конкретные модели
                                     arr.forEach(item => {
                                         const el = document.createElement('div');
                                         el.className = 'manufacturer';
                                         el.setAttribute('data-target', String(item.id));
-                                        el.textContent = item.title;
                                         el.setAttribute('data-title', item.title);
+                                        el.textContent = item.title;
                                         console.log('Created element with data-target:', el.getAttribute('data-target'), 'text:', el.textContent, 'className before append:', el.className);
                                         listDiv.appendChild(el);
                                         console.log('After append - element parent:', el.parentElement?.id, 'is in DOM:', document.body.contains(el), 'boundingRect:', {top: el.getBoundingClientRect().top, left: el.getBoundingClientRect().left, width: el.getBoundingClientRect().width, height: el.getBoundingClientRect().height});
-                                        // Добавим inline click handler для отладки
                                         el.onclick = function(e) { console.log('*** INLINE onclick on manufacturer element:', this.textContent); };
                                     });
                                     listDiv.style.display = 'block';
@@ -3867,14 +3911,24 @@
                                     console.log('*** Full target:', e.target);
                                     if (e.target.classList.contains('manufacturer')) {
                                         e.stopPropagation();
-                                        const clickedId = parseInt(e.target.getAttribute('data-target'), 10);
-                                        const clickedTitle = e.target.getAttribute('data-title');
-                                        console.log('*** MATCHED MANUFACTURER! ID:', clickedId, 'Title:', clickedTitle);
-                                        // Установим флаг перед изменением input, чтобы не триггирить input event
-                                        skipAdsSearchInput = true;
-                                        input.value = clickedTitle;
-                                        listDiv.style.display = 'none';
-                                        findAdAndScroll(null, clickedId);
+                                        const dataTarget = e.target.getAttribute('data-target');
+                                        console.log('*** MATCHED MANUFACTURER! data-target:', dataTarget);
+                                        
+                                        // Проверяем, это опция по бренду или конкретное объявление
+                                        if (dataTarget.startsWith('brand:')) {
+                                            const brand = dataTarget.substring(6);
+                                            console.log('*** Selected brand filter:', brand);
+                                            skipAdsSearchInput = true;
+                                            findAdAndScroll(null, null, brand);
+                                        } else {
+                                            const clickedId = parseInt(dataTarget, 10);
+                                            const clickedTitle = e.target.getAttribute('data-title');
+                                            console.log('*** Selected specific ad! ID:', clickedId, 'Title:', clickedTitle);
+                                            skipAdsSearchInput = true;
+                                            input.value = clickedTitle;
+                                            listDiv.style.display = 'none';
+                                            findAdAndScroll(null, clickedId);
+                                        }
                                     } else {
                                         console.log('*** Click but NOT manufacturer, checking parent...');
                                     }
