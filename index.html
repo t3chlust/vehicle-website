@@ -1214,7 +1214,7 @@
                                 text-align: left;
                                 padding: 8px 12px;
                                 font-weight: 700;
-                                font-size: 13px;
+                                font-size: clamp(10px, 2.5vw, 14px);
                                 line-height: 1.1;
                                 display: none;
                                 align-items: center;
@@ -1229,6 +1229,20 @@
                                 display: flex;
                                 background: #ab47bc;
                                 color: #fff;
+                            }
+
+                            /* Экстра-контроль для очень маленьких экранов */
+                            @media (max-width: 320px) {
+                                .ad-card-tender-badge {
+                                    font-size: 10px;
+                                    padding: 6px 8px;
+                                }
+                            }
+
+                            @media (min-width: 321px) and (max-width: 374px) {
+                                .ad-card-tender-badge {
+                                    font-size: 10px;
+                                }
                             }
 
                             .ad-card-tender-badge.placeholder {
@@ -1331,7 +1345,7 @@
                                     text-align: left;
                                     padding: 6px 10px;
                                     font-weight: 700;
-                                    font-size: 12px;
+                                    font-size: clamp(9px, 2.2vw, 12px);
                                     line-height: 1.15;
                                     display: none;
                                     align-items: center;
@@ -1346,6 +1360,20 @@
                                     display: flex;
                                     background: #ab47bc;
                                     color: #fff;
+                                }
+
+                                /* Экстра-контроль для очень маленьких экранов */
+                                @media (max-width: 320px) {
+                                    .ad-card-tender-badge {
+                                        font-size: 9px;
+                                        padding: 5px 8px;
+                                    }
+                                }
+
+                                @media (min-width: 321px) and (max-width: 374px) {
+                                    .ad-card-tender-badge {
+                                        font-size: 9px;
+                                    }
                                 }
 
                                 .ad-card-tender-badge.placeholder {
