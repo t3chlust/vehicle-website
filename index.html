@@ -805,6 +805,9 @@
 
                             .search-container {
                                 position: relative;
+                                display: flex;
+                                gap: 8px;
+                                align-items: center;
                             }
 
                             .search-container::before {
@@ -823,6 +826,7 @@
                             }
 
                             .search-container .filter-input {
+                                flex: 1;
                                 height: 46px;
                                 margin-bottom: 0;
                                 padding: 0 42px 0 14px;
@@ -2168,7 +2172,7 @@
                                         <div class="search-container">
                                             <input type="text" id="adsSearchInput" class="form-input filter-input"
                                                 placeholder="Поиск техники" autocomplete="off">
-                                            <button id="adsClearFilterBtn" class="clear-filter-btn" onclick="clearAdsBrandFilter()" style="display:none; margin-left: 8px; padding: 8px 12px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">✕ Сброс</button>
+                                            <button id="adsClearFilterBtn" class="clear-filter-btn" onclick="clearAdsBrandFilter()" style="display:none; padding: 8px 12px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap;">✕ Сброс</button>
                                         </div>
                                         <div id="adsSearchList" class="search-suggestions" onclick="console.log('*** HTML onclick on adsSearchList:', event.target.className)"></div>
                                     </div>
