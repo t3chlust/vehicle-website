@@ -802,26 +802,26 @@
                                 }
                                 .search-container .filter-input {
                                     width: 100%;
+                                    padding: 0 100px 0 14px;
                                 }
                                 .clear-filter-btn {
                                     font-size: 12px;
-                                    padding: 6px 10px;
+                                    padding: 5px 10px;
+                                    right: 6px;
                                 }
                             }
 
                             .search-container {
-                                display: flex;
-                                gap: 8px;
-                                align-items: center;
+                                position: relative;
                                 width: 100%;
-                                max-width: calc(500px + 60px);
+                                max-width: 500px;
                             }
 
                             .search-container .filter-input {
-                                width: 500px;
+                                width: 100%;
                                 height: 46px;
                                 margin-bottom: 0;
-                                padding: 0 42px 0 14px;
+                                padding: 0 110px 0 14px;
                                 border: 1px solid #e2d8ee;
                                 border-radius: 12px;
                                 background: linear-gradient(180deg, #ffffff 0%, #fbf9fe 100%);
@@ -849,23 +849,27 @@
                             }
                             
                             .clear-filter-btn {
-                                flex-shrink: 0;
+                                position: absolute;
+                                right: 8px;
+                                top: 50%;
+                                transform: translateY(-50%);
                                 white-space: nowrap;
-                                padding: 8px 14px;
+                                padding: 6px 12px;
                                 background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
                                 color: white;
                                 border: none;
-                                border-radius: 8px;
+                                border-radius: 6px;
                                 cursor: pointer;
-                                font-size: 14px;
+                                font-size: 13px;
                                 font-weight: 600;
-                                height: 46px;
-                                display: flex;
+                                height: auto;
+                                display: none;
                                 align-items: center;
                                 justify-content: center;
                                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                                 box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
                                 letter-spacing: 0.5px;
+                                z-index: 10;
                             }
                             
                             .clear-filter-btn:hover {
@@ -3267,7 +3271,7 @@
                                     const input = document.getElementById('adsSearchInput');
                                     
                                     if (input) input.value = currentBrandFilter;
-                                    if (filterBtn) filterBtn.style.display = 'inline-flex';
+                                    if (filterBtn) filterBtn.style.display = 'flex';
                                     
                                     const brandLower = currentBrandFilter.toLowerCase();
                                     const filtered = allAds.filter(ad => {
@@ -3293,7 +3297,7 @@
                                     const input = document.getElementById('tenderSearchInput');
                                     
                                     if (input) input.value = currentTenderBrandFilter;
-                                    if (filterBtn) filterBtn.style.display = 'inline-flex';
+                                    if (filterBtn) filterBtn.style.display = 'flex';
                                     
                                     const brandLower = currentTenderBrandFilter.toLowerCase();
                                     const filtered = allAds.filter(ad => {
@@ -3837,7 +3841,7 @@
                                 console.log('*** Filtering by brand:', brandFilter);
                                 currentBrandFilter = brandFilter; // Сохраняем активный фильтр
                                 if (input) input.value = brandFilter;
-                                if (clearBtn) clearBtn.style.display = 'inline-block'; // Показываем кнопку сброса
+                                if (clearBtn) clearBtn.style.display = 'flex'; // Показываем кнопку сброса
                                 // Создаём фильтр для отображения всех объявлений этого бренда
                                 const brandLower = brandFilter.toLowerCase();
                                 const filtered = allAds.filter(ad => {
@@ -4194,7 +4198,7 @@
                                             skipTenderSearchInput = true;
                                             input.value = brand;
                                             if (document.getElementById('tenderClearFilterBtn')) {
-                                                document.getElementById('tenderClearFilterBtn').style.display = 'inline-flex';
+                                                document.getElementById('tenderClearFilterBtn').style.display = 'flex';
                                             }
                                             // Фильтруем по выбранному бренду (только объявления в тендере!)
                                             const filtered = allAds.filter(ad => {
