@@ -797,9 +797,15 @@
                             @media (max-width: 768px) {
 
                                 .form-input,
-                                .form-select,
-                                .filter-input {
-                                    font-size: 16px;
+                                .search-container {
+                                    max-width: 100%;
+                                }
+                                .search-container .filter-input {
+                                    width: 100%;
+                                }
+                                .clear-filter-btn {
+                                    font-size: 12px;
+                                    padding: 6px 10px;
                                 }
                             }
 
@@ -2354,6 +2360,14 @@
                                     </div>
                                 </div>
                                 <div id="tab-content-tender" class="tab-content">
+                                    <div style="margin-bottom: 25px; max-width: 500px;">
+                                        <div class="search-container">
+                                            <input type="text" id="tenderSearchInput" class="form-input filter-input"
+                                                placeholder="Поиск в реестре" autocomplete="off">
+                                            <button id="tenderClearFilterBtn" class="clear-filter-btn" onclick="clearTenderBrandFilter()" style="display:none;">Сбросить</button>
+                                        </div>
+                                        <div id="tenderSearchList" class="search-suggestions"></div>
+                                    </div>
                                     <div id="view-tender-list" style="min-height: 400px; margin-top:30px;">
                                         <div id="loading-tender"
                                             style="text-align:center; padding: 60px; color:#888; display:none;">
@@ -3863,6 +3877,22 @@
                             renderGrid(allAds);
                             console.log('*** Brand filter cleared, showing all ads');
                         }
+                        function clearTenderBrandFilter() {
+                            console.log('*** Clearing tender brand filter');
+                            const input = document.getElementById('tenderSearchInput');
+                            const clearBtn = document.getElementById('tenderClearFilterBtn');
+                            const listDiv = document.getElementById('tenderSearchList');
+                            
+                            if (input) input.value = '';
+                            if (clearBtn) clearBtn.style.display = 'none';
+                            if (listDiv) listDiv.style.display = 'none';
+                            
+                            // Показываем все объявления тендера
+                            if (typeof renderTenderAds === 'function') {
+                                renderTenderAds();
+                            }
+                            console.log('*** Tender filter cleared');
+                        }
                         function initAdsSearch() {
                             if (adsSearchInitialized) return;
                             console.log('*** initAdsSearch CALLED');
@@ -4005,6 +4035,77 @@
                                 if (!listDiv || !inputEl) return;
                                 if (!listDiv.contains(e.target) && e.target !== inputEl) {
                                     console.log('*** Hiding listDiv from document click');
+                                    listDiv.style.display = 'none';
+                                }
+                            });
+                        }
+                        function initTenderSearch() {
+                            const input = document.getElementById('tenderSearchInput');
+                            const listDiv = document.getElementById('tenderSearchList');
+                            if (!input || !listDiv) return;
+                            
+                            input.addEventListener('input', function () {
+                                let typed = this.value.trim().toLowerCase();
+                                if (!typed) {
+                                    listDiv.style.display = 'none';
+                                    return;
+                                }
+                                
+                                // Фильтруем объявления тендера по названию бренда
+                                const found = allAds.filter(ad => {
+                                    const brand = (ad.brand || '').toLowerCase();
+                                    const title = (ad.title || '').toLowerCase();
+                                    return (ad.tender || ad.Tender) && (brand.includes(typed) || title.includes(typed));
+                                });
+                                
+                                listDiv.innerHTML = '';
+                                const uniq = new Set();
+                                const arr = [];
+                                
+                                for (const item of found) {
+                                    const brand = (item.brand || '').trim();
+                                    if (brand && !uniq.has(brand.toLowerCase())) {
+                                        uniq.add(brand.toLowerCase());\n                                        arr.push({ id: item.rowIndex, title: brand, brand: brand });
+                                    }
+                                    if (arr.length >= 5) break;
+                                }
+                                
+                                if (arr.length === 0) {
+                                    listDiv.style.display = 'none';
+                                } else {
+                                    arr.forEach(item => {
+                                        const el = document.createElement('div');
+                                        el.className = 'manufacturer';
+                                        el.setAttribute('data-brand', item.brand);
+                                        el.textContent = item.brand;
+                                        listDiv.appendChild(el);
+                                    });
+                                    listDiv.style.display = 'block';
+                                }
+                            });
+                            
+                            listDiv.addEventListener('click', function (e) {
+                                if (e.target.classList.contains('manufacturer')) {
+                                    const brand = e.target.getAttribute('data-brand');
+                                    if (input && brand) {
+                                        input.value = brand;
+                                        listDiv.style.display = 'none';
+                                        \n                                        // Фильтруем по выбранному бренду
+                                        const filtered = allAds.filter(ad => {
+                                            const adBrand = (ad.brand || '').toLowerCase();\n                                            return (ad.tender || ad.Tender) && adBrand === brand.toLowerCase();
+                                        });
+                                        if (document.getElementById('tenderClearFilterBtn')) {
+                                            document.getElementById('tenderClearFilterBtn').style.display = 'inline-flex';
+                                        }
+                                        renderTenderAds(filtered);
+                                    }
+                                }
+                            });
+                            
+                            document.addEventListener('click', function (e) {
+                                const inputEl = document.getElementById('tenderSearchInput');
+                                if (!listDiv || !inputEl) return;
+                                if (!listDiv.contains(e.target) && e.target !== inputEl) {
                                     listDiv.style.display = 'none';
                                 }
                             });
@@ -4237,14 +4338,14 @@
                             // Перестраиваем индекс поиска на основе отфильтрованных запчастей
                             buildPartSearchIndex(parts);
                         }
-                        function renderTenderAds() {
+                        function renderTenderAds(filteredItems) {
                             const container = document.getElementById('tender-container');
                             const loadingDiv = document.getElementById('loading-tender');
 
                             if (!container || !loadingDiv) return;
 
-                            // Фильтруем объявления, у которых есть флаг 'tender'
-                            const tenderAds = allAds.filter(ad => (ad.tender || "").toLowerCase() === 'yes');
+                            // Если переданы отфильтрованные объявления, используем их, иначе фильтруем по флагу tender
+                            const tenderAds = filteredItems || allAds.filter(ad => (ad.tender || "").toLowerCase() === 'yes');
 
                             loadingDiv.style.display = 'none';
                             container.innerHTML = '';
@@ -4289,6 +4390,7 @@
 
                             setTimeout(() => {
                                 container.classList.add('loaded');
+                                initTenderSearch();
                             }, 50);
                         }
 
