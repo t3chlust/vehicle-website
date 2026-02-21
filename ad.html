@@ -527,7 +527,7 @@
                     <div class="details-price-row">
                         <div class="details-price">${Number(item.price || 0).toLocaleString()} ₽</div>
                         <div class="price-with-actions">
-                            <button class="icon-btn share-btn" onclick="shareAd(${item.rowIndex})" title="Поделиться">
+                            <button class="icon-btn share-btn" data-share-btn="true" title="Поделиться">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="18" cy="5" r="3"></circle>
                                     <circle cx="6" cy="12" r="3"></circle>
@@ -556,6 +556,19 @@
                 </div>
             `;
             document.title = `${item.title || item.partName} - купитьвездеход.рф`;
+            
+            // Добавляем event listener для кнопки поделиться
+            const shareButton = document.querySelector('[data-share-btn="true"]');
+            if (shareButton) {
+                console.log('Share button найдена, добавляю event listener');
+                shareButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('Share button клик зарегистрирован');
+                    shareAd(item.rowIndex);
+                });
+            } else {
+                console.log('Share button не найдена в DOM');
+            }
             
             // Set back button color based on type
             const backLink = document.querySelector('.back-link');
