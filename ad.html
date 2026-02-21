@@ -112,9 +112,6 @@
             height: 100%;
             transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        .gallery-track.no-transition {
-            transition: none;
-        }
         .gallery-slide {
             min-width: 100%;
             height: 100%;
@@ -392,37 +389,14 @@
             }, 600);
         }
 
-        function updateGalleryNoAnimation() {
-            const track = document.getElementById('gallery-track');
-            if (!track) return;
-            
-            // Добавляем класс чтобы отключить транзицию
-            track.classList.add('no-transition');
-            // Применяем трансформ
-            track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
-            
-            // После отрисовки удаляем класс для следующего раза
-            setTimeout(() => {
-                track.classList.remove('no-transition');
-            }, 50);
-            
-            // Сбрасываем флаг сразу (нет ожидания анимации)
-            isGalleryAnimating = false;
-        }
-
         function galleryNext() {
             // Защита от множественных кликов во время анимации
             if (isGalleryAnimating) return;
             if (currentPhotos.length <= 1) return;
             
-            if (currentPhotoIndex < currentPhotos.length - 1) {
-                currentPhotoIndex++;
-                updateGallery(); // С анимацией
-            } else if (currentPhotoIndex === currentPhotos.length - 1) {
-                // Циклический переход без анимации
-                currentPhotoIndex = 0;
-                updateGalleryNoAnimation();
-            }
+            // Циклический переход с анимацией
+            currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+            updateGallery();
         }
 
         function galleryPrev() {
@@ -430,14 +404,9 @@
             if (isGalleryAnimating) return;
             if (currentPhotos.length <= 1) return;
             
-            if (currentPhotoIndex > 0) {
-                currentPhotoIndex--;
-                updateGallery(); // С анимацией
-            } else if (currentPhotoIndex === 0) {
-                // Циклический переход без анимации
-                currentPhotoIndex = currentPhotos.length - 1;
-                updateGalleryNoAnimation();
-            }
+            // Циклический переход с анимацией
+            currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+            updateGallery();
         }
 
         function galleryNextSwipe() {
@@ -445,14 +414,9 @@
             if (isGalleryAnimating) return;
             if (currentPhotos.length <= 1) return;
             
-            if (currentPhotoIndex < currentPhotos.length - 1) {
-                currentPhotoIndex++;
-                updateGallery(); // С анимацией
-            } else if (currentPhotoIndex === currentPhotos.length - 1) {
-                // Циклический переход при свайпе без анимации
-                currentPhotoIndex = 0;
-                updateGalleryNoAnimation();
-            }
+            // Циклический переход с анимацией
+            currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+            updateGallery();
         }
 
         function galleryPrevSwipe() {
@@ -460,14 +424,9 @@
             if (isGalleryAnimating) return;
             if (currentPhotos.length <= 1) return;
             
-            if (currentPhotoIndex > 0) {
-                currentPhotoIndex--;
-                updateGallery(); // С анимацией
-            } else if (currentPhotoIndex === 0) {
-                // Циклический переход при свайпе без анимации
-                currentPhotoIndex = currentPhotos.length - 1;
-                updateGalleryNoAnimation();
-            }
+            // Циклический переход с анимацией
+            currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+            updateGallery();
         }
 
         function initGallerySwipe() {
