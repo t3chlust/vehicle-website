@@ -161,7 +161,58 @@
         .badge-new { background: #4caf50; }
         .badge-private { background: #ff9800; }
         .badge-float { background: #2196f3; }
-        .details-price { font-size: 20px; font-weight: 600; margin-bottom: 15px; }
+        .details-price { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-share, .btn-favorite {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-share {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        .btn-share:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-favorite {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+        }
+        .btn-favorite:hover {
+            background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-favorite.active {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+        }
+        @media (max-width: 600px) {
+            .action-row {
+                gap: 8px;
+            }
+            .btn-share, .btn-favorite {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
         .seller-info { background: #f9f9f9; padding: 20px; border-radius: 12px; margin-bottom: 30px; }
         .seller-label { font-size:14px;color:#888;font-weight:bold; }
         .seller-name { font-size:18px;font-weight:bold; }
@@ -233,6 +284,7 @@
         let currentPhotoIndex = 0;
         let currentUser = null;
         let currentItemType = null;
+        let userFavorites = [];
 
         function normalizePhone(phone) { 
             return String(phone || '').replace(/\D/g, ''); 
@@ -412,6 +464,10 @@
                             <div class="details-badges">${badgesHtml}</div>
                         </div>
                         <div class="details-price">${Number(item.price || 0).toLocaleString()} ₽</div>
+                        <div class="action-row">
+                            <button class="btn-share" onclick="shareAd(${item.rowIndex})">📤 Поделиться</button>
+                            <button class="btn-favorite ${userFavorites.includes(item.rowIndex) ? 'active' : ''}" onclick="toggleFavoriteFromDetail(${item.rowIndex})">❤️ В избранное</button>
+                        </div>
                         <div class="seller-info">
                             <div class="seller-label">Продавец</div>
                             <div class="seller-name">${item.name || "Продавец"}</div>
@@ -444,6 +500,61 @@
             }
         }
 
+        function shareAd(adId) {
+            const url = window.location.href;
+            const title = currentItem?.title || 'Объявление';
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    text: `Посмотри это объявление: ${title}`,
+                    url: url
+                }).catch(err => console.log('Share cancelled'));
+            } else {
+                // Fallback - копирование ссылки в буфер обмена
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Ссылка скопирована в буфер обмена');
+                }).catch(err => console.error('Ошибка копирования:', err));
+            }
+        }
+
+        async function toggleFavoriteFromDetail(adId) {
+            if (!currentUser) {
+                alert('Пожалуйста, войдите в аккаунт');
+                return;
+            }
+            
+            const isFavorite = userFavorites.includes(adId);
+            const button = document.querySelector('[onclick="toggleFavoriteFromDetail(' + adId + ')"]');
+            
+            try {
+                const action = isFavorite ? 'remove' : 'add';
+                const response = await fetch('/api/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUser.id || currentUser.phone, advertisementId: adId, action: action })
+                });
+                
+                if (response.ok) {
+                    if (isFavorite) {
+                        userFavorites = userFavorites.filter(id => id !== adId);
+                    } else {
+                        userFavorites.push(adId);
+                    }
+                    
+                    if (button) {
+                        button.classList.toggle('active');
+                        button.textContent = userFavorites.includes(adId) ? '❤️ В избранном' : '❤️ В избранное';
+                    }
+                } else {
+                    alert('Ошибка при сохранении в избранное');
+                }
+            } catch (e) {
+                console.error('Ошибка:', e);
+                alert('Ошибка при работе с избранным');
+            }
+        }
+
         async function init() {
             const params = new URLSearchParams(window.location.search);
             const itemId = params.get('id');
@@ -451,6 +562,19 @@
             const container = document.getElementById('details-container');
 
             currentUser = getCurrentUserFromStorage();
+
+            // Загружаем избранное если пользователь вошел
+            if (currentUser) {
+                try {
+                    const favResponse = await fetch('/api/favorites?userId=' + (currentUser.id || currentUser.phone));
+                    if (favResponse.ok) {
+                        userFavorites = await favResponse.json();
+                    }
+                } catch (e) {
+                    console.log('Не удалось загрузить избранное:', e);
+                    userFavorites = [];
+                }
+            }
 
             if (!itemId || !itemType) {
                 container.innerHTML = '<div class="empty-message">Ошибка: ID или тип объявления не указан.</div>';
