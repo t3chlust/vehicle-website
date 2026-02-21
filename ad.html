@@ -343,6 +343,7 @@
         let swipeStartX = 0;
         let swipeEndX = 0;
         let isGalleryDragging = false;
+        let isGalleryAnimating = false;
 
         function normalizePhone(phone) { 
             return String(phone || '').replace(/\D/g, ''); 
@@ -379,19 +380,37 @@
             const track = document.getElementById('gallery-track');
             if (!track) return;
             track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
+            
+            // Сброс флага анимации после завершения транзиции
+            isGalleryAnimating = true;
+            setTimeout(() => {
+                isGalleryAnimating = false;
+            }, 600);
         }
 
         function galleryNext() {
+            // Защита от множественных кликов во время анимации
+            if (isGalleryAnimating) return;
+            
+            if (currentPhotos.length <= 1) return;
             currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
             updateGallery();
         }
 
         function galleryPrev() {
+            // Защита от множественных кликов во время анимации
+            if (isGalleryAnimating) return;
+            
+            if (currentPhotos.length <= 1) return;
             currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
             updateGallery();
         }
 
         function galleryNextSwipe() {
+            // Защита от множественных кликов во время анимации
+            if (isGalleryAnimating) return;
+            if (currentPhotos.length <= 1) return;
+            
             // Циклический переход без пролистывания всех слайдов
             if (currentPhotoIndex === currentPhotos.length - 1) {
                 currentPhotoIndex = 0;
@@ -402,6 +421,10 @@
         }
 
         function galleryPrevSwipe() {
+            // Защита от множественных кликов во время анимации
+            if (isGalleryAnimating) return;
+            if (currentPhotos.length <= 1) return;
+            
             // Циклический переход без пролистывания всех слайдов
             if (currentPhotoIndex === 0) {
                 currentPhotoIndex = currentPhotos.length - 1;
