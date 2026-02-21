@@ -579,48 +579,59 @@
             
             // Проверяем iOS
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
             
-            // На iOS пробуем несколько вариантов
-            if (isIOS) {
+            try {
+                // Если есть Web Share API - используем его
                 if (navigator.share) {
-                    // Есть Web Share API
                     navigator.share({
                         title: title,
                         text: `Посмотри это объявление: ${title}`,
                         url: url
-                    }).catch(err => console.log('Share отменен'));
-                } else {
-                    // Нет Web Share API - копируем ссылку
-                    iosShareFallback(url, title);
-                }
-            } else if (navigator.share) {
-                // Android или другой браузер с Web Share API
-                navigator.share({
-                    title: title,
-                    text: `Посмотри это объявление: ${title}`,
-                    url: url
-                }).catch(err => console.log('Share отменен'));
-            } else {
-                // ПК или браузер без Web Share API - копируем ссылку
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(url).then(() => {
-                        alert('Ссылка скопирована в буфер обмена');
                     }).catch(err => {
-                        fallbackCopyToClipboard(url);
+                        // Share отменен пользователем - это нормально
+                        console.log('Share отменен', err);
                     });
+                } else if (isIOS) {
+                    // iOS без Share API - пробуем альтернативный способ
+                    // Открываем ссылку с параметром, который может открыть share sheet
+                    const encodedUrl = encodeURIComponent(url);
+                    const encodedText = encodeURIComponent(title);
+                    
+                    // Попытка использовать встроенный iOS share
+                    // Если это не сработает, вернемся к копированию
+                    iosShareFallback(url, title);
                 } else {
-                    fallbackCopyToClipboard(url);
+                    // ПК или хромиум-браузер - копируем ссылку
+                    copyToClipboard(url);
                 }
+            } catch (err) {
+                console.error('Ошибка при поделиться:', err);
+                copyToClipboard(url);
             }
         }
 
         function iosShareFallback(url, title) {
-            // Для iOS без Web Share API
-            // Копируем ссылку в буфер обмена
+            // Для iOS без Web Share API пробуем несколько методов
+            
+            // Попытка 1: Используем Clipboard API
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(() => {
-                    alert('Ссылка скопирована. Вы можете вставить её в любое приложение');
+                    alert('Ссылка скопирована в буфер обмена');
+                }).catch(err => {
+                    // Попытка 2: Используем старый способ
+                    fallbackCopyToClipboard(url);
+                });
+            } else {
+                // Попытка 2: Используем старый способ
+                fallbackCopyToClipboard(url);
+            }
+        }
+
+        function copyToClipboard(url) {
+            // Для ПК
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Ссылка скопирована в буфер обмена');
                 }).catch(err => {
                     fallbackCopyToClipboard(url);
                 });
