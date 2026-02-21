@@ -149,6 +149,12 @@
             gap: 15px;
             margin-bottom: 15px;
         }
+        .title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
         .details-title { font-size: 24px; font-weight: 800; color: #1565C0; }
         .details-badges { display: flex; gap: 6px; }
         .badge-new, .badge-private, .badge-float {
@@ -161,56 +167,58 @@
         .badge-new { background: #4caf50; }
         .badge-private { background: #ff9800; }
         .badge-float { background: #2196f3; }
-        .details-price { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
-        .action-row {
+        .action-icons {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            align-items: center;
         }
-        .btn-share, .btn-favorite {
-            flex: 1;
-            padding: 12px 16px;
+        .icon-btn {
+            background: none;
             border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
         }
-        .btn-share {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        .icon-btn svg {
+            width: 24px;
+            height: 24px;
+            transition: all 0.3s ease;
         }
-        .btn-share:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            transform: translateY(-1px);
+        .icon-btn.share-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
         }
-        .btn-favorite {
-            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+        .icon-btn.share-btn:hover svg {
+            stroke: #3b82f6;
+            filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.4));
         }
-        .btn-favorite:hover {
-            background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
-            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
-            transform: translateY(-1px);
+        .icon-btn.favorite-btn:hover {
+            background: rgba(236, 72, 153, 0.1);
         }
-        .btn-favorite.active {
-            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+        .icon-btn.favorite-btn:hover svg {
+            stroke: #ec4899;
+            filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.4));
+        }
+        .icon-btn.favorite-btn.active svg {
+            fill: #ec4899;
+            stroke: #ec4899;
         }
         @media (max-width: 600px) {
-            .action-row {
+            .details-title-row {
+                flex-wrap: wrap;
+            }
+            .title-wrapper {
+                width: 100%;
+            }
+            .action-icons {
                 gap: 8px;
             }
-            .btn-share, .btn-favorite {
-                padding: 10px 12px;
-                font-size: 13px;
+            .icon-btn svg {
+                width: 20px;
+                height: 20px;
             }
         }
         .seller-info { background: #f9f9f9; padding: 20px; border-radius: 12px; margin-bottom: 30px; }
@@ -459,15 +467,29 @@
                     </div>
                     <div class="tender-banner ${isTender ? 'visible' : ''}">В РЕЕСТРЕ МИНПРОМТОРГА</div>
                     <div class="details-content">
-                        <div class="details-title-row">
+                    <div class="details-title-row">
+                        <div class="title-wrapper">
                             <div class="details-title">${item.title || item.partName || 'Объявление'}</div>
                             <div class="details-badges">${badgesHtml}</div>
                         </div>
-                        <div class="details-price">${Number(item.price || 0).toLocaleString()} ₽</div>
-                        <div class="action-row">
-                            <button class="btn-share" onclick="shareAd(${item.rowIndex})">📤 Поделиться</button>
-                            <button class="btn-favorite ${userFavorites.includes(item.rowIndex) ? 'active' : ''}" onclick="toggleFavoriteFromDetail(${item.rowIndex})">❤️ В избранное</button>
+                        <div class="action-icons">
+                            <button class="icon-btn share-btn" onclick="shareAd(${item.rowIndex})" title="Поделиться">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="18" cy="5" r="3"></circle>
+                                    <circle cx="6" cy="12" r="3"></circle>
+                                    <circle cx="18" cy="19" r="3"></circle>
+                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                </svg>
+                            </button>
+                            <button class="icon-btn favorite-btn ${userFavorites.includes(item.rowIndex) ? 'active' : ''}" onclick="toggleFavoriteFromDetail(${item.rowIndex})" title="В избранное">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </button>
                         </div>
+                    </div>
+                        <div class="details-price">${Number(item.price || 0).toLocaleString()} ₽</div>
                         <div class="seller-info">
                             <div class="seller-label">Продавец</div>
                             <div class="seller-name">${item.name || "Продавец"}</div>
@@ -544,7 +566,6 @@
                     
                     if (button) {
                         button.classList.toggle('active');
-                        button.textContent = userFavorites.includes(adId) ? '❤️ В избранном' : '❤️ В избранное';
                     }
                 } else {
                     alert('Ошибка при сохранении в избранное');
