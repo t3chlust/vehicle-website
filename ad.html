@@ -195,16 +195,40 @@
             stroke: #3b82f6;
             filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.4));
         }
-        .icon-btn.favorite-btn:hover {
-            background: rgba(236, 72, 153, 0.1);
+        .favorite-heart {
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            padding: 0;
         }
-        .icon-btn.favorite-btn:hover svg {
-            stroke: #ec4899;
-            filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.4));
+        .favorite-heart:hover {
+            transform: scale(1.1);
+            background: transparent;
+            box-shadow: none;
         }
-        .icon-btn.favorite-btn.active svg {
-            fill: #ec4899;
-            stroke: #ec4899;
+        .favorite-heart.active svg {
+            animation: heartBeat 0.3s ease;
+        }
+        @keyframes heartBeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.3);
+            }
+            50% {
+                transform: scale(1.1);
+            }
         }
         @media (max-width: 600px) {
             .details-title-row {
@@ -482,10 +506,8 @@
                                     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                                 </svg>
                             </button>
-                            <button class="icon-btn favorite-btn ${userFavorites.includes(item.rowIndex) ? 'active' : ''}" onclick="toggleFavoriteFromDetail(${item.rowIndex})" title="В избранное">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                </svg>
+                            <button class="favorite-heart ${userFavorites.includes(item.rowIndex) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavoriteFromDetail(${item.rowIndex})" title="${userFavorites.includes(item.rowIndex) ? 'Удалить из избранного' : 'Добавить в избранное'}">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="${userFavorites.includes(item.rowIndex) ? '#ff4757' : 'none'}" stroke="${userFavorites.includes(item.rowIndex) ? '#ff4757' : '#ccc'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                             </button>
                         </div>
                     </div>
@@ -547,7 +569,7 @@
             }
             
             const isFavorite = userFavorites.includes(adId);
-            const button = document.querySelector('[onclick="toggleFavoriteFromDetail(' + adId + ')"]');
+            const button = document.querySelector('.favorite-heart');
             
             try {
                 const action = isFavorite ? 'remove' : 'add';
@@ -566,6 +588,13 @@
                     
                     if (button) {
                         button.classList.toggle('active');
+                        const svg = button.querySelector('svg');
+                        const newIsFavorite = userFavorites.includes(adId);
+                        if (svg) {
+                            svg.setAttribute('fill', newIsFavorite ? '#ff4757' : 'none');
+                            svg.setAttribute('stroke', newIsFavorite ? '#ff4757' : '#ccc');
+                        }
+                        button.setAttribute('title', newIsFavorite ? 'Удалить из избранного' : 'Добавить в избранное');
                     }
                 } else {
                     alert('Ошибка при сохранении в избранное');
