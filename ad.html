@@ -112,6 +112,9 @@
             height: 100%;
             transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
+        .gallery-track.no-transition {
+            transition: none !important;
+        }
         .gallery-slide {
             min-width: 100%;
             height: 100%;
@@ -379,6 +382,7 @@
         function updateGallery() {
             const track = document.getElementById('gallery-track');
             if (!track) return;
+            track.classList.remove('no-transition');
             track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
             
             // Сброс флага анимации после завершения транзиции
@@ -388,13 +392,35 @@
             }, 600);
         }
 
+        function updateGalleryImmediate() {
+            // Мгновенный переход без анимации
+            const track = document.getElementById('gallery-track');
+            if (!track) return;
+            
+            track.classList.add('no-transition');
+            track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
+            
+            // Через микросекунду перемещаем DOM, это принудит браузер перерисовать
+            setTimeout(() => {
+                track.classList.remove('no-transition');
+                isGalleryAnimating = false;
+            }, 10);
+        }
+
         function galleryNext() {
             // Защита от множественных кликов во время анимации
             if (isGalleryAnimating) return;
             
             if (currentPhotos.length <= 1) return;
-            currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
-            updateGallery();
+            
+            // Циклический переход при клике на стрелку (ПК)
+            if (currentPhotoIndex === currentPhotos.length - 1) {
+                currentPhotoIndex = 0;
+                updateGalleryImmediate(); // Мгновенный переход без анимации
+            } else {
+                currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+                updateGallery(); // Обычный переход с анимацией
+            }
         }
 
         function galleryPrev() {
@@ -402,8 +428,15 @@
             if (isGalleryAnimating) return;
             
             if (currentPhotos.length <= 1) return;
-            currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
-            updateGallery();
+            
+            // Циклический переход при клике на стрелку (ПК)
+            if (currentPhotoIndex === 0) {
+                currentPhotoIndex = currentPhotos.length - 1;
+                updateGalleryImmediate(); // Мгновенный переход без анимации
+            } else {
+                currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+                updateGallery(); // Обычный переход с анимацией
+            }
         }
 
         function galleryNextSwipe() {
@@ -411,13 +444,14 @@
             if (isGalleryAnimating) return;
             if (currentPhotos.length <= 1) return;
             
-            // Циклический переход без пролистывания всех слайдов
+            // Циклический переход при свайпе
             if (currentPhotoIndex === currentPhotos.length - 1) {
                 currentPhotoIndex = 0;
+                updateGalleryImmediate(); // Мгновенный переход без анимации
             } else {
                 currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+                updateGallery(); // Обычный переход с анимацией
             }
-            updateGallery();
         }
 
         function galleryPrevSwipe() {
@@ -425,13 +459,14 @@
             if (isGalleryAnimating) return;
             if (currentPhotos.length <= 1) return;
             
-            // Циклический переход без пролистывания всех слайдов
+            // Циклический переход при свайпе
             if (currentPhotoIndex === 0) {
                 currentPhotoIndex = currentPhotos.length - 1;
+                updateGalleryImmediate(); // Мгновенный переход без анимации
             } else {
                 currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+                updateGallery(); // Обычный переход с анимацией
             }
-            updateGallery();
         }
 
         function initGallerySwipe() {
