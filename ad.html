@@ -314,6 +314,7 @@
             .details-price {
                 font-size: 16px !important;
             }
+            .gallery-arrow { display: none !important; }
         }
     </style>
 </head>
@@ -390,6 +391,26 @@
             updateGallery();
         }
 
+        function galleryNextSwipe() {
+            // Циклический переход без пролистывания всех слайдов
+            if (currentPhotoIndex === currentPhotos.length - 1) {
+                currentPhotoIndex = 0;
+            } else {
+                currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+            }
+            updateGallery();
+        }
+
+        function galleryPrevSwipe() {
+            // Циклический переход без пролистывания всех слайдов
+            if (currentPhotoIndex === 0) {
+                currentPhotoIndex = currentPhotos.length - 1;
+            } else {
+                currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+            }
+            updateGallery();
+        }
+
         function initGallerySwipe() {
             const wrapper = document.querySelector('.gallery-wrapper');
             if (!wrapper) return;
@@ -413,11 +434,11 @@
 
                 if (Math.abs(diff) > swipeThreshold) {
                     if (diff > 0) {
-                        // Свайп влево - показываем следующее фото
-                        galleryNext();
+                        // Свайп влево - показываем следующее фото с циклическим переходом
+                        galleryNextSwipe();
                     } else {
-                        // Свайп вправо - показываем предыдущее фото
-                        galleryPrev();
+                        // Свайп вправо - показываем предыдущее фото с циклическим переходом
+                        galleryPrevSwipe();
                     }
                 }
             }, false);
