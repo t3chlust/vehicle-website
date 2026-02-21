@@ -388,6 +388,25 @@
             }, 600);
         }
 
+        function updateGalleryNoAnimation() {
+            // Мгновенный переход без анимации
+            const track = document.getElementById('gallery-track');
+            if (!track) return;
+            
+            // Отключаем транзицию
+            track.style.transition = 'none';
+            track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
+            
+            // Принудительная перерисовка браузером
+            void track.offsetHeight;
+            
+            // Включаем транзицию обратно
+            track.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            
+            // Сброс флага анимации
+            isGalleryAnimating = false;
+        }
+
         function galleryNext() {
             // Защита от множественных кликов во время анимации
             if (isGalleryAnimating) return;
@@ -414,10 +433,12 @@
             // Циклический переход без пролистывания всех слайдов
             if (currentPhotoIndex === currentPhotos.length - 1) {
                 currentPhotoIndex = 0;
+                // Мгновенный переход без анимации
+                updateGalleryNoAnimation();
             } else {
                 currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+                updateGallery();
             }
-            updateGallery();
         }
 
         function galleryPrevSwipe() {
@@ -428,10 +449,12 @@
             // Циклический переход без пролистывания всех слайдов
             if (currentPhotoIndex === 0) {
                 currentPhotoIndex = currentPhotos.length - 1;
+                // Мгновенный переход без анимации
+                updateGalleryNoAnimation();
             } else {
                 currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+                updateGallery();
             }
-            updateGallery();
         }
 
         function initGallerySwipe() {
