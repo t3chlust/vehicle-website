@@ -112,6 +112,9 @@
             height: 100%;
             transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
+        .gallery-track.no-transition {
+            transition: none;
+        }
         .gallery-slide {
             min-width: 100%;
             height: 100%;
@@ -379,6 +382,7 @@
         function updateGallery() {
             const track = document.getElementById('gallery-track');
             if (!track) return;
+            track.classList.remove('no-transition');
             track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
             
             // Сброс флага анимации после завершения транзиции
@@ -388,6 +392,24 @@
             }, 600);
         }
 
+        function updateGalleryNoAnimation() {
+            const track = document.getElementById('gallery-track');
+            if (!track) return;
+            
+            // Добавляем класс чтобы отключить транзицию
+            track.classList.add('no-transition');
+            // Применяем трансформ
+            track.style.transform = `translateX(-${currentPhotoIndex * 100}%)`;
+            
+            // После отрисовки удаляем класс для следующего раза
+            setTimeout(() => {
+                track.classList.remove('no-transition');
+            }, 50);
+            
+            // Сбрасываем флаг сразу (нет ожидания анимации)
+            isGalleryAnimating = false;
+        }
+
         function galleryNext() {
             // Защита от множественных кликов во время анимации
             if (isGalleryAnimating) return;
@@ -395,7 +417,11 @@
             
             if (currentPhotoIndex < currentPhotos.length - 1) {
                 currentPhotoIndex++;
-                updateGallery();
+                updateGallery(); // С анимацией
+            } else if (currentPhotoIndex === currentPhotos.length - 1) {
+                // Циклический переход без анимации
+                currentPhotoIndex = 0;
+                updateGalleryNoAnimation();
             }
         }
 
@@ -406,7 +432,11 @@
             
             if (currentPhotoIndex > 0) {
                 currentPhotoIndex--;
-                updateGallery();
+                updateGallery(); // С анимацией
+            } else if (currentPhotoIndex === 0) {
+                // Циклический переход без анимации
+                currentPhotoIndex = currentPhotos.length - 1;
+                updateGalleryNoAnimation();
             }
         }
 
@@ -415,10 +445,13 @@
             if (isGalleryAnimating) return;
             if (currentPhotos.length <= 1) return;
             
-            // Не циклим при свайпе - просто переходим если не последний
             if (currentPhotoIndex < currentPhotos.length - 1) {
-                currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
-                updateGallery();
+                currentPhotoIndex++;
+                updateGallery(); // С анимацией
+            } else if (currentPhotoIndex === currentPhotos.length - 1) {
+                // Циклический переход при свайпе без анимации
+                currentPhotoIndex = 0;
+                updateGalleryNoAnimation();
             }
         }
 
@@ -427,10 +460,13 @@
             if (isGalleryAnimating) return;
             if (currentPhotos.length <= 1) return;
             
-            // Не циклим при свайпе - просто переходим если не первый
             if (currentPhotoIndex > 0) {
-                currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
-                updateGallery();
+                currentPhotoIndex--;
+                updateGallery(); // С анимацией
+            } else if (currentPhotoIndex === 0) {
+                // Циклический переход при свайпе без анимации
+                currentPhotoIndex = currentPhotos.length - 1;
+                updateGalleryNoAnimation();
             }
         }
 
