@@ -147,7 +147,16 @@
             justify-content: space-between;
             align-items: center;
             gap: 15px;
+            margin-bottom: 10px;
+        }
+        .details-actions-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
             margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
         }
         .title-wrapper {
             display: flex;
@@ -237,7 +246,7 @@
             .title-wrapper {
                 width: 100%;
             }
-            .action-icons {
+            .details-actions-row {
                 gap: 8px;
             }
             .icon-btn svg {
@@ -504,20 +513,20 @@
                             <div class="details-title">${item.title || item.partName || 'Объявление'}</div>
                             <div class="details-badges">${badgesHtml}</div>
                         </div>
-                        <div class="action-icons">
-                            <button class="icon-btn share-btn" onclick="shareAd(${item.rowIndex})" title="Поделиться">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="18" cy="5" r="3"></circle>
-                                    <circle cx="6" cy="12" r="3"></circle>
-                                    <circle cx="18" cy="19" r="3"></circle>
-                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                                </svg>
-                            </button>
-                            <button class="favorite-heart ${userFavorites.includes(item.rowIndex) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavoriteFromDetail(${item.rowIndex})" title="${userFavorites.includes(item.rowIndex) ? 'Удалить из избранного' : 'Добавить в избранное'}">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="${userFavorites.includes(item.rowIndex) ? '#ff4757' : 'none'}" stroke="${userFavorites.includes(item.rowIndex) ? '#ff4757' : '#ccc'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                            </button>
-                        </div>
+                    </div>
+                    <div class="details-actions-row">
+                        <button class="icon-btn share-btn" onclick="shareAd(${item.rowIndex})" title="Поделиться">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </button>
+                        <button class="favorite-heart ${userFavorites.includes(item.rowIndex) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavoriteFromDetail(${item.rowIndex})" title="${userFavorites.includes(item.rowIndex) ? 'Удалить из избранного' : 'Добавить в избранное'}">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="${userFavorites.includes(item.rowIndex) ? '#ff4757' : 'none'}" stroke="${userFavorites.includes(item.rowIndex) ? '#ff4757' : '#ccc'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </button>
                     </div>
                         <div class="details-price">${Number(item.price || 0).toLocaleString()} ₽</div>
                         <div class="seller-info">
