@@ -548,14 +548,18 @@
             const url = window.location.href;
             const title = currentItem?.title || 'Объявление';
             
-            if (navigator.share) {
+            // Проверяем, мобильное ли это устройство (наличие touchscreen)
+            const isMobile = navigator.maxTouchPoints > 0 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile && navigator.share) {
+                // На мобильных используем нативный Share
                 navigator.share({
                     title: title,
                     text: `Посмотри это объявление: ${title}`,
                     url: url
                 }).catch(err => console.log('Share cancelled'));
             } else {
-                // Fallback - копирование ссылки в буфер обмена
+                // На ПК копируем ссылку в буфер обмена
                 navigator.clipboard.writeText(url).then(() => {
                     alert('Ссылка скопирована в буфер обмена');
                 }).catch(err => console.error('Ошибка копирования:', err));
