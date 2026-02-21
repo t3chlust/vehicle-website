@@ -577,31 +577,32 @@
             const url = window.location.href;
             const title = currentItem?.title || 'Объявление';
             
+            console.log('=== shareAd вызвана ===');
+            console.log('URL:', url);
+            console.log('Title:', title);
+            console.log('Navigator.share доступна:', !!navigator.share);
+            console.log('UserAgent:', navigator.userAgent);
+            
             // Проверяем iOS
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            console.log('isIOS:', isIOS);
             
             try {
                 // Если есть Web Share API - используем его
                 if (navigator.share) {
+                    console.log('Используется Web Share API');
                     navigator.share({
                         title: title,
                         text: `Посмотри это объявление: ${title}`,
                         url: url
                     }).catch(err => {
-                        // Share отменен пользователем - это нормально
                         console.log('Share отменен', err);
                     });
                 } else if (isIOS) {
-                    // iOS без Share API - пробуем альтернативный способ
-                    // Открываем ссылку с параметром, который может открыть share sheet
-                    const encodedUrl = encodeURIComponent(url);
-                    const encodedText = encodeURIComponent(title);
-                    
-                    // Попытка использовать встроенный iOS share
-                    // Если это не сработает, вернемся к копированию
+                    console.log('iOS без Share API - fallback');
                     iosShareFallback(url, title);
                 } else {
-                    // ПК или хромиум-браузер - копируем ссылку
+                    console.log('Копирование для ПК');
                     copyToClipboard(url);
                 }
             } catch (err) {
@@ -611,36 +612,45 @@
         }
 
         function iosShareFallback(url, title) {
+            console.log('iosShareFallback вызвана');
             // Для iOS без Web Share API пробуем несколько методов
             
             // Попытка 1: Используем Clipboard API
             if (navigator.clipboard && navigator.clipboard.writeText) {
+                console.log('Используется Clipboard API');
                 navigator.clipboard.writeText(url).then(() => {
+                    console.log('Успешно скопировано в буфер');
                     alert('Ссылка скопирована в буфер обмена');
                 }).catch(err => {
-                    // Попытка 2: Используем старый способ
+                    console.log('Clipboard error:', err);
                     fallbackCopyToClipboard(url);
                 });
             } else {
-                // Попытка 2: Используем старый способ
+                console.log('Clipboard API недоступна, используем fallback');
                 fallbackCopyToClipboard(url);
             }
         }
 
         function copyToClipboard(url) {
+            console.log('copyToClipboard вызвана');
             // Для ПК
             if (navigator.clipboard && navigator.clipboard.writeText) {
+                console.log('Используется Clipboard API');
                 navigator.clipboard.writeText(url).then(() => {
+                    console.log('Успешно скопировано в буфер');
                     alert('Ссылка скопирована в буфер обмена');
                 }).catch(err => {
+                    console.log('Clipboard error:', err);
                     fallbackCopyToClipboard(url);
                 });
             } else {
+                console.log('Clipboard API недоступна, используем fallback');
                 fallbackCopyToClipboard(url);
             }
         }
 
         function fallbackCopyToClipboard(text) {
+            console.log('fallbackCopyToClipboard вызвана');
             try {
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
@@ -652,7 +662,7 @@
                 document.body.removeChild(textarea);
                 
                 if (success) {
-                    console.log('Fallback copy successful');
+                    console.log('Fallback copy успешно');
                     alert('Ссылка скопирована в буфер обмена');
                 } else {
                     console.error('Fallback copy failed');
