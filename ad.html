@@ -344,6 +344,11 @@
         let currentUser = null;
         let currentItemType = null;
         let userFavorites = [];
+        
+        // Переменные для свайпа галереи
+        let swipeStartX = 0;
+        let swipeEndX = 0;
+        let isGalleryDragging = false;
 
         function normalizePhone(phone) { 
             return String(phone || '').replace(/\D/g, ''); 
@@ -390,6 +395,41 @@
         function galleryPrev() {
             currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
             updateGallery();
+        }
+
+        function initGallerySwipe() {
+            const wrapper = document.querySelector('.gallery-wrapper');
+            if (!wrapper) return;
+
+            wrapper.addEventListener('touchstart', (e) => {
+                swipeStartX = e.changedTouches[0].clientX;
+                isGalleryDragging = true;
+            }, false);
+
+            wrapper.addEventListener('touchmove', (e) => {
+                if (!isGalleryDragging) return;
+                swipeEndX = e.changedTouches[0].clientX;
+            }, false);
+
+            wrapper.addEventListener('touchend', () => {
+                if (!isGalleryDragging) return;
+                isGalleryDragging = false;
+
+                const swipeThreshold = 50;
+                const diff = swipeStartX - swipeEndX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        // Свайп влево - показываем следующее фото
+                        galleryNext();
+                    } else {
+                        // Свайп вправо - показываем предыдущее фото
+                        galleryPrev();
+                    }
+                }
+            }, false);
+
+            console.log('Gallery swipe инициализирована');
         }
 
         async function editAd() {
@@ -569,6 +609,9 @@
             } else {
                 console.log('Share button не найдена в DOM');
             }
+            
+            // Инициализируем свайп для галереи
+            initGallerySwipe();
             
             // Set back button color based on type
             const backLink = document.querySelector('.back-link');
