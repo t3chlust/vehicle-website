@@ -548,11 +548,16 @@
             const url = window.location.href;
             const title = currentItem?.title || 'Объявление';
             
+            console.log('shareAd called with url:', url);
+            
             // Проверяем, мобильное ли это устройство (наличие touchscreen)
             const isMobile = navigator.maxTouchPoints > 0 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
+            console.log('isMobile:', isMobile);
+            
             if (isMobile && navigator.share) {
                 // На мобильных используем нативный Share
+                console.log('Using native share API');
                 navigator.share({
                     title: title,
                     text: `Посмотри это объявление: ${title}`,
@@ -560,9 +565,45 @@
                 }).catch(err => console.log('Share cancelled'));
             } else {
                 // На ПК копируем ссылку в буфер обмена
-                navigator.clipboard.writeText(url).then(() => {
+                console.log('Attempting to copy to clipboard');
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        console.log('Successfully copied to clipboard');
+                        alert('Ссылка скопирована в буфер обмена');
+                    }).catch(err => {
+                        console.error('Clipboard API error:', err);
+                        // Fallback - используем старый способ
+                        fallbackCopyToClipboard(url);
+                    });
+                } else {
+                    console.log('Clipboard API not available, using fallback');
+                    fallbackCopyToClipboard(url);
+                }
+            }
+        }
+
+        function fallbackCopyToClipboard(text) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-999999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                const success = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                if (success) {
+                    console.log('Fallback copy successful');
                     alert('Ссылка скопирована в буфер обмена');
-                }).catch(err => console.error('Ошибка копирования:', err));
+                } else {
+                    console.error('Fallback copy failed');
+                    alert('Не удалось скопировать ссылку');
+                }
+            } catch (err) {
+                console.error('Fallback copy error:', err);
+                alert('Ошибка при копировании: ' + err.message);
             }
         }
 
