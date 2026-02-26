@@ -3011,7 +3011,7 @@
                                             <label style="cursor:pointer; display:block;"><span
                                                     style="font-weight:bold; color:#0066cc;">Добавить фото и видео</span><input
                                                     type="file" id="inp-media" multiple accept="image/*,video/*"
-                                                    style="display:none" onchange="showFilePreview()" /></label>
+                                                    style="display:none" onchange="accumulateMediaFiles()" /></label>
                                         </div>
                                         <div id="preview-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;"></div>
                                         <div id="file-count" style="margin-top:10px; font-weight:bold;"></div>
@@ -3614,10 +3614,30 @@
                                 countEl.innerText = '';
                             }
                         }
+                        function accumulateMediaFiles() {
+                            const mediaInput = document.getElementById('inp-media');
+                            if (!window.accumulatedMediaFiles) {
+                                window.accumulatedMediaFiles = [];
+                            }
+                            
+                            // Add new files to accumulated array
+                            for (let i = 0; i < mediaInput.files.length; i++) {
+                                window.accumulatedMediaFiles.push(mediaInput.files[i]);
+                            }
+                            
+                            // Clear the input so user can select same files again if needed
+                            mediaInput.value = '';
+                            
+                            // Show preview with accumulated files
+                            showFilePreview();
+                        }
                         function showFilePreview() {
                             const container = document.getElementById('preview-container');
                             const countEl = document.getElementById('file-count');
-                            const mediaInput = document.getElementById('inp-media');
+                            
+                            if (!window.accumulatedMediaFiles) {
+                                window.accumulatedMediaFiles = [];
+                            }
                             
                             // Clear only new media previews, keep existing media
                             const newPreviewsContainer = container.querySelector('#new-previews') || 
@@ -3630,7 +3650,7 @@
                                 })();
                             
                             newPreviewsContainer.innerHTML = '';
-                            const totalFiles = mediaInput.files.length;
+                            const totalFiles = window.accumulatedMediaFiles.length;
                             
                             // Update count
                             const existingCount = container.querySelectorAll('.existing-media').length;
@@ -3643,10 +3663,7 @@
                             
                             // Process new media files
                             for (let i = 0; i < totalFiles; i++) {
-                                // Skip files marked for deletion
-                                if (window.removedNewMediaIndices && window.removedNewMediaIndices.includes(i)) continue;
-                                
-                                const file = mediaInput.files[i];
+                                const file = window.accumulatedMediaFiles[i];
                                 const isImage = file.type.startsWith('image/');
                                 const isVideo = file.type.startsWith('video/');
                                 
@@ -3709,21 +3726,10 @@
                                     deleteBtn.style.fontWeight = 'bold';
                                     deleteBtn.onclick = (e) => {
                                         e.stopPropagation();
-                                        wrapper.style.display = 'none';
-                                        // Mark file as deleted by adding to tracking array
-                                        if (!window.removedNewMediaIndices) window.removedNewMediaIndices = [];
-                                        window.removedNewMediaIndices.push(i);
-                                        // Update count
-                                        const container = document.getElementById('preview-container');
-                                        const existingCount = container.querySelectorAll('.existing-media').length;
-                                        const visibleNewCount = container.querySelectorAll('.new-media-preview:not([style*="display: none"])').length;
-                                        const newTotal = existingCount + visibleNewCount;
-                                        const countEl = document.getElementById('file-count');
-                                        if (newTotal > 0) {
-                                            countEl.innerText = `Файлов: ${newTotal}`;
-                                        } else {
-                                            countEl.innerText = '';
-                                        }
+                                        // Remove file from accumulated array
+                                        window.accumulatedMediaFiles.splice(i, 1);
+                                        // Refresh preview
+                                        showFilePreview();
                                     };
                                     wrapper.appendChild(deleteBtn);
                                     
@@ -5183,18 +5189,17 @@
                                     });
                                 }
                                 
-                                const mediaInput = document.getElementById('inp-media');
+                                if (!window.accumulatedMediaFiles) {
+                                    window.accumulatedMediaFiles = [];
+                                }
                                 
                                 // Upload new media files
-                                if (mediaInput && mediaInput.files.length > 0) {
+                                if (window.accumulatedMediaFiles && window.accumulatedMediaFiles.length > 0) {
                                     let photoArr = [];
                                     let videoArr = [];
                                     
-                                    for (let i = 0; i < mediaInput.files.length; i++) {
-                                        // Skip files marked for deletion
-                                        if (window.removedNewMediaIndices && window.removedNewMediaIndices.includes(i)) continue;
-                                        
-                                        const file = mediaInput.files[i];
+                                    for (let i = 0; i < window.accumulatedMediaFiles.length; i++) {
+                                        const file = window.accumulatedMediaFiles[i];
                                         const isImage = file.type.startsWith('image/');
                                         const isVideo = file.type.startsWith('video/');
                                         
@@ -5264,6 +5269,7 @@
                                     document.getElementById('file-count').innerText = '';
                                     window.currentAdDeletedMedia = [];
                                     window.removedNewMediaIndices = [];
+                                    window.accumulatedMediaFiles = [];
                                     showList();
                                     loadParts();
                                     showTab(document.querySelector('.tab-link[onclick*="parts"]'), 'parts');
@@ -5318,6 +5324,7 @@
                                 document.getElementById('file-count').innerText = '';
                                 window.currentAdDeletedMedia = [];
                                 window.removedNewMediaIndices = [];
+                                window.accumulatedMediaFiles = [];
                                 showList(); loadAds();
                             } catch (er) { alert(er.message); hideLoader(); } finally { hideLoader() }
                         });
@@ -5417,6 +5424,7 @@
                             isEditMode = false;
                             window.currentAdDeletedMedia = [];
                             window.removedNewMediaIndices = [];
+                            window.accumulatedMediaFiles = [];
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) btnCreate.classList.add('hidden');
                             document.getElementById('form-title').innerText = "Новое объявление";
@@ -5606,6 +5614,7 @@
                         function openEditMode(ad) {
                             isEditMode = true;
                             window.removedNewMediaIndices = [];
+                            window.accumulatedMediaFiles = [];
                             document.getElementById('form-title').innerText = "Редактирование";
                             document.getElementById('submit-btn').innerText = "Сохранить";
                             const btnCreate = document.getElementById('btn-create-ad');
@@ -5664,6 +5673,7 @@
                         function openEditModePart(part) {
                             isEditMode = true;
                             window.removedNewMediaIndices = [];
+                            window.accumulatedMediaFiles = [];
                             document.getElementById('form-title').innerText = "Редактирование";
                             document.getElementById('submit-btn').innerText = "Сохранить";
                             const btnCreate = document.getElementById('btn-create-ad');
