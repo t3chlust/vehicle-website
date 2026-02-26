@@ -3007,14 +3007,10 @@
                                         id="inp-desc" rows="4" placeholder="Доп. информация..."></textarea>
                                     <div
                                         style="border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
-                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                                        <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 15px;">
                                             <label style="cursor:pointer; display:block;"><span
-                                                    style="font-weight:bold; color:#0066cc;">🖼️ Добавить фото</span><input
-                                                    type="file" id="inp-photos" multiple accept="image/*"
-                                                    style="display:none" onchange="showFilePreview()" /></label>
-                                            <label style="cursor:pointer; display:block;"><span
-                                                    style="font-weight:bold; color:#0066cc;">🎥 Добавить видео</span><input
-                                                    type="file" id="inp-videos" multiple accept="video/*"
+                                                    style="font-weight:bold; color:#0066cc;">📁 Добавить фото и видео</span><input
+                                                    type="file" id="inp-media" multiple accept="image/*,video/*"
                                                     style="display:none" onchange="showFilePreview()" /></label>
                                         </div>
                                         <div id="preview-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;"></div>
@@ -3383,32 +3379,210 @@
                             if (!el || !el.value) return '';
                             return el.value.replace(/\s/g, '');
                         }
+                        function showExistingMedia(ad) {
+                            const container = document.getElementById('preview-container');
+                            if (!container) return;
+                            
+                            // Clear existing media and new previews
+                            container.innerHTML = '';
+                            
+                            // Parse existing photos and videos
+                            const photos = ad.photos ? ad.photos.split(',').filter(p => p.startsWith('http')) : [];
+                            const videos = ad.videos ? ad.videos.split(',').filter(v => v.startsWith('http')) : [];
+                            const allMedia = [...photos, ...videos];
+                            
+                            // Store references for tracking deletions
+                            window.currentAdExistingMedia = allMedia;
+                            window.currentAdDeletedMedia = [];
+                            
+                            if (allMedia.length > 0) {
+                                document.getElementById('file-count').innerText = `Файлов: ${allMedia.length} существующих`;
+                                
+                                // Display existing media
+                                photos.forEach((photoUrl, index) => {
+                                    const wrapper = document.createElement('div');
+                                    wrapper.style.position = 'relative';
+                                    wrapper.className = 'existing-media';
+                                    wrapper.setAttribute('data-media-type', 'photo');
+                                    wrapper.setAttribute('data-media-url', photoUrl);
+                                    
+                                    const img = document.createElement('img');
+                                    img.src = photoUrl;
+                                    img.style.width = '100%';
+                                    img.style.height = '100px';
+                                    img.style.objectFit = 'cover';
+                                    img.style.borderRadius = '4px';
+                                    wrapper.appendChild(img);
+                                    
+                                    const badge = document.createElement('div');
+                                    badge.textContent = '📷';
+                                    badge.style.position = 'absolute';
+                                    badge.style.top = '4px';
+                                    badge.style.right = '24px';
+                                    badge.style.fontSize = '16px';
+                                    badge.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                                    badge.style.color = 'white';
+                                    badge.style.borderRadius = '50%';
+                                    badge.style.width = '24px';
+                                    badge.style.height = '24px';
+                                    badge.style.display = 'flex';
+                                    badge.style.alignItems = 'center';
+                                    badge.style.justifyContent = 'center';
+                                    wrapper.appendChild(badge);
+                                    
+                                    // Add delete button
+                                    const deleteBtn = document.createElement('div');
+                                    deleteBtn.textContent = '✕';
+                                    deleteBtn.style.position = 'absolute';
+                                    deleteBtn.style.top = '4px';
+                                    deleteBtn.style.right = '4px';
+                                    deleteBtn.style.cursor = 'pointer';
+                                    deleteBtn.style.fontSize = '20px';
+                                    deleteBtn.style.color = 'white';
+                                    deleteBtn.style.backgroundColor = 'rgba(255,0,0,0.7)';
+                                    deleteBtn.style.width = '24px';
+                                    deleteBtn.style.height = '24px';
+                                    deleteBtn.style.borderRadius = '50%';
+                                    deleteBtn.style.display = 'flex';
+                                    deleteBtn.style.alignItems = 'center';
+                                    deleteBtn.style.justifyContent = 'center';
+                                    deleteBtn.style.fontSize = '14px';
+                                    deleteBtn.style.lineHeight = '1';
+                                    deleteBtn.style.paddingTop = '1px';
+                                    deleteBtn.style.fontWeight = 'bold';
+                                    deleteBtn.onclick = (e) => deleteMediaItem(photoUrl, 'photo', wrapper);
+                                    wrapper.appendChild(deleteBtn);
+                                    
+                                    container.appendChild(wrapper);
+                                });
+                                
+                                videos.forEach((videoUrl, index) => {
+                                    const wrapper = document.createElement('div');
+                                    wrapper.style.position = 'relative';
+                                    wrapper.className = 'existing-media';
+                                    wrapper.setAttribute('data-media-type', 'video');
+                                    wrapper.setAttribute('data-media-url', videoUrl);
+                                    
+                                    const video = document.createElement('video');
+                                    video.src = videoUrl;
+                                    video.style.width = '100%';
+                                    video.style.height = '100px';
+                                    video.style.objectFit = 'cover';
+                                    video.style.borderRadius = '4px';
+                                    video.style.backgroundColor = '#000';
+                                    wrapper.appendChild(video);
+                                    
+                                    const badge = document.createElement('div');
+                                    badge.textContent = '🎥';
+                                    badge.style.position = 'absolute';
+                                    badge.style.top = '4px';
+                                    badge.style.right = '24px';
+                                    badge.style.fontSize = '16px';
+                                    badge.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                                    badge.style.color = 'white';
+                                    badge.style.borderRadius = '50%';
+                                    badge.style.width = '24px';
+                                    badge.style.height = '24px';
+                                    badge.style.display = 'flex';
+                                    badge.style.alignItems = 'center';
+                                    badge.style.justifyContent = 'center';
+                                    wrapper.appendChild(badge);
+                                    
+                                    // Add delete button
+                                    const deleteBtn = document.createElement('div');
+                                    deleteBtn.textContent = '✕';
+                                    deleteBtn.style.position = 'absolute';
+                                    deleteBtn.style.top = '4px';
+                                    deleteBtn.style.right = '4px';
+                                    deleteBtn.style.cursor = 'pointer';
+                                    deleteBtn.style.fontSize = '20px';
+                                    deleteBtn.style.color = 'white';
+                                    deleteBtn.style.backgroundColor = 'rgba(255,0,0,0.7)';
+                                    deleteBtn.style.width = '24px';
+                                    deleteBtn.style.height = '24px';
+                                    deleteBtn.style.borderRadius = '50%';
+                                    deleteBtn.style.display = 'flex';
+                                    deleteBtn.style.alignItems = 'center';
+                                    deleteBtn.style.justifyContent = 'center';
+                                    deleteBtn.style.fontSize = '14px';
+                                    deleteBtn.style.lineHeight = '1';
+                                    deleteBtn.style.paddingTop = '1px';
+                                    deleteBtn.style.fontWeight = 'bold';
+                                    deleteBtn.onclick = (e) => deleteMediaItem(videoUrl, 'video', wrapper);
+                                    wrapper.appendChild(deleteBtn);
+                                    
+                                    container.appendChild(wrapper);
+                                });
+                            }
+                        }
+                        function deleteMediaItem(mediaUrl, mediaType, wrapperElement) {
+                            // Remove from UI
+                            wrapperElement.remove();
+                            
+                            // Track deletion
+                            if (!window.currentAdDeletedMedia) window.currentAdDeletedMedia = [];
+                            window.currentAdDeletedMedia.push({ url: mediaUrl, type: mediaType });
+                            
+                            // Update count
+                            const container = document.getElementById('preview-container');
+                            const newCount = container.querySelectorAll('.existing-media').length + 
+                                            document.getElementById('inp-media').files.length;
+                            const countEl = document.getElementById('file-count');
+                            if (newCount > 0) {
+                                countEl.innerText = `Файлов: ${newCount}`;
+                            } else {
+                                countEl.innerText = '';
+                            }
+                        }
                         function showFilePreview() {
                             const container = document.getElementById('preview-container');
                             const countEl = document.getElementById('file-count');
-                            const photoInput = document.getElementById('inp-photos');
-                            const videoInput = document.getElementById('inp-videos');
+                            const mediaInput = document.getElementById('inp-media');
                             
-                            container.innerHTML = '';
-                            const totalFiles = photoInput.files.length + videoInput.files.length;
+                            // Clear only new media previews, keep existing media
+                            const newPreviewsContainer = container.querySelector('#new-previews') || 
+                                (() => {
+                                    const div = document.createElement('div');
+                                    div.id = 'new-previews';
+                                    div.style.display = 'contents';
+                                    container.appendChild(div);
+                                    return div;
+                                })();
                             
-                            if (totalFiles > 0) {
-                                countEl.innerText = `Файлов: ${totalFiles}`;
+                            newPreviewsContainer.innerHTML = '';
+                            const totalFiles = mediaInput.files.length;
+                            
+                            // Update count
+                            const existingCount = container.querySelectorAll('.existing-media').length;
+                            const totalCount = existingCount + totalFiles;
+                            if (totalCount > 0) {
+                                countEl.innerText = `Файлов: ${totalCount} (${existingCount} существующих, ${totalFiles} новых)`;
+                            } else {
+                                countEl.innerText = '';
+                            }
+                            
+                            // Process new media files
+                            for (let i = 0; i < Math.min(totalFiles, 10); i++) {
+                                const file = mediaInput.files[i];
+                                const isImage = file.type.startsWith('image/');
+                                const isVideo = file.type.startsWith('video/');
                                 
-                                // Show photo previews
-                                for (let i = 0; i < Math.min(photoInput.files.length, 10); i++) {
-                                    const file = photoInput.files[i];
-                                    const reader = new FileReader();
-                                    reader.onload = function (e) {
-                                        const wrapper = document.createElement('div');
-                                        wrapper.style.position = 'relative';
+                                if (!isImage && !isVideo) continue;
+                                
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    const wrapper = document.createElement('div');
+                                    wrapper.style.position = 'relative';
+                                    wrapper.className = 'new-media-preview';
+                                    
+                                    if (isImage) {
                                         const img = document.createElement('img');
                                         img.src = e.target.result;
-                                        img.className = 'preview-thumb';
                                         img.style.width = '100%';
                                         img.style.height = '100px';
                                         img.style.objectFit = 'cover';
                                         img.style.borderRadius = '4px';
+                                        wrapper.appendChild(img);
                                         
                                         const badge = document.createElement('div');
                                         badge.textContent = '📷';
@@ -3424,30 +3598,16 @@
                                         badge.style.display = 'flex';
                                         badge.style.alignItems = 'center';
                                         badge.style.justifyContent = 'center';
-                                        badge.style.fontSize = '12px';
-                                        
-                                        wrapper.appendChild(img);
                                         wrapper.appendChild(badge);
-                                        container.appendChild(wrapper);
-                                    };
-                                    reader.readAsDataURL(file);
-                                }
-                                
-                                // Show video previews
-                                for (let i = 0; i < Math.min(videoInput.files.length, 10); i++) {
-                                    const file = videoInput.files[i];
-                                    const reader = new FileReader();
-                                    reader.onload = function (e) {
-                                        const wrapper = document.createElement('div');
-                                        wrapper.style.position = 'relative';
+                                    } else if (isVideo) {
                                         const video = document.createElement('video');
                                         video.src = e.target.result;
-                                        video.className = 'preview-thumb';
                                         video.style.width = '100%';
                                         video.style.height = '100px';
                                         video.style.objectFit = 'cover';
                                         video.style.borderRadius = '4px';
                                         video.style.backgroundColor = '#000';
+                                        wrapper.appendChild(video);
                                         
                                         const badge = document.createElement('div');
                                         badge.textContent = '🎥';
@@ -3463,16 +3623,12 @@
                                         badge.style.display = 'flex';
                                         badge.style.alignItems = 'center';
                                         badge.style.justifyContent = 'center';
-                                        badge.style.fontSize = '12px';
-                                        
-                                        wrapper.appendChild(video);
                                         wrapper.appendChild(badge);
-                                        container.appendChild(wrapper);
-                                    };
-                                    reader.readAsDataURL(file);
-                                }
-                            } else {
-                                countEl.innerText = '';
+                                    }
+                                    
+                                    newPreviewsContainer.appendChild(wrapper);
+                                };
+                                reader.readAsDataURL(file);
                             }
                         }
                         function safeVal(id) { const e = document.getElementById(id); return e ? e.value : "" }
@@ -4914,41 +5070,61 @@
                             try {
                                 let phU = (currentAd && isEditMode) ? currentAd.photos : "";
                                 let vidU = (currentAd && isEditMode) ? currentAd.videos : "";
-                                const fI = document.getElementById('inp-photos');
-                                const vI = document.getElementById('inp-videos');
                                 
-                                // Upload photos
-                                if (fI.files.length > 0) {
-                                    let arr = [];
-                                    for (let i = 0; i < Math.min(fI.files.length, 10); i++) {
-                                        let fd = new FormData(); 
-                                        fd.append('file', fI.files[i]); 
-                                        fd.append('upload_preset', UPLOAD_PRESET);
-                                        let r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
-                                        let j = await r.json(); 
-                                        if (j.secure_url) arr.push(j.secure_url);
-                                    }
-                                    phU = arr.join(',');
+                                // Remove deleted media
+                                if (window.currentAdDeletedMedia && window.currentAdDeletedMedia.length > 0) {
+                                    window.currentAdDeletedMedia.forEach(item => {
+                                        if (item.type === 'photo') {
+                                            phU = phU.split(',').filter(p => p !== item.url).join(',');
+                                        } else if (item.type === 'video') {
+                                            vidU = vidU.split(',').filter(v => v !== item.url).join(',');
+                                        }
+                                    });
                                 }
                                 
-                                // Upload videos
-                                if (vI.files.length > 0) {
-                                    let arr = [];
-                                    for (let i = 0; i < Math.min(vI.files.length, 5); i++) {
-                                        let fd = new FormData(); 
-                                        fd.append('file', vI.files[i]); 
-                                        fd.append('upload_preset', UPLOAD_PRESET);
-                                        fd.append('resource_type', 'video');
-                                        try {
-                                            let r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: 'POST', body: fd, timeout: 60000 });
+                                const mediaInput = document.getElementById('inp-media');
+                                
+                                // Upload new media files
+                                if (mediaInput && mediaInput.files.length > 0) {
+                                    let photoArr = [];
+                                    let videoArr = [];
+                                    
+                                    for (let i = 0; i < mediaInput.files.length; i++) {
+                                        const file = mediaInput.files[i];
+                                        const isImage = file.type.startsWith('image/');
+                                        const isVideo = file.type.startsWith('video/');
+                                        
+                                        if (isImage) {
+                                            let fd = new FormData(); 
+                                            fd.append('file', file); 
+                                            fd.append('upload_preset', UPLOAD_PRESET);
+                                            let r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
                                             let j = await r.json(); 
-                                            if (j.secure_url) arr.push(j.secure_url);
-                                        } catch (err) {
-                                            console.warn('Video upload failed:', err);
+                                            if (j.secure_url) photoArr.push(j.secure_url);
+                                        } else if (isVideo && videoArr.length < 5) {
+                                            let fd = new FormData(); 
+                                            fd.append('file', file); 
+                                            fd.append('upload_preset', UPLOAD_PRESET);
+                                            fd.append('resource_type', 'video');
+                                            try {
+                                                let r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: 'POST', body: fd, timeout: 60000 });
+                                                let j = await r.json(); 
+                                                if (j.secure_url) videoArr.push(j.secure_url);
+                                            } catch (err) {
+                                                console.warn('Video upload failed:', err);
+                                            }
                                         }
                                     }
-                                    vidU = arr.join(',');
+                                    
+                                    // Append new files to existing ones
+                                    if (photoArr.length > 0) {
+                                        phU = phU ? phU + ',' + photoArr.join(',') : photoArr.join(',');
+                                    }
+                                    if (videoArr.length > 0) {
+                                        vidU = vidU ? vidU + ',' + videoArr.join(',') : videoArr.join(',');
+                                    }
                                 }
+                                
                                 const cond = safeVal('inp-condition');
                                 let desc = safeVal('inp-desc');
                                 if (cond === 'new') desc += NEW_STATUS_TAG;
@@ -4982,6 +5158,7 @@
                                     document.getElementById('main-form').reset();
                                     document.getElementById('preview-container').innerHTML = '';
                                     document.getElementById('file-count').innerText = '';
+                                    window.currentAdDeletedMedia = [];
                                     showList();
                                     loadParts();
                                     showTab(document.querySelector('.tab-link[onclick*="parts"]'), 'parts');
@@ -5034,6 +5211,7 @@
                                 document.getElementById('main-form').reset();
                                 document.getElementById('preview-container').innerHTML = '';
                                 document.getElementById('file-count').innerText = '';
+                                window.currentAdDeletedMedia = [];
                                 showList(); loadAds();
                             } catch (er) { alert(er.message); hideLoader(); } finally { hideLoader() }
                         });
@@ -5131,6 +5309,7 @@
                                 return;
                             }
                             isEditMode = false;
+                            window.currentAdDeletedMedia = [];
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) btnCreate.classList.add('hidden');
                             document.getElementById('form-title').innerText = "Новое объявление";
@@ -5355,8 +5534,7 @@
                             setVal('inp-capacity', ad.capacity || "");
                             checkTechTypeVisibility();
                             checkChassisTypeVisibility();
-                            document.getElementById('preview-container').innerHTML = '';
-                            document.getElementById('file-count').innerText = '';
+                            showExistingMedia(ad);
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
                             // Set background color for ads section
@@ -5403,8 +5581,7 @@
                             setVal('inp-brand', "");
                             setVal('inp-model', "");
                             checkTechTypeVisibility();
-                            document.getElementById('preview-container').innerHTML = '';
-                            document.getElementById('file-count').innerText = '';
+                            showExistingMedia(part);
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
                             // Set background color for parts section
