@@ -487,7 +487,7 @@ app.post('/api/listings/query', async (req, res) => {
 app.post('/api/ads', async (req, res) => {
   try {
     const {
-      action, rowIndex, title, brand, model, price, desc, name, phone, userId, photos,
+      action, rowIndex, title, brand, model, price, desc, name, phone, userId, photos, videos,
       engine, power, transmission, fuel, wheels, city, condition, sellerType, sellerTypeId,
       tender, wheelFormula, color, mileage, amphibious, docs, techType,
       constructionType, capacity
@@ -608,6 +608,17 @@ app.post('/api/ads', async (req, res) => {
           }
         }
 
+        // Добавляем видео
+        if (videos && videos.length > 0) {
+          const videoUrls = videos.split(',').filter(v => v.trim());
+          for (const videoUrl of videoUrls) {
+            await connection.query(
+              'INSERT INTO advertisement_video (advertisement, video) VALUES (?, ?)',
+              [adId, videoUrl.trim()]
+            );
+          }
+        }
+
         connection.release();
         res.json({ status: 'success', message: 'Объявление создано', id: adId });
 
@@ -684,6 +695,8 @@ app.post('/api/ads', async (req, res) => {
 
         // Удаляем старые фотографии
         await connection.query('DELETE FROM advertisement_photo WHERE advertisement = ?', [rowIndex]);
+        // Удаляем старые видео
+        await connection.query('DELETE FROM advertisement_video WHERE advertisement = ?', [rowIndex]);
 
         // Добавляем новые фотографии
         if (photos && photos.length > 0) {
@@ -692,6 +705,17 @@ app.post('/api/ads', async (req, res) => {
             await connection.query(
               'INSERT INTO advertisement_photo (advertisement, photo) VALUES (?, ?)',
               [rowIndex, photoUrl.trim()]
+            );
+          }
+        }
+
+        // Добавляем новые видео
+        if (videos && videos.length > 0) {
+          const videoUrls = videos.split(',').filter(v => v.trim());
+          for (const videoUrl of videoUrls) {
+            await connection.query(
+              'INSERT INTO advertisement_video (advertisement, video) VALUES (?, ?)',
+              [rowIndex, videoUrl.trim()]
             );
           }
         }
@@ -868,7 +892,8 @@ app.post('/api/parts', async (req, res) => {
       phone,
       name,
       userId,
-      photos
+      photos,
+      videos
     } = req.body;
 
     const connection = await pool.getConnection();
@@ -927,6 +952,16 @@ app.post('/api/parts', async (req, res) => {
           }
         }
 
+        if (videos && videos.length > 0) {
+          const videoUrls = videos.split(',').filter((v) => v.trim());
+          for (const videoUrl of videoUrls) {
+            await connection.query(
+              'INSERT INTO advertisement_video (advertisement, video) VALUES (?, ?)',
+              [partId, videoUrl.trim()]
+            );
+          }
+        }
+
         connection.release();
         res.json({ status: 'success', message: 'Запчасть создана', id: partId });
       } else if (action === 'edit') {
@@ -955,12 +990,23 @@ app.post('/api/parts', async (req, res) => {
         );
 
         await connection.query('DELETE FROM advertisement_photo WHERE advertisement = ?', [rowIndex]);
+        await connection.query('DELETE FROM advertisement_video WHERE advertisement = ?', [rowIndex]);
         if (photos && photos.length > 0) {
           const photoUrls = photos.split(',').filter((p) => p.trim());
           for (const photoUrl of photoUrls) {
             await connection.query(
               'INSERT INTO advertisement_photo (advertisement, photo) VALUES (?, ?)',
               [rowIndex, photoUrl.trim()]
+            );
+          }
+        }
+
+        if (videos && videos.length > 0) {
+          const videoUrls = videos.split(',').filter((v) => v.trim());
+          for (const videoUrl of videoUrls) {
+            await connection.query(
+              'INSERT INTO advertisement_video (advertisement, video) VALUES (?, ?)',
+              [rowIndex, videoUrl.trim()]
             );
           }
         }
