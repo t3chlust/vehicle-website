@@ -2505,6 +2505,14 @@
                                                 <p>У вас пока нет избранных объявлений</p>
                                             </div>
                                             <div id="profile-favorites-grid" class="ad-grid"></div>
+                                            <div id="profile-favorites-toggle-wrap"
+                                                style="display:none; margin-top:15px; text-align:center;">
+                                                <button id="profile-favorites-toggle" class="btn btn-black"
+                                                    onclick="toggleProfileFavoritesList()"
+                                                    style="width:100%; max-width:240px;">
+                                                    Показать все
+                                                </button>
+                                            </div>
                                         </div>
                                         <!-- Кнопка выхода -->
                                         <div style="margin-top:20px; text-align:center;">
@@ -2894,7 +2902,7 @@
                                         <option value="Бортоповоротный">Бортоповоротный</option>
                                     </select>
                                     <div id="div-part-only" class="hidden">
-                                        <div class="form-section-title">Данные запчасти <span
+                                        <div class="form-section-title">Информация <span
                                                 style="color:#ff4757; font-weight:bold;">*</span></div>
                                         <input class="form-input" id="inp-part-brand" placeholder="Бренд" />
                                         <input class="form-input" id="inp-part-title"
@@ -2947,7 +2955,7 @@
                                             <option value="АКПП">АКПП</option>
                                             <option value="МКПП">МКПП</option>
                                             <option value="Вариатор">Вариатор</option>
-                                        </select> <select class="form-select" id="inp-fuel">
+                                        </select> <select class="form-select" id="inp-fuel" onchange="checkFuelTypeVisibility()">
                                             <option value="">Топливо</option>
                                             <option value="Бензин">Бензин</option>
                                             <option value="Дизель">Дизель</option>
@@ -3109,7 +3117,7 @@
                         const FILTERS_API_URL = "/api/filters";
                         const CLOUD_NAME = "duystfz2v"; const UPLOAD_PRESET = "majorka_vladikavkaz"; const NEW_STATUS_TAG = " ***STATUS_NEW***";
                         const ADMIN_PHONE = "+79829817369";
-                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [], tenderSearchInitialized = false, tenderSearchIndex = [], profileShowAllAds = false;
+                        let confirmationResult, recaptchaVerifier, currentUser, currentUserName = "", allAds = [], allParts = [], currentAd = null, isEditMode = false, isAdmin = false, adsSearchInitialized = false, adSearchIndex = [], partsSearchInitialized = false, partSearchIndex = [], tenderSearchInitialized = false, tenderSearchIndex = [], profileShowAllAds = false, profileShowAllFavorites = false;
                         let adsSearchListClickListenerAdded = false, partsSearchListClickListenerAdded = false, tenderSearchListClickListenerAdded = false;
                         let skipAdsSearchInput = false, skipPartsSearchInput = false, skipTenderSearchInput = false; // Флаги для предотвращения рекурсии
                         let currentBrandFilter = null, currentTenderBrandFilter = null; // Отслеживаем активные фильтры по бренду
@@ -3354,6 +3362,7 @@
                                     btnCreate.classList.add('hidden');
                                 }
                             }
+                            updateFooterButtonVisibility();
                         }
 
                         function formatPriceInput(input) {
@@ -3682,6 +3691,33 @@
                                 setVal('tire-w', '');
                             } else {
                                 wheelsDiv.classList.remove('hidden');
+                            }
+                        }
+                        function checkFuelTypeVisibility() {
+                            const fuel = safeVal('inp-fuel');
+                            const transField = document.getElementById('inp-trans');
+                            const engineField = document.getElementById('inp-engine');
+                            if (fuel === 'Электричество') {
+                                if (transField) transField.removeAttribute('required');
+                                if (engineField) engineField.removeAttribute('required');
+                            } else {
+                                if (transField) transField.setAttribute('required', 'required');
+                                if (engineField) engineField.setAttribute('required', 'required');
+                            }
+                        }
+                        function updateFooterButtonVisibility() {
+                            const footerBtn = document.querySelector('.footer-top-link');
+                            const formView = document.getElementById('view-form');
+                            const profileTab = document.getElementById('tab-content-profile');
+                            if (!footerBtn) return;
+                            // Проверяем видимость формы и профиля
+                            const isFormVisible = formView && !formView.classList.contains('hidden');
+                            const isProfileActive = profileTab && profileTab.classList.contains('active');
+                            // Скрываем кнопку если видна форма или профиль
+                            if (isFormVisible || isProfileActive) {
+                                footerBtn.style.display = 'none';
+                            } else {
+                                footerBtn.style.display = '';
                             }
                         }
                         function applyFilters() {
@@ -5003,6 +5039,7 @@
                             document.getElementById('inp-tech-type').disabled = false;
                             checkTechTypeVisibility();
                             checkConditionVisibility();
+                            updateFooterButtonVisibility();
                             // Set background color based on which tab was active before opening form
                             const activeTabContent = document.querySelector('.tab-content.active');
                             let tabName = 'ads'; // default
@@ -5032,6 +5069,7 @@
                             }
                             // When returning to list, always show the 'ads' tab
                             showTab(document.querySelector('.tab-link[onclick*="ads"]'), 'ads');
+                            updateFooterButtonVisibility();
                         }
                         function editCurrentAd() { closeModalDirect(); openEditMode(currentAd) }
                         function deleteCurrentAd() { closeModalDirect(); sendDelete(parseInt(currentAd.rowIndex), currentAd.phone, currentUser ? currentUser.id : null); }
@@ -5229,6 +5267,7 @@
                                 }
                             }
                             document.getElementById('view-form').classList.remove('hidden'); // Show form
+                            updateFooterButtonVisibility();
                         }
                         function openEditModePart(part) {
                             isEditMode = true;
@@ -5269,6 +5308,7 @@
                                 tRecords.classList.add('tab-parts');
                             }
                             document.getElementById('view-form').classList.remove('hidden'); // Show form
+                            updateFooterButtonVisibility();
                         }
                         // --- NEW ADMIN FUNCTIONS ---
                         function getPendingModerationItems() {
@@ -5542,59 +5582,79 @@
                             profileShowAllAds = !profileShowAllAds;
                             renderUserAds();
                         }
+                        function toggleProfileFavoritesList() {
+                            profileShowAllFavorites = !profileShowAllFavorites;
+                            renderProfileFavorites();
+                        }
                         function renderProfileFavorites() {
                             const grid = document.getElementById('profile-favorites-grid');
                             const placeholder = document.getElementById('profile-favorites-placeholder');
                             const countEl = document.getElementById('profile-favorites-count');
+                            const toggleWrap = document.getElementById('profile-favorites-toggle-wrap');
+                            const toggleBtn = document.getElementById('profile-favorites-toggle');
+                            if (!grid || !placeholder || !countEl) return;
                             if (!currentUser || !currentUser.id) {
                                 grid.innerHTML = '';
                                 placeholder.style.display = 'block';
                                 countEl.innerText = '(0)';
+                                if (toggleWrap) toggleWrap.style.display = 'none';
                                 return;
                             }
                             // Получаем избранные объявления
                             const favoriteAds = allAds.filter(ad => userFavorites.includes(ad.rowIndex));
                             const favoriteParts = allParts.filter(part => userFavorites.includes(part.rowIndex));
-                            const allFavorites = [...favoriteAds, ...favoriteParts];
+                            const allFavorites = [
+                                ...favoriteAds.map(ad => ({ type: 'ad', data: ad })),
+                                ...favoriteParts.map(part => ({ type: 'part', data: part }))
+                            ];
                             countEl.innerText = `(${allFavorites.length})`;
                             if (allFavorites.length === 0) {
                                 placeholder.style.display = 'block';
                                 grid.style.display = 'none';
+                                if (toggleWrap) toggleWrap.style.display = 'none';
                                 return;
+                            }
+                            const shouldShowToggle = allFavorites.length > 2;
+                            if (toggleWrap) toggleWrap.style.display = shouldShowToggle ? 'block' : 'none';
+                            if (!shouldShowToggle) profileShowAllFavorites = false;
+                            if (toggleBtn) {
+                                toggleBtn.innerText = profileShowAllFavorites ? 'Показать меньше' : 'Показать все';
                             }
                             placeholder.style.display = 'none';
                             grid.style.display = 'grid';
                             grid.innerHTML = '';
                             grid.classList.remove('loaded');
-                            // Рендерим избранную технику
-                            favoriteAds.forEach(ad => {
-                                let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
-                                if (mI && !mI.startsWith('http')) mI = '';
-                                const sellerLabel = getSellerTypeLabel(ad);
-                                let badgesHtml = '';
-                                if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
-                                if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
-                                if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
-                                const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
-                                    ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
-                                    : '';
-                                let infoParts = [];
-                                if (ad.city) infoParts.push(ad.city);
-                                else if (ad.region) infoParts.push(ad.region);
-                                if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission) infoParts.push(ad.transmission);
-                                const d = document.createElement('div');
-                                d.className = 'ad-card';
-                                d.id = `ad-${ad.rowIndex}`;
-                                d.onclick = () => openAd(ad);
-                                const heartClass = 'favorite-heart active';
-                                const heartFill = '#ff4757';
-                                const heartStroke = '#ff4757';
-                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
-                                grid.appendChild(d);
-                            });
-                            // Рендерим избранные запчасти
-                            favoriteParts.forEach(part => {
+                            const itemsToRender = profileShowAllFavorites ? allFavorites : allFavorites.slice(0, 2);
+                            itemsToRender.forEach(entry => {
+                                if (entry.type === 'ad') {
+                                    const ad = entry.data;
+                                    let ph = ad.photos ? ad.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
+                                    if (mI && !mI.startsWith('http')) mI = '';
+                                    const sellerLabel = getSellerTypeLabel(ad);
+                                    let badgesHtml = '';
+                                    if (checkIsNew(ad)) badgesHtml += '<span class="badge-new">НОВЫЙ</span>';
+                                    if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
+                                    if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
+                                    const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
+                                        ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                        : '';
+                                    let infoParts = [];
+                                    if (ad.city) infoParts.push(ad.city);
+                                    else if (ad.region) infoParts.push(ad.region);
+                                    if (ad.power) infoParts.push(ad.power + ' л.с.');
+                                    if (ad.transmission) infoParts.push(ad.transmission);
+                                    const d = document.createElement('div');
+                                    d.className = 'ad-card';
+                                    d.id = `ad-${ad.rowIndex}`;
+                                    d.onclick = () => openAd(ad);
+                                    const heartClass = 'favorite-heart active';
+                                    const heartFill = '#ff4757';
+                                    const heartStroke = '#ff4757';
+                                    d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                    grid.appendChild(d);
+                                    return;
+                                }
+                                const part = entry.data;
                                 let ph = part.photos ? part.photos.split(',') : [], mI = ph.length > 0 ? ph[0] : '';
                                 if (mI && !mI.startsWith('http')) mI = '';
                                 const sellerLabel = getSellerTypeLabel(part);
