@@ -343,6 +343,11 @@ async function fetchAdsPayload() {
         [ad.id]
       );
 
+      const [videos] = await connection.query(
+        'SELECT video FROM advertisement_video WHERE advertisement = ?',
+        [ad.id]
+      );
+
       const title = [ad.brand, ad.name].filter(Boolean).join(' ').trim();
       const isNew = bitToBool(ad.condition);
       const tenderFlag = bitToBool(ad.tender);
@@ -379,6 +384,7 @@ async function fetchAdsPayload() {
         status: 'approved',
         creationDate: ad.date,
         photos: photos.map(p => p.photo).join(','),
+        videos: videos.map(v => v.video).join(','),
         wheelFormula: ad.chassisName || '',
         title: title,
         brand: ad.brand || '',
@@ -417,6 +423,11 @@ async function fetchPartsPayload() {
         [part.id]
       );
 
+      const [videos] = await connection.query(
+        'SELECT video FROM advertisement_video WHERE advertisement = ?',
+        [part.id]
+      );
+
       return {
         rowIndex: part.id,
         userId: part.userId,
@@ -433,6 +444,7 @@ async function fetchPartsPayload() {
         name: part.userName || '',
         phone: formatPhoneForDisplay(part.userPhone),
         photos: photos.map((p) => p.photo).join(','),
+        videos: videos.map((v) => v.video).join(','),
         verified: part.verified
       };
     }));
