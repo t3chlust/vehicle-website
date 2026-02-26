@@ -3563,8 +3563,9 @@
                             
                             // Process new media files
                             for (let i = 0; i < Math.min(totalFiles, 10); i++) {
-                                const file = mediaInput.files[i];
-                                const isImage = file.type.startsWith('image/');
+                                // Skip files marked for deletion
+                                if (window.removedNewMediaIndices && window.removedNewMediaIndices.includes(i)) continue;
+                                
                                 const isVideo = file.type.startsWith('video/');
                                 
                                 if (!isImage && !isVideo) continue;
@@ -3588,7 +3589,7 @@
                                         badge.textContent = '📷';
                                         badge.style.position = 'absolute';
                                         badge.style.top = '4px';
-                                        badge.style.right = '4px';
+                                        badge.style.right = '24px';
                                         badge.style.fontSize = '16px';
                                         badge.style.backgroundColor = 'rgba(0,0,0,0.5)';
                                         badge.style.color = 'white';
@@ -3613,7 +3614,7 @@
                                         badge.textContent = '🎥';
                                         badge.style.position = 'absolute';
                                         badge.style.top = '4px';
-                                        badge.style.right = '4px';
+                                        badge.style.right = '24px';
                                         badge.style.fontSize = '16px';
                                         badge.style.backgroundColor = 'rgba(0,0,0,0.5)';
                                         badge.style.color = 'white';
@@ -3625,6 +3626,46 @@
                                         badge.style.justifyContent = 'center';
                                         wrapper.appendChild(badge);
                                     }
+                                    
+                                    // Add delete button to new media
+                                    const deleteBtn = document.createElement('div');
+                                    deleteBtn.textContent = '✕';
+                                    deleteBtn.style.position = 'absolute';
+                                    deleteBtn.style.top = '4px';
+                                    deleteBtn.style.right = '4px';
+                                    deleteBtn.style.cursor = 'pointer';
+                                    deleteBtn.style.fontSize = '20px';
+                                    deleteBtn.style.color = 'white';
+                                    deleteBtn.style.backgroundColor = 'rgba(255,0,0,0.7)';
+                                    deleteBtn.style.width = '24px';
+                                    deleteBtn.style.height = '24px';
+                                    deleteBtn.style.borderRadius = '50%';
+                                    deleteBtn.style.display = 'flex';
+                                    deleteBtn.style.alignItems = 'center';
+                                    deleteBtn.style.justifyContent = 'center';
+                                    deleteBtn.style.fontSize = '14px';
+                                    deleteBtn.style.lineHeight = '1';
+                                    deleteBtn.style.paddingTop = '1px';
+                                    deleteBtn.style.fontWeight = 'bold';
+                                    deleteBtn.onclick = (e) => {
+                                        e.stopPropagation();
+                                        wrapper.style.display = 'none';
+                                        // Mark file as deleted by adding to tracking array
+                                        if (!window.removedNewMediaIndices) window.removedNewMediaIndices = [];
+                                        window.removedNewMediaIndices.push(i);
+                                        // Update count
+                                        const container = document.getElementById('preview-container');
+                                        const existingCount = container.querySelectorAll('.existing-media').length;
+                                        const visibleNewCount = container.querySelectorAll('.new-media-preview:not([style*="display: none"])').length;
+                                        const newTotal = existingCount + visibleNewCount;
+                                        const countEl = document.getElementById('file-count');
+                                        if (newTotal > 0) {
+                                            countEl.innerText = `Файлов: ${newTotal}`;
+                                        } else {
+                                            countEl.innerText = '';
+                                        }
+                                    };
+                                    wrapper.appendChild(deleteBtn);
                                     
                                     newPreviewsContainer.appendChild(wrapper);
                                 };
@@ -5090,6 +5131,9 @@
                                     let videoArr = [];
                                     
                                     for (let i = 0; i < mediaInput.files.length; i++) {
+                                        // Skip files marked for deletion
+                                        if (window.removedNewMediaIndices && window.removedNewMediaIndices.includes(i)) continue;
+                                        
                                         const file = mediaInput.files[i];
                                         const isImage = file.type.startsWith('image/');
                                         const isVideo = file.type.startsWith('video/');
@@ -5132,8 +5176,8 @@
                                 const techType = safeVal('inp-tech-type');
                                 if (techType === 'Запчасть') {
                                     const payload = {
-                                        action: 'create',
-                                        rowIndex: '',
+                                        action: isEditMode ? 'edit' : 'create',
+                                        rowIndex: safeVal('edit-row-index') || '',
                                         brand: safeVal('inp-part-brand'),
                                         partName: safeVal('inp-part-title'),
                                         price: priceVal,
@@ -5159,6 +5203,7 @@
                                     document.getElementById('preview-container').innerHTML = '';
                                     document.getElementById('file-count').innerText = '';
                                     window.currentAdDeletedMedia = [];
+                                    window.removedNewMediaIndices = [];
                                     showList();
                                     loadParts();
                                     showTab(document.querySelector('.tab-link[onclick*="parts"]'), 'parts');
@@ -5212,6 +5257,7 @@
                                 document.getElementById('preview-container').innerHTML = '';
                                 document.getElementById('file-count').innerText = '';
                                 window.currentAdDeletedMedia = [];
+                                window.removedNewMediaIndices = [];
                                 showList(); loadAds();
                             } catch (er) { alert(er.message); hideLoader(); } finally { hideLoader() }
                         });
@@ -5310,6 +5356,7 @@
                             }
                             isEditMode = false;
                             window.currentAdDeletedMedia = [];
+                            window.removedNewMediaIndices = [];
                             const btnCreate = document.getElementById('btn-create-ad');
                             if (btnCreate) btnCreate.classList.add('hidden');
                             document.getElementById('form-title').innerText = "Новое объявление";
@@ -5498,6 +5545,7 @@
                         }
                         function openEditMode(ad) {
                             isEditMode = true;
+                            window.removedNewMediaIndices = [];
                             document.getElementById('form-title').innerText = "Редактирование";
                             document.getElementById('submit-btn').innerText = "Сохранить";
                             const btnCreate = document.getElementById('btn-create-ad');
@@ -5555,6 +5603,7 @@
                         }
                         function openEditModePart(part) {
                             isEditMode = true;
+                            window.removedNewMediaIndices = [];
                             document.getElementById('form-title').innerText = "Редактирование";
                             document.getElementById('submit-btn').innerText = "Сохранить";
                             const btnCreate = document.getElementById('btn-create-ad');
