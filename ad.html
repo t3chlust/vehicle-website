@@ -337,6 +337,8 @@
         const NEW_STATUS_TAG = '***STATUS_NEW***';
         let currentItem = null;
         let currentPhotos = [];
+        let currentVideos = [];
+        let currentMediaItems = [];  // Combined photos and videos
         let currentPhotoIndex = 0;
         let currentUser = null;
         let currentItemType = null;
@@ -407,40 +409,40 @@
         function galleryNext() {
             // Защита от множественных кликов во время анимации
             if (isGalleryAnimating) return;
-            if (currentPhotos.length <= 1) return;
+            if (currentMediaItems.length <= 1) return;
             
             // Циклический переход с анимацией
-            currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+            currentPhotoIndex = (currentPhotoIndex + 1) % currentMediaItems.length;
             updateGallery();
         }
 
         function galleryPrev() {
             // Защита от множественных кликов во время анимации
             if (isGalleryAnimating) return;
-            if (currentPhotos.length <= 1) return;
+            if (currentMediaItems.length <= 1) return;
             
             // Циклический переход с анимацией
-            currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+            currentPhotoIndex = (currentPhotoIndex - 1 + currentMediaItems.length) % currentMediaItems.length;
             updateGallery();
         }
 
         function galleryNextSwipe() {
             // Защита от множественных кликов во время анимации
             if (isGalleryAnimating) return;
-            if (currentPhotos.length <= 1) return;
+            if (currentMediaItems.length <= 1) return;
             
             // Циклический переход с анимацией
-            currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotos.length;
+            currentPhotoIndex = (currentPhotoIndex + 1) % currentMediaItems.length;
             updateGallery();
         }
 
         function galleryPrevSwipe() {
             // Защита от множественных кликов во время анимации
             if (isGalleryAnimating) return;
-            if (currentPhotos.length <= 1) return;
+            if (currentMediaItems.length <= 1) return;
             
             // Циклический переход с анимацией
-            currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
+            currentPhotoIndex = (currentPhotoIndex - 1 + currentMediaItems.length) % currentMediaItems.length;
             updateGallery();
         }
 
@@ -583,10 +585,29 @@
                 specs.push({ l: 'Город', v: item.city });
             }
 
-            currentPhotos = item.photos ? item.photos.split(',').filter(p => p.startsWith('http')) : ['https://placehold.co/800x600?text=Нет+фото'];
+            currentPhotos = item.photos ? item.photos.split(',').filter(p => p.startsWith('http')) : [];
+            currentVideos = item.videos ? item.videos.split(',').filter(v => v.startsWith('http')) : [];
+            
+            // Combine photos and videos for display
+            currentMediaItems = [
+                ...currentPhotos.map(url => ({ type: 'photo', url })),
+                ...currentVideos.map(url => ({ type: 'video', url }))
+            ];
+            
+            // Use placeholder if no photos or videos
+            if (currentMediaItems.length === 0) {
+                currentMediaItems = [{ type: 'photo', url: 'https://placehold.co/800x600?text=Нет+фото' }];
+            }
+            currentPhotos = currentMediaItems;
 
             const specsHtml = specs.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
-            const gallerySlidesHtml = currentPhotos.map(url => `<div class="gallery-slide"><img class="gallery-img" src="${url}"></div>`).join('');
+            const gallerySlidesHtml = currentMediaItems.map(media => {
+                if (media.type === 'video') {
+                    return `<div class="gallery-slide"><video class="gallery-img" src="${media.url}" controls style="width:100%; height:100%; object-fit:cover;"></video></div>`;
+                } else {
+                    return `<div class="gallery-slide"><img class="gallery-img" src="${media.url}"></div>`;
+                }
+            }).join('');
             
             const showActionButtons = canEditOrDelete();
             const actionButtonsHtml = showActionButtons ? `
@@ -659,6 +680,11 @@
             
             // Инициализируем свайп для галереи
             initGallerySwipe();
+            
+            // Initialize video controls for media items
+            document.querySelectorAll('.gallery-slide video').forEach(video => {
+                video.addEventListener('click', e => e.stopPropagation());
+            });
             
             // Set back button color based on type
             const backLink = document.querySelector('.back-link');

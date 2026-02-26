@@ -3007,11 +3007,17 @@
                                         id="inp-desc" rows="4" placeholder="Доп. информация..."></textarea>
                                     <div
                                         style="border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
-                                        <label style="cursor:pointer; display:block;"><span
-                                                style="font-weight:bold; color:#0066cc;">Добавить фото</span><input
-                                                type="file" id="inp-photos" multiple accept="image/*"
-                                                style="display:none" onchange="showFilePreview(this)" /></label>
-                                        <div id="preview-container"></div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                                            <label style="cursor:pointer; display:block;"><span
+                                                    style="font-weight:bold; color:#0066cc;">🖼️ Добавить фото</span><input
+                                                    type="file" id="inp-photos" multiple accept="image/*"
+                                                    style="display:none" onchange="showFilePreview()" /></label>
+                                            <label style="cursor:pointer; display:block;"><span
+                                                    style="font-weight:bold; color:#0066cc;">🎥 Добавить видео</span><input
+                                                    type="file" id="inp-videos" multiple accept="video/*"
+                                                    style="display:none" onchange="showFilePreview()" /></label>
+                                        </div>
+                                        <div id="preview-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;"></div>
                                         <div id="file-count" style="margin-top:10px; font-weight:bold;"></div>
                                     </div>
                                     <div style="display:flex; gap:10px;"><button type="button" class="btn btn-red"
@@ -3377,20 +3383,91 @@
                             if (!el || !el.value) return '';
                             return el.value.replace(/\s/g, '');
                         }
-                        function showFilePreview(input) {
+                        function showFilePreview() {
                             const container = document.getElementById('preview-container');
                             const countEl = document.getElementById('file-count');
+                            const photoInput = document.getElementById('inp-photos');
+                            const videoInput = document.getElementById('inp-videos');
+                            
                             container.innerHTML = '';
-                            if (input.files.length > 0) {
-                                countEl.innerText = `Файлов: ${input.files.length}`;
-                                for (let i = 0; i < Math.min(input.files.length, 10); i++) {
-                                    const file = input.files[i];
+                            const totalFiles = photoInput.files.length + videoInput.files.length;
+                            
+                            if (totalFiles > 0) {
+                                countEl.innerText = `Файлов: ${totalFiles}`;
+                                
+                                // Show photo previews
+                                for (let i = 0; i < Math.min(photoInput.files.length, 10); i++) {
+                                    const file = photoInput.files[i];
                                     const reader = new FileReader();
                                     reader.onload = function (e) {
+                                        const wrapper = document.createElement('div');
+                                        wrapper.style.position = 'relative';
                                         const img = document.createElement('img');
                                         img.src = e.target.result;
                                         img.className = 'preview-thumb';
-                                        container.appendChild(img);
+                                        img.style.width = '100%';
+                                        img.style.height = '100px';
+                                        img.style.objectFit = 'cover';
+                                        img.style.borderRadius = '4px';
+                                        
+                                        const badge = document.createElement('div');
+                                        badge.textContent = '📷';
+                                        badge.style.position = 'absolute';
+                                        badge.style.top = '4px';
+                                        badge.style.right = '4px';
+                                        badge.style.fontSize = '16px';
+                                        badge.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                                        badge.style.color = 'white';
+                                        badge.style.borderRadius = '50%';
+                                        badge.style.width = '24px';
+                                        badge.style.height = '24px';
+                                        badge.style.display = 'flex';
+                                        badge.style.alignItems = 'center';
+                                        badge.style.justifyContent = 'center';
+                                        badge.style.fontSize = '12px';
+                                        
+                                        wrapper.appendChild(img);
+                                        wrapper.appendChild(badge);
+                                        container.appendChild(wrapper);
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                                
+                                // Show video previews
+                                for (let i = 0; i < Math.min(videoInput.files.length, 10); i++) {
+                                    const file = videoInput.files[i];
+                                    const reader = new FileReader();
+                                    reader.onload = function (e) {
+                                        const wrapper = document.createElement('div');
+                                        wrapper.style.position = 'relative';
+                                        const video = document.createElement('video');
+                                        video.src = e.target.result;
+                                        video.className = 'preview-thumb';
+                                        video.style.width = '100%';
+                                        video.style.height = '100px';
+                                        video.style.objectFit = 'cover';
+                                        video.style.borderRadius = '4px';
+                                        video.style.backgroundColor = '#000';
+                                        
+                                        const badge = document.createElement('div');
+                                        badge.textContent = '🎥';
+                                        badge.style.position = 'absolute';
+                                        badge.style.top = '4px';
+                                        badge.style.right = '4px';
+                                        badge.style.fontSize = '16px';
+                                        badge.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                                        badge.style.color = 'white';
+                                        badge.style.borderRadius = '50%';
+                                        badge.style.width = '24px';
+                                        badge.style.height = '24px';
+                                        badge.style.display = 'flex';
+                                        badge.style.alignItems = 'center';
+                                        badge.style.justifyContent = 'center';
+                                        badge.style.fontSize = '12px';
+                                        
+                                        wrapper.appendChild(video);
+                                        wrapper.appendChild(badge);
+                                        container.appendChild(wrapper);
                                     };
                                     reader.readAsDataURL(file);
                                 }
@@ -4835,15 +4912,42 @@
                             }
                             showLoader("Публикация...");
                             try {
-                                let phU = (currentAd && isEditMode) ? currentAd.photos : "", fI = document.getElementById('inp-photos');
+                                let phU = (currentAd && isEditMode) ? currentAd.photos : "";
+                                let vidU = (currentAd && isEditMode) ? currentAd.videos : "";
+                                const fI = document.getElementById('inp-photos');
+                                const vI = document.getElementById('inp-videos');
+                                
+                                // Upload photos
                                 if (fI.files.length > 0) {
                                     let arr = [];
                                     for (let i = 0; i < Math.min(fI.files.length, 10); i++) {
-                                        let fd = new FormData(); fd.append('file', fI.files[i]); fd.append('upload_preset', UPLOAD_PRESET);
+                                        let fd = new FormData(); 
+                                        fd.append('file', fI.files[i]); 
+                                        fd.append('upload_preset', UPLOAD_PRESET);
                                         let r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
-                                        let j = await r.json(); if (j.secure_url) arr.push(j.secure_url);
+                                        let j = await r.json(); 
+                                        if (j.secure_url) arr.push(j.secure_url);
                                     }
                                     phU = arr.join(',');
+                                }
+                                
+                                // Upload videos
+                                if (vI.files.length > 0) {
+                                    let arr = [];
+                                    for (let i = 0; i < Math.min(vI.files.length, 5); i++) {
+                                        let fd = new FormData(); 
+                                        fd.append('file', vI.files[i]); 
+                                        fd.append('upload_preset', UPLOAD_PRESET);
+                                        fd.append('resource_type', 'video');
+                                        try {
+                                            let r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: 'POST', body: fd, timeout: 60000 });
+                                            let j = await r.json(); 
+                                            if (j.secure_url) arr.push(j.secure_url);
+                                        } catch (err) {
+                                            console.warn('Video upload failed:', err);
+                                        }
+                                    }
+                                    vidU = arr.join(',');
                                 }
                                 const cond = safeVal('inp-condition');
                                 let desc = safeVal('inp-desc');
@@ -4863,7 +4967,8 @@
                                         phone: currentUser.phoneNumber,
                                         name: currentUserName || '',
                                         userId: currentUser.id,
-                                        photos: phU
+                                        photos: phU,
+                                        videos: vidU
                                     };
                                     const response = await fetch('/api/parts', {
                                         method: 'POST',
@@ -4897,6 +5002,7 @@
                                     phone: currentUser.phoneNumber,
                                     userId: currentUser.id,
                                     photos: phU,
+                                    videos: vidU,
                                     engine: safeVal('inp-engine'),
                                     power: safeVal('inp-power'),
                                     transmission: safeVal('inp-trans'),
