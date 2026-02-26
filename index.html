@@ -3642,7 +3642,7 @@
                             }
                             
                             // Process new media files
-                            for (let i = 0; i < Math.min(totalFiles, 10); i++) {
+                            for (let i = 0; i < totalFiles; i++) {
                                 // Skip files marked for deletion
                                 if (window.removedNewMediaIndices && window.removedNewMediaIndices.includes(i)) continue;
                                 
@@ -5205,7 +5205,7 @@
                                             let r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
                                             let j = await r.json(); 
                                             if (j.secure_url) photoArr.push(j.secure_url);
-                                        } else if (isVideo && videoArr.length < 5) {
+                                        } else if (isVideo) {
                                             let fd = new FormData(); 
                                             fd.append('file', file); 
                                             fd.append('upload_preset', UPLOAD_PRESET);
