@@ -3532,6 +3532,11 @@
                             closeBtn.style.borderRadius = '50%';
                             closeBtn.style.zIndex = '10001';
                             closeBtn.style.transition = 'background 0.2s';
+                            closeBtn.style.display = 'flex';
+                            closeBtn.style.alignItems = 'center';
+                            closeBtn.style.justifyContent = 'center';
+                            closeBtn.style.padding = '0';
+                            closeBtn.style.lineHeight = '1';
                             closeBtn.onclick = () => closeMediaPreview();
                             closeBtn.onmouseover = () => closeBtn.style.background = 'rgba(255,255,255,0.3)';
                             closeBtn.onmouseout = () => closeBtn.style.background = 'rgba(255,255,255,0.2)';
