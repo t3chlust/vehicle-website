@@ -3570,6 +3570,9 @@
                             modal.appendChild(contentContainer);
                             modal.style.display = 'flex';
                             
+                            // Block scrolling on body
+                            document.body.style.overflow = 'hidden';
+                            
                             // Close on background click
                             modal.onclick = (e) => {
                                 if (e.target === modal) closeMediaPreview();
@@ -3588,6 +3591,8 @@
                             const modal = document.getElementById('media-preview-modal');
                             if (modal) {
                                 modal.style.display = 'none';
+                                // Restore scrolling on body
+                                document.body.style.overflow = '';
                             }
                         }
                         function deleteMediaItem(mediaUrl, mediaType, wrapperElement) {
