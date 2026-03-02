@@ -710,6 +710,11 @@
                                     margin-right: 6px;
                                     cursor: pointer;
                                     border: none;
+                                    transition: all 0.3s ease;
+                                }
+
+                                .tab-link:active {
+                                    animation: heartBeat 0.3s ease;
                                 }
 
                                 /* Solid background colors for each tab - no effects */
@@ -1803,6 +1808,10 @@
                                 font-weight: 600;
                                 color: #222;
                                 border-radius: 8px;
+                            }
+
+                            .tab-link:active {
+                                animation: none;
                             }
 
                             /* Solid background colors for each tab on desktop - no effects */
