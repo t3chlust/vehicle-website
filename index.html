@@ -2407,7 +2407,14 @@
                                     </div>
                                 </div>
                                 <div id="tab-content-tender" class="tab-content">
-                                    <div id="view-tender-list" style="min-height: 400px; margin-top:30px;">
+                                    <div style="margin-bottom: 25px; max-width: 500px;">
+                                        <div class="search-container">
+                                            <input type="text" id="tenderSearchInput" class="form-input filter-input"
+                                                placeholder="Поиск в реестре" autocomplete="off">
+                                        </div>
+                                        <div id="tenderSearchList" class="search-suggestions"></div>
+                                    </div>
+                                    <div id="view-tender-list" style="min-height: 400px;">
                                         <div id="loading-tender"
                                             style="text-align:center; padding: 60px; color:#888; display:none;">
                                             <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
