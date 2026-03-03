@@ -4657,6 +4657,7 @@
                                                 const isTender = (ad.tender || '').toLowerCase() === 'yes';
                                                 return isTender && adBrand === brand.toLowerCase();
                                             });
+                                            console.log('*** Filtered tender ads by brand "' + brand + '":', filtered.length, 'total ads:', allAds.length);
                                             renderTenderAds(filtered);
                                             listDiv.style.display = 'none';
                                         } else {
