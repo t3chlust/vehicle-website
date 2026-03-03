@@ -4009,8 +4009,8 @@
                         
                         function applyTenderFilters() {
                             let filteredAds = allAds.filter(ad => (ad.tender || "").toLowerCase() === 'yes');
-                            const minStr = document.getElementById('f-tender-price-min')?.value || '';
-                            const maxStr = document.getElementById('f-tender-price-max')?.value || '';
+                            const minStr = getPriceValue('f-tender-price-min');
+                            const maxStr = getPriceValue('f-tender-price-max');
                             const min = minStr ? parseInt(minStr, 10) : 0;
                             const max = maxStr ? parseInt(maxStr, 10) : 0;
                             const cond = document.getElementById('f-tender-cond')?.value || '';
