@@ -5439,17 +5439,7 @@
                         async function loadParts() {
                             try {
                                 const raw = await fetchDatasetWithFallback('/api/spares');
-                                allParts = (Array.isArray(raw) ? raw : []).map(part => {
-                                    const brand = String(part.brand || part.Brand || part.Бренд || part.BrandName || '').trim();
-                                    const model = String(part.model || part.Model || part.Модель || part.ModelName || '').trim();
-                                    const combined = [brand, model].filter(Boolean).join(' ').trim();
-                                    if (combined) part.title = combined;
-                                    // Нормализуем поля brand и model
-                                    part.brand = brand;
-                                    part.model = model;
-                                    if (typeof part.title === 'undefined' || part.title === null) part.title = '';
-                                    return part;
-                                });
+                                allParts = Array.isArray(raw) ? raw : [];
                                 const displayParts = allParts;
                                 renderPartsGrid(displayParts);
                                 initPartsSearch();
