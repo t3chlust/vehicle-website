@@ -2411,6 +2411,7 @@
                                         <div class="search-container">
                                             <input type="text" id="tenderSearchInput" class="form-input filter-input"
                                                 placeholder="Поиск в реестре" autocomplete="off">
+                                            <button id="tenderClearFilterBtn" class="clear-filter-btn" onclick="clearTenderBrandFilter()" style="display:none;">Сбросить</button>
                                         </div>
                                         <div id="tenderSearchList" class="search-suggestions"></div>
                                     </div>
@@ -4401,6 +4402,22 @@
                                         }
                                     }
                                 }
+                                // Если все еще ничего не найдено, ищем по бренду
+                                if (found.length === 0) {
+                                    for (const item of adSearchIndex) {
+                                        if (item.brandLower && item.brandLower.startsWith(typed)) {
+                                            found.push(item);
+                                        }
+                                    }
+                                }
+                                // И еще раз по бренду с includes если длина >= 2
+                                if (found.length === 0 && typed.length >= 2) {
+                                    for (const item of adSearchIndex) {
+                                        if (item.brandLower && item.brandLower.includes(typed)) {
+                                            found.push(item);
+                                        }
+                                    }
+                                }
                                 listDiv.innerHTML = '';
                                 const uniq = new Set();
                                 const brandSet = new Set();
@@ -4542,6 +4559,22 @@
                                 if (found.length === 0 && typed.length >= 2) {
                                     for (const item of tenderSearchIndex) {
                                         if (item.titleLower.includes(typed)) {
+                                            found.push(item);
+                                        }
+                                    }
+                                }
+                                // Если все еще ничего не найдено, ищем по бренду
+                                if (found.length === 0) {
+                                    for (const item of tenderSearchIndex) {
+                                        if (item.brandLower && item.brandLower.startsWith(typed)) {
+                                            found.push(item);
+                                        }
+                                    }
+                                }
+                                // И еще раз по бренду с includes если длина >= 2
+                                if (found.length === 0 && typed.length >= 2) {
+                                    for (const item of tenderSearchIndex) {
+                                        if (item.brandLower && item.brandLower.includes(typed)) {
                                             found.push(item);
                                         }
                                     }
