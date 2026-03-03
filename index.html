@@ -2415,6 +2415,130 @@
                                         </div>
                                         <div id="tenderSearchList" class="search-suggestions"></div>
                                     </div>
+                                    <div id="view-tender-filters" class="filters-container">
+                                        <div class="filters-toggle-btn" onclick="toggleTenderFilters()">Фильтры</div>
+                                        <div id="tender-filters-wrapper" class="filters-wrapper">
+                                            <div class="filters-content">
+                                                <div class="filters-grid">
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Сортировка</label><select
+                                                            class="filter-input" id="f-tender-sort" onchange="applyTenderFilters()">
+                                                            <option value="default">Свежие</option>
+                                                            <option value="asc">Сначала дешевле</option>
+                                                            <option value="desc">Сначала дороже</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label class="filter-label">Цена от</label>
+                                                        <div style="position: relative;"><input class="filter-input"
+                                                                id="f-tender-price-min" type="text" placeholder="от"
+                                                                list="price-list"
+                                                                oninput="formatPriceInput(this);applyTenderFilters()"
+                                                                onclick="this.showPicker ? this.showPicker() : this.focus()"><span
+                                                                class="price-dropdown-trigger"></span></div>
+                                                    </div>
+                                                    <div class="filter-item"><label class="filter-label">Цена до</label>
+                                                        <div style="position: relative;"><input class="filter-input"
+                                                                id="f-tender-price-max" type="text" placeholder="до"
+                                                                list="price-list"
+                                                                oninput="formatPriceInput(this);applyTenderFilters()"
+                                                                onclick="this.showPicker ? this.showPicker() : this.focus()"><span
+                                                                class="price-dropdown-trigger"></span></div>
+                                                    </div>
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Город</label><input
+                                                            class="filter-input" id="f-tender-geo" type="text"
+                                                            placeholder="Поиск..." oninput="applyTenderFilters()"></div>
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Состояние</label><select
+                                                            class="filter-input" id="f-tender-cond" onchange="applyTenderFilters()">
+                                                            <option value="">Любое</option>
+                                                            <option value="new">Новый</option>
+                                                            <option value="used">Б/У</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label class="filter-label">Тип
+                                                            шасси</label><select class="filter-input" id="f-tender-wheels"
+                                                            onchange="applyTenderFilters()">
+                                                            <option value="">Любой</option>
+                                                            <option value="Колёсный">Колёсный</option>
+                                                            <option value="Гусеничный">Гусеничный</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Трансмиссия</label><select
+                                                            class="filter-input" id="f-tender-trans" onchange="applyTenderFilters()">
+                                                            <option value="">Любая</option>
+                                                            <option value="МКПП">МКПП</option>
+                                                            <option value="АКПП">АКПП</option>
+                                                            <option value="Вариатор">Вариатор</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Топливо</label><select
+                                                            class="filter-input" id="f-tender-fuel" onchange="applyTenderFilters()">
+                                                            <option value="">Любое</option>
+                                                            <option value="Бензин">Бензин</option>
+                                                            <option value="Дизель">Дизель</option>
+                                                            <option value="Электричество">Электричество</option>
+                                                            <option value="Газ">Газ</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Документы</label><select
+                                                            class="filter-input" id="f-tender-docs" onchange="applyTenderFilters()">
+                                                            <option value="">Любые</option>
+                                                            <option value="ЭПСМ">ЭПСМ (ПСМ)</option>
+                                                            <option value="Спорт.инвентарь">Спорт.инвентарь</option>
+                                                            <option value="Без документов">Без документов</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Плавающий</label><select
+                                                            class="filter-input" id="f-tender-amphibious"
+                                                            onchange="applyTenderFilters()">
+                                                            <option value="">Не важно</option>
+                                                            <option value="yes">Да</option>
+                                                            <option value="no">Нет</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label class="filter-label">Тип
+                                                            техники</label><select class="filter-input" id="f-tender-tech-type"
+                                                            onchange="applyTenderFilters()">
+                                                            <option value="">Любой</option>
+                                                            <option value="Вездеход">Вездеход</option>
+                                                            <option value="Мото-техника">Мото-техника</option>
+                                                            <option value="Прицеп">Прицеп</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Конструкция</label><select
+                                                            class="filter-input" id="f-tender-construction"
+                                                            onchange="applyTenderFilters()">
+                                                            <option value="">Любая</option>
+                                                            <option value="Цельнорамный">Цельнорамный</option>
+                                                            <option value="Переломный">Переломный</option>
+                                                            <option value="Бортоповоротный">Бортоповоротный</option>
+                                                        </select></div>
+                                                    <div class="filter-item"><label
+                                                            class="filter-label">Цвет</label><select
+                                                            class="filter-input" id="f-tender-color" onchange="applyTenderFilters()">
+                                                            <option value="">Любой</option>
+                                                            <option value="Синий">Синий</option>
+                                                            <option value="Красный">Красный</option>
+                                                            <option value="Желтый">Желтый</option>
+                                                            <option value="Коричневый">Коричневый</option>
+                                                            <option value="Черный">Черный</option>
+                                                            <option value="Серый">Серый</option>
+                                                            <option value="Зеленый">Зеленый</option>
+                                                            <option value="Оранжевый">Оранжевый</option>
+                                                            <option value="Фиолетовый">Фиолетовый</option>
+                                                            <option value="Белый">Белый</option>
+                                                            <option value="Хаки">Хаки</option>
+                                                            <option value="Золотой">Золотой</option>
+                                                            <option value="Серебристый">Серебристый</option>
+                                                        </select></div>
+                                                    <div class="filter-item filter-item-clear">
+                                                        <label class="filter-label" style="opacity:0;">&nbsp;</label>
+                                                        <button type="button" class="btn btn-black"
+                                                            style="width:100%; height:42px;"
+                                                            onclick="clearAllTenderFilters()">Очистить</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div id="view-tender-list" style="min-height: 400px;">
                                         <div id="loading-tender"
                                             style="text-align:center; padding: 60px; color:#888; display:none;">
@@ -3859,6 +3983,78 @@
                         }
 
                         function toggleFilters() { const fw = document.getElementById('filters-wrapper'); if (fw.classList.contains('open')) { fw.classList.remove('open'); } else { fw.classList.add('open'); } }
+                        
+                        function toggleTenderFilters() { const fw = document.getElementById('tender-filters-wrapper'); if (fw.classList.contains('open')) { fw.classList.remove('open'); } else { fw.classList.add('open'); } }
+                        
+                        function resetTenderFiltersOnStartup() {
+                            document.getElementById('f-tender-sort').value = 'default';
+                            document.getElementById('f-tender-price-min').value = '';
+                            document.getElementById('f-tender-price-max').value = '';
+                            document.getElementById('f-tender-geo').value = '';
+                            document.getElementById('f-tender-cond').value = '';
+                            document.getElementById('f-tender-wheels').value = '';
+                            document.getElementById('f-tender-trans').value = '';
+                            document.getElementById('f-tender-fuel').value = '';
+                            document.getElementById('f-tender-docs').value = '';
+                            document.getElementById('f-tender-amphibious').value = '';
+                            document.getElementById('f-tender-tech-type').value = '';
+                            document.getElementById('f-tender-construction').value = '';
+                            document.getElementById('f-tender-color').value = '';
+                        }
+                        
+                        function clearAllTenderFilters() {
+                            resetTenderFiltersOnStartup();
+                            applyTenderFilters();
+                        }
+                        
+                        function applyTenderFilters() {
+                            let filteredAds = allAds.filter(ad => (ad.tender || "").toLowerCase() === 'yes');
+                            const minStr = document.getElementById('f-tender-price-min')?.value || '';
+                            const maxStr = document.getElementById('f-tender-price-max')?.value || '';
+                            const min = minStr ? parseInt(minStr, 10) : 0;
+                            const max = maxStr ? parseInt(maxStr, 10) : 0;
+                            const cond = document.getElementById('f-tender-cond')?.value || '';
+                            const wheels = document.getElementById('f-tender-wheels')?.value || '';
+                            const color = document.getElementById('f-tender-color')?.value || '';
+                            const geo = (document.getElementById('f-tender-geo')?.value || '').toLowerCase().trim();
+                            const sortType = document.getElementById('f-tender-sort')?.value || 'default';
+                            const amph = document.getElementById('f-tender-amphibious')?.value || '';
+                            const trans = document.getElementById('f-tender-trans')?.value || '';
+                            const fuel = document.getElementById('f-tender-fuel')?.value || '';
+                            const docs = document.getElementById('f-tender-docs')?.value || '';
+                            const techType = document.getElementById('f-tender-tech-type')?.value || '';
+                            const constr = document.getElementById('f-tender-construction')?.value || '';
+                            
+                            let filtered = filteredAds.filter(ad => {
+                                const adPrice = Number(ad.price || 0);
+                                if (min && adPrice < min) return false;
+                                if (max && adPrice > max) return false;
+                                if (cond) { const isNew = checkIsNew(ad); if (cond === 'new' && !isNew) return false; if (cond === 'used' && isNew) return false; }
+                                if (color && (ad.color || "").trim() !== color) return false;
+                                if (wheels && (ad.wheelFormula || "").trim() !== wheels) return false;
+                                if (amph && (ad.amphibious || "no") !== amph) return false;
+                                if (trans && (ad.transmission || "").trim() !== trans) return false;
+                                if (fuel && (ad.fuel || "").trim() !== fuel) return false;
+                                if (docs) {
+                                    if (docs === 'Без документов') { if (ad.docs && ad.docs !== 'Без документов') return false; }
+                                    else if ((ad.docs || "").trim() !== docs) return false;
+                                }
+                                if (techType && (ad.techType || "").trim() !== techType) return false;
+                                if (constr && (ad.constructionType || "").trim() !== constr) return false;
+                                if (geo) { const adGeo = ((ad.region || "") + " " + (ad.city || "")).toLowerCase(); if (!adGeo.includes(geo)) return false; }
+                                return true;
+                            });
+                            
+                            if (sortType === 'asc') {
+                                filtered.sort((a, b) => getPriceVal(a.price) - getPriceVal(b.price));
+                            } else if (sortType === 'desc') {
+                                filtered.sort((a, b) => getPriceVal(a.price) - getPriceVal(b.price)).reverse();
+                            } else {
+                                filtered.sort((a, b) => Number(b.rowIndex) - Number(a.rowIndex));
+                            }
+                            
+                            renderTenderAds(filtered);
+                        }
                         function checkIsNew(ad) { if (ad.desc && ad.desc.includes(NEW_STATUS_TAG.trim())) return true; if (ad.condition === 'new') return true; return false; }
                         function handlePhoneInput(input) {
                             // Оставляем только цифры и +
