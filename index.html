@@ -4966,8 +4966,8 @@
                                 container.appendChild(d);
                             });
 
-                            // Перестраиваем индекс поиска на основе отфильтрованных объявлений в тендере
-                            buildTenderSearchIndex(tenderAds);
+                            // Перестраиваем индекс поиска на основе ВСЕХ объявлений в тендере (не только отфильтрованных)
+                            buildTenderSearchIndex(allAds);
                             
                             setTimeout(() => {
                                 container.classList.add('loaded');
