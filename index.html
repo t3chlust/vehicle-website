@@ -88,9 +88,10 @@
                                 document.getElementById('auth-step-2').classList.add('hidden');
                                 document.getElementById('auth-code').value = '';
                                 document.getElementById('auth-phone').value = '+7';
+                                document.getElementById('privacy-agree-step1').checked = false;
                                 hideRegistrationPrompt();
                                 document.getElementById('auth-modal').classList.add('active');
-                                updateSmsButtonState();
+                                updateSendButtonState();
                             }
                             function closeAuthModal() { document.getElementById('auth-modal').classList.remove('active') }
                             function verifySmsCode() {
@@ -224,15 +225,9 @@
                             function completeRegistration() {
                                 const phone = safeVal('auth-phone').trim();
                                 const name = safeVal('auth-name').trim();
-                                const privacyAgreed = document.getElementById('privacy-agree').checked;
                                 
                                 if (!name) {
                                     alert('Введите имя');
-                                    return;
-                                }
-                                
-                                if (!privacyAgreed) {
-                                    alert('Пожалуйста, согласитесь с политикой конфидециальности');
                                     return;
                                 }
                                 
@@ -3174,7 +3169,14 @@
                                     oninput="handlePhoneInput(this)"
                                     onpaste="event.preventDefault(); handlePhoneInputPaste(this)"
                                     onkeypress="if(event.key==='Enter' && !this.closest('#auth-step-1').querySelector('.btn-black').disabled) sendSmsCode()" />
-                                <div id="recaptcha-container"></div> <button class="btn btn-black btn-full" disabled
+                                <div id="recaptcha-container"></div> 
+                                <div style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;">
+                                    <input type="checkbox" id="privacy-agree-step1" style="margin-top: 3px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;" onchange="updateSendButtonState()">
+                                    <label for="privacy-agree-step1" style="cursor: pointer; font-size: 13px; color: #666; line-height: 1.4;">
+                                        Я согласен с <a href="/privacy" target="_blank" style="color: #1E88E5; text-decoration: underline;">политикой конфидециальности</a>
+                                    </label>
+                                </div>
+                                <button class="btn btn-black btn-full" disabled
                                     onclick="sendSmsCode()">Отправить код</button> <button class="btn btn-full"
                                     onclick="closeAuthModal()" style="background:#eee;">Отмена</button>
                             </div>
@@ -3189,12 +3191,6 @@
                                         onclick="verifySmsCode()">Подтвердить</button>
                                 </div>
                                 <input class="form-input hidden" id="auth-name" type="text" placeholder="Ваше имя" />
-                                <div style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;">
-                                    <input type="checkbox" id="privacy-agree" style="margin-top: 3px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;">
-                                    <label for="privacy-agree" style="cursor: pointer; font-size: 13px; color: #666; line-height: 1.4;">
-                                        Я согласен с <a href="/privacy" target="_blank" style="color: #1E88E5; text-decoration: underline;">политикой конфидециальности</a>
-                                    </label>
-                                </div>
                                 <button id="auth-register-btn" class="btn btn-black btn-full hidden"
                                     onclick="completeRegistration()">Зарегистрироваться</button>
                             </div>
@@ -4105,9 +4101,24 @@
                             // Проверяем: номер должен быть +7 + 10 цифр = 12 символов всего
                             const digitCount = phoneInput.value.replace(/[^0-9]/g, '').length;
                             const isValid = phoneInput.value.startsWith('+7') && digitCount === 11;
-                            sendBtn.disabled = !isValid;
-                            sendBtn.style.opacity = isValid ? '1' : '0.5';
-                            sendBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+                            updateSendButtonState();  // Обновляем с учетом валидации номера и чекбокса
+                        }
+                        
+                        function updateSendButtonState() {
+                            const phoneInput = document.getElementById('auth-phone');
+                            const privacyCheckbox = document.getElementById('privacy-agree-step1');
+                            const sendBtn = document.querySelector('#auth-step-1 .btn-black');
+                            if (!phoneInput || !privacyCheckbox || !sendBtn) return;
+                            
+                            // Проверяем: номер должен быть +7 + 10 цифр = 12 символов всего
+                            const digitCount = phoneInput.value.replace(/[^0-9]/g, '').length;
+                            const isPhoneValid = phoneInput.value.startsWith('+7') && digitCount === 11;
+                            const isPrivacyChecked = privacyCheckbox.checked;
+                            
+                            const isEnabled = isPhoneValid && isPrivacyChecked;
+                            sendBtn.disabled = !isEnabled;
+                            sendBtn.style.opacity = isEnabled ? '1' : '0.5';
+                            sendBtn.style.cursor = isEnabled ? 'pointer' : 'not-allowed';
                         }
                         function checkTenderVisibility() {
                             const select = document.getElementById('inp-seller-type');
