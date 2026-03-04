@@ -224,10 +224,18 @@
                             function completeRegistration() {
                                 const phone = safeVal('auth-phone').trim();
                                 const name = safeVal('auth-name').trim();
+                                const privacyAgreed = document.getElementById('privacy-agree').checked;
+                                
                                 if (!name) {
                                     alert('Введите имя');
                                     return;
                                 }
+                                
+                                if (!privacyAgreed) {
+                                    alert('Пожалуйста, согласитесь с политикой конфидециальности');
+                                    return;
+                                }
+                                
                                 showLoader('Регистрация...');
                                 fetch('/api/users/ensure', {
                                     method: 'POST',
@@ -3181,6 +3189,12 @@
                                         onclick="verifySmsCode()">Подтвердить</button>
                                 </div>
                                 <input class="form-input hidden" id="auth-name" type="text" placeholder="Ваше имя" />
+                                <div style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;">
+                                    <input type="checkbox" id="privacy-agree" style="margin-top: 3px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;">
+                                    <label for="privacy-agree" style="cursor: pointer; font-size: 13px; color: #666; line-height: 1.4;">
+                                        Я согласен с <a href="/privacy" target="_blank" style="color: #1E88E5; text-decoration: underline;">политикой конфидециальности</a>
+                                    </label>
+                                </div>
                                 <button id="auth-register-btn" class="btn btn-black btn-full hidden"
                                     onclick="completeRegistration()">Зарегистрироваться</button>
                             </div>

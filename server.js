@@ -141,6 +141,13 @@ app.get('/manufacturer.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'manufacturer.html'));
 });
 
+app.get('/privacy', (req, res) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.sendFile(path.join(__dirname, 'privacy.html'));
+});
+
 // Генерация случайного 4-значного кода
 function generateCode() {
   return String(Math.floor(1000 + Math.random() * 9000));
