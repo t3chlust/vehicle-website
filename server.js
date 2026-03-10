@@ -515,11 +515,17 @@ app.post('/api/ads', async (req, res) => {
     const connection = await pool.getConnection();
     const lookups = await getLookupTables(connection);
 
-    const resolvedSellerTypeId = resolveIdByName(
-      lookups.sellerTypes || [],
-      sellerTypeId || sellerType,
-      lookups.sellerTypes && lookups.sellerTypes[0] ? lookups.sellerTypes[0].id : 1
-    );
+    // For services (techType === 'Услуга'), sellerType should be NULL
+    let resolvedSellerTypeId;
+    if (techType === 'Услуга') {
+      resolvedSellerTypeId = null;
+    } else {
+      resolvedSellerTypeId = resolveIdByName(
+        lookups.sellerTypes || [],
+        sellerTypeId || sellerType,
+        lookups.sellerTypes && lookups.sellerTypes[0] ? lookups.sellerTypes[0].id : 1
+      );
+    }
     const conditionFlag = condition === 'new' ? 1 : 0;
     const tenderFlag = tender === 'yes' ? 1 : 0;
     const amphibiousFlag = amphibious === 'yes' ? 1 : 0;
@@ -599,8 +605,8 @@ app.post('/api/ads', async (req, res) => {
         const adId = result.insertId;
 
         // Для техники (тип 1,2,3) вставляем дополнительные данные в advertisement_technic
-        // Для запчастей (тип 4) НЕ создаем запись в advertisement_technic
-        if (vehicleTypeId !== 4 && vehicleTypeId >= 1 && vehicleTypeId <= 3) {
+        // Для запчастей (тип 4) и услуг (тип 5) НЕ создаем запись в advertisement_technic
+        if (vehicleTypeId >= 1 && vehicleTypeId <= 3) {
           await connection.query(
             `INSERT INTO advertisement_technic 
               (advertisement, tender, chassis, color, mileage, engine, power, 
@@ -612,8 +618,6 @@ app.post('/api/ads', async (req, res) => {
               constructionId, capacity || null
             ]
           );
-        } else if (vehicleTypeId === 4) {
-        } else {
         }
 
         // Добавляем фотографии
@@ -663,8 +667,8 @@ app.post('/api/ads', async (req, res) => {
         );
 
         // Для техники (тип 1,2,3) обновляем или вставляем данные в advertisement_technic
-        // Для запчастей (тип 4) удаляем запись из advertisement_technic если она есть
-        if (vehicleTypeId !== 4 && vehicleTypeId >= 1 && vehicleTypeId <= 3) {
+        // Для запчастей (тип 4) и услуг (тип 5) удаляем запись из advertisement_technic если она есть
+        if (vehicleTypeId >= 1 && vehicleTypeId <= 3) {
           const [existing] = await connection.query(
             'SELECT advertisement FROM advertisement_technic WHERE advertisement = ?',
             [rowIndex]
@@ -698,14 +702,8 @@ app.post('/api/ads', async (req, res) => {
               ]
             );
           }
-        } else if (vehicleTypeId === 4) {
-          // Для запчастей удаляем данные из advertisement_technic если они есть
-          await connection.query(
-            'DELETE FROM advertisement_technic WHERE advertisement = ?',
-            [rowIndex]
-          );
         } else {
-          // Удаляем на всякий случай
+          // Для запчастей и услуг удаляем данные из advertisement_technic если они есть
           await connection.query(
             'DELETE FROM advertisement_technic WHERE advertisement = ?',
             [rowIndex]
