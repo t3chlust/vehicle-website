@@ -359,13 +359,13 @@
                 return;
             }
             let socialsHtml = '';
-            const addSocial = (url, icon) => {
+            const addSocial = (url, icon, forceIcon) => {
                 if (!url) return;
-                socialsHtml += `<a href="${url}" target="_blank"><img src="${icon}" alt="social"></a>`;
+                socialsHtml += `<a href="${url}" target="_blank"><img src="${forceIcon || icon}" alt="social"></a>`;
             };
             addSocial(manufacturer.website, ICONS.WEB);
-            addSocial(manufacturer.vk, ICONS.VK);
-            addSocial(manufacturer.youtube, ICONS.YT);
+            if (manufacturer.vk) addSocial(manufacturer.vk, ICONS.VK, 'images/vk_social.png');
+            if (manufacturer.youtube) addSocial(manufacturer.youtube, ICONS.YT, 'images/youtube_social.png');
             addSocial(manufacturer.rutube, ICONS.RUTUBE);
             addSocial(manufacturer.telegram, ICONS.TG);
             let headerHtml = `
