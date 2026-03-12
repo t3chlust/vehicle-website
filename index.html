@@ -6063,7 +6063,7 @@
                                 const ph = ad.photos ? ad.photos.split(',') : [];
                                 const imgSrc = ph.length > 0 ? ph[0] : '';
                                 card.innerHTML = `
-                                    <img class="moderation-card-img" src="${imgSrc}" onerror="this.src='images/no_photo.png'">
+                                    <img class="moderation-card-img" src="${imgSrc}" onerror="this.src='images/no_logo.svg'">
                                     <div class="moderation-card-info">
                                         <div class="moderation-card-title">${ad.title || 'Без названия'}</div>
                                         <div class="moderation-card-price">${Number(ad.price || 0).toLocaleString()} ₽</div>
