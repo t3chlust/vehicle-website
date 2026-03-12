@@ -4699,51 +4699,40 @@
                             if (!adsSearchListClickListenerAdded) {
                                 adsSearchListClickListenerAdded = true;
                                 listDiv.addEventListener('click', function (e) {
-                                    console.log('*** listDiv.click FIRED!!! target tag:', e.target.tagName, 'class:', e.target.className, 'text:', e.target.textContent?.substring(0, 30), 'data-target:', e.target.getAttribute('data-target'));
-                                    console.log('*** target.classList.contains("manufacturer"):', e.target.classList?.contains('manufacturer'));
-                                    console.log('*** Full target:', e.target);
                                     if (e.target.classList.contains('manufacturer')) {
                                         e.stopPropagation();
                                         const dataTarget = e.target.getAttribute('data-target');
-                                        console.log('*** MATCHED MANUFACTURER! data-target:', dataTarget);
                                         
                                         // Проверяем, это опция по бренду или конкретное объявление
                                         if (dataTarget.startsWith('brand:')) {
                                             const brand = dataTarget.substring(6);
-                                            console.log('*** Selected brand filter:', brand);
                                             skipAdsSearchInput = true;
                                             findAdAndScroll(null, null, brand);
                                         } else {
                                             const clickedId = parseInt(dataTarget, 10);
                                             const clickedTitle = e.target.getAttribute('data-title');
-                                            console.log('*** Selected specific ad! ID:', clickedId, 'Title:', clickedTitle);
                                             skipAdsSearchInput = true;
                                             input.value = clickedTitle;
                                             listDiv.style.display = 'none';
                                             findAdAndScroll(null, clickedId);
                                         }
                                     } else {
-                                        console.log('*** Click but NOT manufacturer, checking parent...');
                                     }
                                 });
                             }
                             document.addEventListener('click', function (e) {
-                                console.log('*** DOCUMENT click detected on:', e.target.className, e.target.tagName);
                                 const inputEl = document.getElementById('adsSearchInput');
                                 if (!listDiv || !inputEl) return;
                                 if (!listDiv.contains(e.target) && e.target !== inputEl) {
-                                    console.log('*** Hiding listDiv from document click');
                                     listDiv.style.display = 'none';
                                 }
                             });
                         }
                         function initTenderSearch() {
                             if (tenderSearchInitialized) return;
-                            console.log('*** initTenderSearch CALLED');
                             const input = document.getElementById('tenderSearchInput');
                             const listDiv = document.getElementById('tenderSearchList');
                             if (!input || !listDiv) return;
-                            console.log('*** tender input and listDiv found, setting up listeners');
                             tenderSearchInitialized = true;
                             input.addEventListener('keypress', e => {
                                 if (e.key === 'Enter') {
@@ -4758,7 +4747,6 @@
                             });
                             input.addEventListener('input', function () {
                                 if (skipTenderSearchInput) {
-                                    console.log('*** Skipping tender input event - programmatic value change');
                                     skipTenderSearchInput = false;
                                     return;
                                 }
@@ -4822,7 +4810,6 @@
                                 if (arr.length === 0) {
                                     listDiv.style.display = 'none';
                                 } else {
-                                    console.log('Showing', arr.length, 'tender search results');
                                     
                                     // СНАЧАЛА добавляем опцию БРЕНДА если есть совпадение
                                     if (brandMatch) {
@@ -4835,7 +4822,6 @@
                                         brandEl.style.color = '#1E88E5';
                                         brandEl.style.borderBottom = '2px solid #1E88E5';
                                         listDiv.appendChild(brandEl);
-                                        console.log('Added tender brand option:', brandMatch);
                                     }
                                     
                                     // Потом добавляем конкретные модели
@@ -4852,7 +4838,6 @@
                             });
                             // Добавляем click listener только один раз!
                             if (!tenderSearchListClickListenerAdded) {
-                                console.log('*** Adding click listener to tender listDiv (FIRST TIME)');
                                 tenderSearchListClickListenerAdded = true;
                                 listDiv.addEventListener('click', function (e) {
                                     if (e.target.classList.contains('manufacturer')) {
