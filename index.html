@@ -4537,16 +4537,11 @@
                                     setTimeout(() => { card.style.background = ''; }, 1600);
                                     if (input) input.value = '';
                                 } else {
-                                    console.log('*** WARNING: Card element not found! Checking what cards exist:');
-                                    document.querySelectorAll('[id^="ad-"]').forEach(card => {
-                                        console.log('  - Found card with ID:', card.id);
-                                    });
                                 }
                             }
                             if (listDiv) listDiv.style.display = 'none';
                         }
                         function clearAdsBrandFilter() {
-                            console.log('*** Clearing brand filter:', currentBrandFilter);
                             const input = document.getElementById('adsSearchInput');
                             const clearBtn = document.getElementById('adsClearFilterBtn');
                             const listDiv = document.getElementById('adsSearchList');
@@ -4558,10 +4553,8 @@
                             
                             // Показываем все объявления
                             renderGrid(allAds);
-                            console.log('*** Brand filter cleared, showing all ads');
                         }
                         function clearTenderBrandFilter() {
-                            console.log('*** Clearing tender brand filter:', currentTenderBrandFilter);
                             const input = document.getElementById('tenderSearchInput');
                             const clearBtn = document.getElementById('tenderClearFilterBtn');
                             const listDiv = document.getElementById('tenderSearchList');
@@ -4575,7 +4568,6 @@
                             if (typeof renderTenderAds === 'function') {
                                 renderTenderAds();
                             }
-                            console.log('*** Tender filter cleared');
                         }
                         function buildTenderSearchIndex(ads) {
                             const approved = (ads || []).filter(ad => (ad.tender || '').toLowerCase() === 'yes');
@@ -4592,15 +4584,12 @@
                                     };
                                 })
                                 .filter(item => item.title);
-                            console.log('Built tender search index with', tenderSearchIndex.length, 'items');
                         }
                         function initAdsSearch() {
                             if (adsSearchInitialized) return;
-                            console.log('*** initAdsSearch CALLED');
                             const input = document.getElementById('adsSearchInput');
                             const listDiv = document.getElementById('adsSearchList');
                             if (!input || !listDiv) return;
-                            console.log('*** input and listDiv found, setting up listeners');
                             adsSearchInitialized = true;
                             input.addEventListener('keypress', e => {
                                 if (e.key === 'Enter') {
@@ -4616,7 +4605,6 @@
                             input.addEventListener('input', function () {
                                 // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: пропускаем, если input значение установлено программно
                                 if (skipAdsSearchInput) {
-                                    console.log('*** Skipping ads input event - programmatic value change');
                                     skipAdsSearchInput = false;
                                     return;
                                 }
@@ -4680,9 +4668,6 @@
                                 if (arr.length === 0) {
                                     listDiv.style.display = 'none';
                                 } else {
-                                    console.log('Showing', arr.length, 'search results:', arr.map(a => ({ id: a.id, title: a.title })));
-                                    console.log('listDiv info - ID:', listDiv.id, 'class:', listDiv.className, 'parent:', listDiv.parentElement?.id || listDiv.parentElement?.tagName, 'children count before:', listDiv.children.length);
-                                    console.log('listDiv boundingRect:', {top: listDiv.getBoundingClientRect().top, left: listDiv.getBoundingClientRect().left, width: listDiv.getBoundingClientRect().width, height: listDiv.getBoundingClientRect().height});
                                     
                                     // СНАЧАЛА добавляем опцию БРЕНДА если есть совпадение
                                     if (brandMatch) {
@@ -4695,7 +4680,6 @@
                                         brandEl.style.color = '#1E88E5';
                                         brandEl.style.borderBottom = '2px solid #1E88E5';
                                         listDiv.appendChild(brandEl);
-                                        console.log('Added brand option:', brandMatch);
                                     }
                                     
                                     // Потом добавляем конкретные модели
@@ -4705,17 +4689,14 @@
                                         el.setAttribute('data-target', String(item.id));
                                         el.setAttribute('data-title', item.title);
                                         el.textContent = item.title;
-                                        console.log('Created element with data-target:', el.getAttribute('data-target'), 'text:', el.textContent, 'className before append:', el.className);
                                         listDiv.appendChild(el);
-                                        console.log('After append - element parent:', el.parentElement?.id, 'is in DOM:', document.body.contains(el), 'boundingRect:', {top: el.getBoundingClientRect().top, left: el.getBoundingClientRect().left, width: el.getBoundingClientRect().width, height: el.getBoundingClientRect().height});
-                                        el.onclick = function(e) { console.log('*** INLINE onclick on manufacturer element:', this.textContent); };
+                                        el.onclick = function(e) {};
                                     });
                                     listDiv.style.display = 'block';
                                 }
                             });
                             // Добавляем click listener только один раз!
                             if (!adsSearchListClickListenerAdded) {
-                                console.log('*** Adding click listener to listDiv (FIRST TIME)');
                                 adsSearchListClickListenerAdded = true;
                                 listDiv.addEventListener('click', function (e) {
                                     console.log('*** listDiv.click FIRED!!! target tag:', e.target.tagName, 'class:', e.target.className, 'text:', e.target.textContent?.substring(0, 30), 'data-target:', e.target.getAttribute('data-target'));
