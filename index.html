@@ -30,6 +30,18 @@
                 <div class="t-container_100 ">
                     <div class="t-width t-width_100 "> <!-- nominify begin -->
                         <script>
+                        function onProductTypeChange() {
+                            const productType = document.getElementById('inp-product-type').value;
+                            const sellerSection = document.getElementById('seller-info-section');
+                            const serviceFields = document.getElementById('service-fields');
+                            if (productType === 'Услуга') {
+                                sellerSection.classList.add('hidden');
+                                serviceFields.classList.remove('hidden');
+                            } else {
+                                sellerSection.classList.remove('hidden');
+                                serviceFields.classList.add('hidden');
+                            }
+                        }
                             function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
                             function closeModalDirect() {
                                 document.getElementById('modal').classList.remove('active');
@@ -2241,7 +2253,7 @@
                                 <button id="tender-tab-link" class="tab-link" onclick="showTab(this, 'tender')">В
                                     реестре Минпромторга</button>
                                 <button class="tab-link active" onclick="showTab(this, 'ads')">Техника</button>
-                                <button class="tab-link" onclick="showTab(this, 'parts')">Запчасти</button>
+                                <button class="tab-link" onclick="showTab(this, 'parts_services')">Запчасти и услуги</button>
                                 <button class="tab-link" onclick="showTab(this, 'manufacturers')">Производители</button>
                                 <button id="admin-tab-link" class="tab-link hidden"
                                     onclick="showTab(this, 'admin')">Админка</button>
@@ -2394,7 +2406,7 @@
                                         <div id="vehicles-container" class="ad-grid"></div>
                                     </div>
                                 </div>
-                                <div id="tab-content-parts" class="tab-content">
+                                <div id="tab-content-parts_services" class="tab-content">
                                     <div style="margin-bottom: 25px; max-width: 500px;">
                                         <div class="search-container">
                                             <input type="text" id="partsSearchInput" class="form-input filter-input"
@@ -3016,27 +3028,47 @@
                             <div id="view-form" class="hidden fade-in">
                                 <h3 id="form-title" style="margin-top:0">Новое объявление</h3>
                                 <form id="main-form"> <input type="hidden" id="edit-row-index" />
-                                    <div class="form-section-title">Информация о продавце <span
-                                            style="color:#ff4757; font-weight:bold;">*</span></div> <select
-                                        class="form-select" id="inp-seller-type" onchange="checkTenderVisibility()"
-                                        required>
-                                        <option value="" disabled selected>Кто вы?</option>
-                                        <option value="factory">Производитель</option>
-                                        <option value="dealer">Дилер</option>
-                                        <option value="private">Владелец</option>
+                                    <div class="form-section-title">Что вы продаёте? <span style="color:#ff4757; font-weight:bold;">*</span></div>
+                                    <select class="form-select" id="inp-product-type" onchange="onProductTypeChange()" required>
+                                        <option value="" disabled selected>Выберите тип</option>
+                                        <option value="Вездеход">Вездеход</option>
+                                        <option value="Мото-техника">Мото-техника</option>
+                                        <option value="Прицеп">Прицеп</option>
+                                        <option value="Запчасть">Запчасть</option>
+                                        <option value="Услуга">Услуга</option>
                                     </select>
-                                    <div class="form-section-title">Основное</div> <select class="form-select"
-                                        id="inp-tech-type" onchange="checkTechTypeVisibility()">
+                                    <div id="seller-info-section">
+                                        <div class="form-section-title">Информация о продавце <span style="color:#ff4757; font-weight:bold;">*</span></div>
+                                        <select class="form-select" id="inp-seller-type" onchange="checkTenderVisibility()" required>
+                                            <option value="" disabled selected>Кто вы?</option>
+                                            <option value="factory">Производитель</option>
+                                            <option value="dealer">Дилер</option>
+                                            <option value="private">Владелец</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-section-title">Основное</div>
+                                    <select class="form-select" id="inp-tech-type" onchange="checkTechTypeVisibility()">
                                         <option value="Вездеход" selected>Вездеход</option>
                                         <option value="Мото-техника">Мото-техника</option>
                                         <option value="Прицеп">Прицеп</option>
                                         <option value="Запчасть">Запчасть</option>
-                                    </select> <select class="form-select" id="inp-construction">
+                                    </select>
+                                    <select class="form-select" id="inp-construction">
                                         <option value="">Конструкция вездехода</option>
                                         <option value="Цельнорамный">Цельнорамный</option>
                                         <option value="Переломный">Переломный</option>
                                         <option value="Бортоповоротный">Бортоповоротный</option>
                                     </select>
+                                    <div id="service-fields" class="hidden">
+                                        <div class="form-section-title">Описание услуги <span style="color:#ff4757; font-weight:bold;">*</span></div>
+                                        <textarea class="form-input" id="inp-service-desc" placeholder="Описание услуги *"></textarea>
+                                        <div class="form-section-title">Цена услуги <span style="color:#ff4757; font-weight:bold;">*</span></div>
+                                        <input type="text" class="form-input" id="inp-service-price" placeholder="Цена (₽) *" list="price-list" oninput="formatPriceInput(this)" required />
+                                        <div class="form-section-title">Город <span style="color:#ff4757; font-weight:bold;">*</span></div>
+                                        <input class="form-input" id="inp-service-city" placeholder="Город *" required />
+                                        <div class="form-section-title">Фотографии</div>
+                                        <input type="file" class="form-input" id="inp-service-photos" multiple accept="image/*" />
+                                    </div>
                                     <div id="div-part-only" class="hidden">
                                         <div class="form-section-title">Информация <span
                                                 style="color:#ff4757; font-weight:bold;">*</span></div>
