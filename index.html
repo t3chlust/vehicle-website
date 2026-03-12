@@ -2266,7 +2266,7 @@
                                                 placeholder="Поиск техники" autocomplete="off">
                                             <button id="adsClearFilterBtn" class="clear-filter-btn" onclick="clearAdsBrandFilter()" style="display:none;">Сбросить</button>
                                         </div>
-                                        <div id="adsSearchList" class="search-suggestions" onclick="console.log('*** HTML onclick on adsSearchList:', event.target.className)"></div>
+                                        <div id="adsSearchList" class="search-suggestions"></div>
                                     </div>
                                     <div id="view-filters" class="filters-container">
                                         <div class="filters-toggle-btn" onclick="toggleFilters()">Фильтры</div>
@@ -3485,7 +3485,6 @@
                                 applyFilters();
                                 // Восстанавливаем фильтр по бренду если он был активен
                                 if (currentBrandFilter) {
-                                    console.log('*** Restoring brand filter:', currentBrandFilter);
                                     const filterBtn = document.getElementById('adsClearFilterBtn');
                                     const input = document.getElementById('adsSearchInput');
                                     
@@ -3497,7 +3496,6 @@
                                         const adBrand = (ad.brand || '').toLowerCase();
                                         return adBrand === brandLower;
                                     });
-                                    console.log('*** Restored filter showing', filtered.length, 'ads for brand:', currentBrandFilter);
                                     renderGrid(filtered);
                                 }
                             }
@@ -3511,7 +3509,6 @@
                                 
                                 // Восстанавливаем фильтр по бренду если он был активен
                                 if (currentTenderBrandFilter) {
-                                    console.log('*** Restoring tender brand filter:', currentTenderBrandFilter);
                                     const filterBtn = document.getElementById('tenderClearFilterBtn');
                                     const input = document.getElementById('tenderSearchInput');
                                     
@@ -3524,7 +3521,6 @@
                                         const isTender = (ad.tender || '').toLowerCase() === 'yes';
                                         return isTender && adBrand === brandLower;
                                     });
-                                    console.log('*** Restored tender filter showing', filtered.length, 'ads for brand:', currentTenderBrandFilter);
                                     renderTenderAds(filtered);
                                 } else {
                                     renderTenderAds();
@@ -4005,10 +4001,8 @@
                             document.addEventListener('click', function(e) {
                                 // Логируем ВСЕ клики на manufacturer элементы
                                 if (e.target.classList?.contains('manufacturer')) {
-                                    console.log('*** GLOBAL CAPTURE: Click detected on .manufacturer element!', e.target.textContent, 'data-target:', e.target.getAttribute('data-target'));
                                 }
                                 if (e.target.id === 'adsSearchList' || e.target.parentElement?.id === 'adsSearchList') {
-                                    console.log('*** GLOBAL click on adsSearchList or child:', e.target.className, e.target.textContent.substring(0, 30));
                                 }
                             }, true); // Capture phase!
                             // Firefox может восстанавливать значения полей с задержкой (особенно на проде)
@@ -4500,17 +4494,14 @@
                                     };
                                 })
                                 .filter(item => item.title);
-                            console.log('Built ad search index with', adSearchIndex.length, 'items:', adSearchIndex.map(a => ({ id: a.id, title: a.title })));
                         }
                         function findAdAndScroll(value, itemId, brandFilter) {
                             const input = document.getElementById('adsSearchInput');
                             const listDiv = document.getElementById('adsSearchList');
                             const clearBtn = document.getElementById('adsClearFilterBtn');
-                            console.log('*** findAdAndScroll called with value:', value, 'itemId:', itemId, 'brandFilter:', brandFilter);
                             
                             // Если это фильтр по бренду - показываем все объявления этого бренда
                             if (brandFilter) {
-                                console.log('*** Filtering by brand:', brandFilter);
                                 currentBrandFilter = brandFilter; // Сохраняем активный фильтр
                                 if (input) input.value = brandFilter;
                                 if (clearBtn) clearBtn.style.display = 'flex'; // Показываем кнопку сброса
@@ -4520,7 +4511,6 @@
                                     const adBrand = (ad.brand || '').toLowerCase();
                                     return adBrand === brandLower;
                                 });
-                                console.log('*** Found', filtered.length, 'ads for brand:', brandFilter);
                                 renderGrid(filtered);
                                 if (listDiv) listDiv.style.display = 'none';
                                 return;
@@ -4528,10 +4518,7 @@
                             
                             let match = null;
                             if (itemId !== undefined) {
-                                console.log('*** findAdAndScroll - Searching for ad by ID:', itemId, 'Index size:', adSearchIndex.length);
-                                console.log('Full index:', adSearchIndex.map(a => ({ id: a.id, title: a.title })));
                                 match = adSearchIndex.find(item => item.id === itemId);
-                                console.log('*** Result of find:', match);
                             } else {
                                 let val = value ? String(value).trim() : (input ? input.value.trim() : '');
                                 if (!val) return;
@@ -4542,10 +4529,8 @@
                                 }
                             }
                             if (match) {
-                                console.log('*** About to show card for:', match.id, match.title);
                                 if (input) input.value = match.title;
                                 const card = document.getElementById(`ad-${match.id}`);
-                                console.log('*** Looking for card element with ID: ad-' + match.id, 'Found:', !!card);
                                 if (card) {
                                     card.style.transition = 'background 1.2s';
                                     card.style.background = getHighlightColor(0.35);
