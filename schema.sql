@@ -118,15 +118,14 @@ CREATE TABLE IF NOT EXISTS `advertisement_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement_type: ~5 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement_type: ~4 rows (приблизительно)
 INSERT INTO `advertisement_type` (`id`, `name`) VALUES
 	(1, 'Вездеход'),
 	(2, 'Мото-техника'),
 	(3, 'Прицеп'),
-	(4, 'Запчасть'),
-	(5, 'Услуга');
+	(4, 'Запчасть');
 
 -- Дамп структуры для таблица vehicle_website.chassis
 CREATE TABLE IF NOT EXISTS `chassis` (

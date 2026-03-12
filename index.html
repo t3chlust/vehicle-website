@@ -3016,16 +3016,7 @@
                             <div id="view-form" class="hidden fade-in">
                                 <h3 id="form-title" style="margin-top:0">Новое объявление</h3>
                                 <form id="main-form"> <input type="hidden" id="edit-row-index" />
-                                    <div class="form-section-title">Что вы продаёте? <span
-                                            style="color:#ff4757; font-weight:bold;">*</span></div> <select class="form-select"
-                                        id="inp-tech-type" onchange="checkTechTypeVisibility()">
-                                        <option value="Вездеход" selected>Вездеход</option>
-                                        <option value="Мото-техника">Мото-техника</option>
-                                        <option value="Прицеп">Прицеп</option>
-                                        <option value="Запчасть">Запчасть</option>
-                                        <option value="Услуга">Услуга</option>
-                                    </select>
-                                    <div id="div-seller-info" class="form-section-title">Информация о продавце <span
+                                    <div class="form-section-title">Информация о продавце <span
                                             style="color:#ff4757; font-weight:bold;">*</span></div> <select
                                         class="form-select" id="inp-seller-type" onchange="checkTenderVisibility()"
                                         required>
@@ -3034,7 +3025,13 @@
                                         <option value="dealer">Дилер</option>
                                         <option value="private">Владелец</option>
                                     </select>
-                                    <div class="form-section-title">Основное</div> <select class="form-select" id="inp-construction">
+                                    <div class="form-section-title">Основное</div> <select class="form-select"
+                                        id="inp-tech-type" onchange="checkTechTypeVisibility()">
+                                        <option value="Вездеход" selected>Вездеход</option>
+                                        <option value="Мото-техника">Мото-техника</option>
+                                        <option value="Прицеп">Прицеп</option>
+                                        <option value="Запчасть">Запчасть</option>
+                                    </select> <select class="form-select" id="inp-construction">
                                         <option value="">Конструкция вездехода</option>
                                         <option value="Цельнорамный">Цельнорамный</option>
                                         <option value="Переломный">Переломный</option>
@@ -4167,14 +4164,6 @@
                             const partOnlyDiv = document.getElementById('div-part-only');
                             const specsTitle = document.getElementById('specs-title');
                             const cityLabel = document.getElementById('city-label');
-                            const sellerInfoDiv = document.getElementById('div-seller-info');
-                            const sellerTypeSelect = document.getElementById('inp-seller-type');
-                            const conditionDiv = document.getElementById('inp-condition').parentElement;
-                            const conditionLabel = document.querySelector('label[for="inp-condition"], .form-section-title:has(+ select#inp-condition)') || 
-                                                    Array.from(document.querySelectorAll('.form-section-title')).find(el => el.textContent.includes('Состояние'));
-                            const mileageDiv = document.getElementById('div-mileage');
-                            const basicSection = Array.from(document.querySelectorAll('.form-section-title')).find(el => el.textContent.includes('Основное'));
-                            
                             constrInp.classList.add('hidden');
                             mainSpecs.classList.remove('hidden');
                             capDiv.classList.add('hidden');
@@ -4183,20 +4172,6 @@
                             colorDocsDiv.classList.remove('hidden');
                             partOnlyDiv.classList.add('hidden');
                             specsTitle.classList.remove('hidden');
-                            
-                            // Show seller info by default
-                            if (sellerInfoDiv) {
-                                sellerInfoDiv.classList.remove('hidden');
-                            }
-                            if (sellerTypeSelect) {
-                                sellerTypeSelect.classList.remove('hidden');
-                            }
-                            
-                            // Show condition by default
-                            if (conditionLabel) {
-                                conditionLabel.classList.remove('hidden');
-                            }
-                            
                             if (type === 'Вездеход') {
                                 constrInp.classList.remove('hidden');
                             } else if (type === 'Прицеп') {
@@ -4212,49 +4187,14 @@
                                 colorDocsDiv.classList.add('hidden');
                                 partOnlyDiv.classList.remove('hidden');
                                 specsTitle.classList.add('hidden');
-                            } else if (type === 'Услуга') {
-                                // For service: hide seller info, hide condition, hide specs
-                                constrInp.classList.add('hidden');
-                                mainSpecs.classList.add('hidden');
-                                wheelsDiv.classList.add('hidden');
-                                capDiv.classList.add('hidden');
-                                brandModelDiv.classList.add('hidden');
-                                colorDocsDiv.classList.add('hidden');
-                                partOnlyDiv.classList.add('hidden');
-                                specsTitle.classList.add('hidden');
-                                
-                                // Hide seller info section
-                                if (sellerInfoDiv) {
-                                    sellerInfoDiv.classList.add('hidden');
-                                }
-                                if (sellerTypeSelect) {
-                                    sellerTypeSelect.classList.add('hidden');
-                                }
-                                
-                                // Hide condition section
-                                if (conditionLabel) {
-                                    conditionLabel.classList.add('hidden');
-                                }
-                                if (basicSection) {
-                                    basicSection.classList.add('hidden');
-                                }
-                                if (mileageDiv) {
-                                    mileageDiv.classList.add('hidden');
-                                }
                             }
-                            
                             if (cityLabel) {
-                                if (type === 'Услуга') {
-                                    cityLabel.innerHTML = 'Город <span style="color:#ff4757; font-weight:bold;">*</span>';
-                                } else if (type === 'Запчасть') {
-                                    cityLabel.innerHTML = 'Где находится запчасть <span style="color:#ff4757; font-weight:bold;">*</span>';
-                                } else {
-                                    cityLabel.innerHTML = 'Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span>';
-                                }
+                                cityLabel.innerHTML = (type === 'Запчасть')
+                                    ? 'Где находится запчасть <span style="color:#ff4757; font-weight:bold;">*</span>'
+                                    : 'Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span>';
                             }
-                            
                             if (colorDocsDiv && colorSelect) {
-                                if (type === 'Прицеп' || type === 'Запчасть' || type === 'Услуга') {
+                                if (type === 'Прицеп' || type === 'Запчасть') {
                                     colorSelect.value = '';
                                     colorSelect.style.display = 'none';
                                     colorDocsDiv.style.gridTemplateColumns = '1fr';
@@ -4263,11 +4203,9 @@
                                     colorDocsDiv.style.gridTemplateColumns = '';
                                 }
                             }
-                            
                             if (type !== 'Запчасть') {
                                 setVal('inp-part-title', '');
                             }
-                            
                             checkTenderVisibility();
                             checkConditionVisibility();
                             checkChassisTypeVisibility();
@@ -4299,12 +4237,6 @@
                                         tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
                                         tRecords.classList.add('tab-parts');
                                     }
-                                } else if (type === 'Услуга') {
-                                    submitBtn.classList.add('btn-purple');
-                                    if (tRecords) {
-                                        tRecords.classList.remove('tab-ads', 'tab-parts', 'tab-manufacturers', 'tab-tender', 'tab-admin');
-                                        tRecords.classList.add('tab-services');
-                                    }
                                 } else {
                                     submitBtn.classList.add('btn-green');
                                     if (tRecords) {
@@ -4320,7 +4252,7 @@
                             const wheelType = safeVal('inp-wheel-f');
                             const wheelsDiv = document.getElementById('div-wheels');
                             if (!wheelsDiv) return;
-                            if (type === 'Запчасть' || type === 'Прицеп' || type === 'Услуга') {
+                            if (type === 'Запчасть' || type === 'Прицеп') {
                                 return;
                             }
                             if (wheelType === 'Гусеничный') {
@@ -5462,48 +5394,34 @@
                         function validateForm() {
                             const errors = [];
                             const techType = safeVal('inp-tech-type');
-                            
-                            // For services - minimal validation
-                            if (techType === 'Услуга') {
-                                if (!safeVal('inp-city').trim()) {
-                                    errors.push('Укажите город');
-                                }
-                                const priceVal = getPriceValue('inp-price');
-                                if (!priceVal || parseInt(priceVal) <= 0) {
-                                    errors.push('Укажите цену');
+                            // Проверяем обязательные поля для всех типов объявлений
+                            if (!safeVal('inp-seller-type')) {
+                                errors.push('Выберите тип продавца (Кто вы?)');
+                            }
+                            if (!safeVal('inp-city').trim()) {
+                                errors.push('Укажите город');
+                            }
+                            const priceVal = getPriceValue('inp-price');
+                            if (!priceVal || parseInt(priceVal) <= 0) {
+                                errors.push('Укажите цену');
+                            }
+                            if (!safeVal('inp-condition')) {
+                                errors.push('Выберите состояние (Новый/Б/У)');
+                            }
+                            // Проверяем специфичные поля для запчастей
+                            if (techType === 'Запчасть') {
+                                if (!safeVal('inp-part-title').trim()) {
+                                    errors.push('Укажите название запчасти');
                                 }
                             } else {
-                                // Проверяем обязательные поля для остальных типов объявлений
-                                if (!safeVal('inp-seller-type')) {
-                                    errors.push('Выберите тип продавца (Кто вы?)');
+                                // Проверяем специфичные поля для техники
+                                if (!safeVal('inp-brand').trim()) {
+                                    errors.push('Укажите марку техники');
                                 }
-                                if (!safeVal('inp-city').trim()) {
-                                    errors.push('Укажите город');
-                                }
-                                const priceVal = getPriceValue('inp-price');
-                                if (!priceVal || parseInt(priceVal) <= 0) {
-                                    errors.push('Укажите цену');
-                                }
-                                if (!safeVal('inp-condition')) {
-                                    errors.push('Выберите состояние (Новый/Б/У)');
-                                }
-                                
-                                // Проверяем специфичные поля для запчастей
-                                if (techType === 'Запчасть') {
-                                    if (!safeVal('inp-part-title').trim()) {
-                                        errors.push('Укажите название запчасти');
-                                    }
-                                } else {
-                                    // Проверяем специфичные поля для техники
-                                    if (!safeVal('inp-brand').trim()) {
-                                        errors.push('Укажите марку техники');
-                                    }
-                                    if (!safeVal('inp-model').trim()) {
-                                        errors.push('Укажите модель техники');
-                                    }
+                                if (!safeVal('inp-model').trim()) {
+                                    errors.push('Укажите модель техники');
                                 }
                             }
-                            
                             if (errors.length > 0) {
                                 const errorMessage = 'Пожалуйста, заполните обязательные поля:\n\n' + errors.map((e, i) => `${i + 1}. ${e}`).join('\n');
                                 alert(errorMessage);
