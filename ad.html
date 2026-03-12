@@ -604,7 +604,12 @@
             }
             currentPhotos = currentMediaItems;
 
-            const specsHtml = specs.map(s => s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '').join('');
+            const specsHtml = specs.map(s => {
+                if (s.l === 'Грузоподъемность') {
+                    return s.v ? `<tr style="height:32px;"><td style="padding-top:18px;">${s.l}</td><td style="padding-top:18px; font-size:18px; font-weight:600;">${s.v}</td></tr>` : '';
+                }
+                return s.v ? `<tr><td>${s.l}</td><td>${s.v}</td></tr>` : '';
+            }).join('');
             const gallerySlidesHtml = currentMediaItems.map(media => {
                 if (media.type === 'video') {
                     return `<div class="gallery-slide"><video class="gallery-video" src="${media.url}" controls preload="metadata" crossorigin="anonymous" style="width:100%; height:100%; object-fit:contain; background:#000;"></video></div>`;

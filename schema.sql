@@ -122,10 +122,21 @@ CREATE TABLE IF NOT EXISTS `advertisement_type` (
 
 -- Дамп данных таблицы vehicle_website.advertisement_type: ~4 rows (приблизительно)
 INSERT INTO `advertisement_type` (`id`, `name`) VALUES
-	(1, 'Вездеход'),
-	(2, 'Мото-техника'),
-	(3, 'Прицеп'),
-	(4, 'Запчасть');
+		(1, 'Вездеход'),
+		(2, 'Мото-техника'),
+		(3, 'Прицеп'),
+		(4, 'Запчасть'),
+		(5, 'Услуга');
+
+-- Таблица для услуг
+CREATE TABLE IF NOT EXISTS `advertisement_service` (
+	`advertisement` int(11) NOT NULL,
+	`description` varchar(10000) NOT NULL,
+	`price` decimal(20,2) NOT NULL,
+	`city` varchar(100) NOT NULL,
+	PRIMARY KEY (`advertisement`),
+	CONSTRAINT `FK_advertisement_service_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Дамп структуры для таблица vehicle_website.chassis
 CREATE TABLE IF NOT EXISTS `chassis` (

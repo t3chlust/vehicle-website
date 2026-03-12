@@ -5101,7 +5101,7 @@
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission) infoParts.push(ad.transmission);
+                                if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `ad-${ad.rowIndex}`;
@@ -5203,7 +5203,7 @@
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission) infoParts.push(ad.transmission);
+                                if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
 
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
@@ -6124,7 +6124,7 @@
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission) infoParts.push(ad.transmission);
+                                if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `ad-${ad.rowIndex}`;
@@ -6240,7 +6240,7 @@
                                     if (ad.city) infoParts.push(ad.city);
                                     else if (ad.region) infoParts.push(ad.region);
                                     if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                    if (ad.transmission) infoParts.push(ad.transmission);
+                                    if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
                                     const d = document.createElement('div');
                                     d.className = 'ad-card';
                                     d.id = `ad-${ad.rowIndex}`;
@@ -6342,7 +6342,7 @@
                                     if (ad.city) infoParts.push(ad.city);
                                     else if (ad.region) infoParts.push(ad.region);
                                     if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                    if (ad.transmission) infoParts.push(ad.transmission);
+                                    if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
                                     const d = document.createElement('div');
                                     d.className = 'ad-card';
                                     d.id = `ad-${ad.rowIndex}`;
