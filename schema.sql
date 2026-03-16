@@ -2,7 +2,7 @@
 -- Хост:                         185.225.34.114
 -- Версия сервера:               10.11.14-MariaDB-0ubuntu0.24.04.1 - Ubuntu 24.04
 -- Операционная система:         debian-linux-gnu
--- HeidiSQL Версия:              12.11.0.7065
+-- HeidiSQL Версия:              12.15.0.7171
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -40,17 +40,27 @@ CREATE TABLE IF NOT EXISTS `advertisement` (
   CONSTRAINT `FK_advertisement_advertisement_type` FOREIGN KEY (`type`) REFERENCES `advertisement_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_base_user_personal_data` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_advertisement_seller_type` FOREIGN KEY (`sellerType`) REFERENCES `seller_type` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement: ~7 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement: ~17 rows (приблизительно)
 INSERT INTO `advertisement` (`id`, `brand`, `name`, `type`, `userId`, `price`, `date`, `city`, `condition`, `sellerType`, `verified`, `description`) VALUES
-	(11, 'Тундра ', 'Восток ', 1, 1, 3000000.00, '2026-02-14 19:34:46', 'Тюмень', b'1', 1, 0, NULL),
-	(12, 'Яр', 'Профи', 3, 1, 300000.00, '2026-02-14 19:36:09', 'Красноярск', b'1', 1, 0, NULL),
-	(13, 'Тингер', 'Трек', 1, 1, 2500000.00, '2026-02-14 19:38:31', 'Череповец', b'1', 2, 1, NULL),
-	(14, 'Севертрак', 'Егерь', 1, 1, 5000000.00, '2026-02-14 19:39:56', 'Красноярск', b'1', 1, 1, NULL),
 	(15, 'Тундра', 'Ободрыши ОИ-25', 4, 1, 250000.00, '2026-02-14 19:40:45', 'Тюмень', b'1', 1, 1, NULL),
 	(16, 'Севертрак', 'Шины Севертрак', 4, 1, 500000.00, '2026-02-14 19:42:11', 'Красноярск', b'1', 1, 1, NULL),
-	(18, 'Тингер', 'Армор', 1, 1, 3000000.00, '2026-02-14 19:54:41', 'Череповец', b'1', 1, 0, NULL);
+	(23, 'Тингер', 'ТФ4', 1, 1, 1900000.00, '2026-03-05 14:55:29', 'Ишим', b'0', 2, 0, 'Модель 2024 года. Трансмиссия 5ст МКПП +вариатор. Лебедка 7000lbs, центральная подкачка колёс, 2 межосевые блокировки, блокировка узла перелома. Ставится на учёт без проблем'),
+	(24, 'Тингер', 'ТФ4 ПРО', 1, 4, 3000000.00, '2026-03-05 15:10:38', 'Ишим', b'0', 2, 0, 'Продаю вездеход-переломку Tinger TF4 Pro. Двигатель ВАЗ 1.6 л (90 л.с.), 5-ступенчатая МКПП ВАЗ, раздатка Соболь, гидроусилитель руля. Грузоподъемность 600 кг, клиренс 500 мм, скорость до 70 км/ч на суше. Комплектация: наружные каркасы, веткорезы, доп. свет, лебёдка 7000лбс, обе межосевые блокировки, центральная подкачка колёс, в кунге планар и вторая печка. Расход топлива по трассе 18-20 л/100км\nТелефон для связи 89833843002, Евгений '),
+	(25, 'Тингер', 'Трек', 1, 4, 2700000.00, '2026-03-05 15:17:43', 'Череповец', b'1', 2, 0, 'Вездеход Тингер Трек от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 2-ступенчатая МКПП+вариатор Грузоподъемность 500 кг, клиренс 330 мм, скорость до 35 км/ч на суше. Базовая комплектация: фаркоп, трюмная помпа, заднее сиденье. Доставка по всей стране.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(26, 'Тингер', 'Трек', 1, 4, 3421000.00, '2026-03-05 15:32:11', 'Череповец', b'1', 2, 0, 'Вездеход Тингер Трек от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 2-ступенчатая МКПП+вариатор Грузоподъемность 500 кг, клиренс 330 мм, скорость до 35 км/ч на суше. Максимальная комплектация: силовые бампера, лебедка, каркас, тент, стекло с подогревом, боковые зеркала, веткорезы, транец под лодочный мотор, отопитель салона, багажник, отвал для снега, колёсный прицеп. Доставка по всей стране.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(27, 'Тингер', 'ТФ4', 1, 4, 2390000.00, '2026-03-05 15:42:18', 'Череповец', b'1', 2, 0, 'Вездеход Тингер ТФ4 от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 5-ступенчатая МКПП+вариатор Грузоподъемность 600 кг, клиренс 500 мм, скорость до 50 км/ч на суше. Базовая комплектация: шины Саламандра, блокировка узла перелома, отопитель салона. Доставка по всей стране. Гарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(28, 'Тингер', 'ТФ4', 1, 4, 3730000.00, '2026-03-05 15:50:08', 'Череповец', b'1', 2, 0, 'Вездеход Тингер ТФ4 от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 5-ступенчатая МКПП+вариатор Грузоподъемность 600 кг, клиренс 500 мм, скорость до 50 км/ч на суше. Максимальная комплектация: шины Тингер, 2 межосевые блокировки, усиленные полусои, защитный каркас, лебёдка спереди и сзади, кунг с отопителем и люком, камера заднего вида, фаркоп. Доставка по всей стране. Гарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(29, 'Тингер', 'Армор', 1, 4, 2550000.00, '2026-03-05 15:55:49', 'Череповец', b'1', 2, 0, 'Вездеход Тингер Армор от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 2-ступенчатая МКПП+вариатор Грузоподъемность 500 кг, клиренс 220 мм, скорость до 35 км/ч на суше. Базовая комплектация: фаркоп, трюмная помпа, заднее сиденье. Доставка по всей стране. Гарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(30, 'Тингер', 'Армор', 1, 4, 3600000.00, '2026-03-05 16:02:04', 'Череповец', b'1', 2, 0, 'Вездеход Тингер Армор от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 2-ступенчатая МКПП+вариатор Грузоподъемность 500 кг, клиренс 220 мм, скорость до 35 км/ч на суше. Максимальная комплектация: силовые бампера, лебедка, каркас, тент, стекло с подогревом, боковые зеркала, веткорезы, транец под лодочный мотор, две гусеницы, отопитель салона, багажник, отвал для снега, колёсный прицеп. Доставка по всей стране. Гарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(31, 'Тингер', 'ТФ4 ПРО', 1, 4, 2790000.00, '2026-03-05 16:14:43', 'Череповец', b'1', 2, 0, 'Вездеход Тингер ТФ4 ПРО от завода-изготовителя. Двигатель ВАЗ Гранта 1.6 л (90 л.с.), 5-ступенчатая МКПП, раздатка соболь, Грузоподъемность 600 кг, клиренс 500 мм, скорость до 70 км/ч на суше. Базовая комплектация: пружинная подвеска, шины Саламандра, блокировка узла перелома, отопитель салона. Доставка по всей стране. Гарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(32, 'Тингер', 'ТФ4 ПРО', 1, 4, 4350000.00, '2026-03-05 16:21:14', 'Череповец', b'1', 2, 0, 'Вездеход Тингер ТФ4 ПРО от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 5-ступенчатая МКПП+вариатор Грузоподъемность 600 кг, клиренс 500 мм, скорость до 70 км/ч на суше. Максимальная комплектация: пружинная подвеска, шины Тингер, 2 межосевые блокировки, усиленные полусои, защитный каркас, лебёдка спереди и сзади, кунг с отопителем и люком, камера заднего вида, фаркоп, второй аккумулятор. Доставка по всей стране. Гарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(33, 'Тингер', 'ТФ4 ЛОНГ', 1, 4, 2490000.00, '2026-03-05 16:25:11', 'Череповец', b'1', 2, 0, 'Вездеход Тингер ТФ4 ЛОНГ от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 5-ступенчатая МКПП+вариатор Грузоподъемность 600 кг, клиренс 500 мм, скорость до 50 км/ч на суше, удлинённый кузов на 30см. Базовая комплектация: шины Саламандра, блокировка узла перелома, отопитель салона. Доставка по всей стране. Гарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(34, 'Тингер', 'ТФ4 ЛОНГ', 1, 4, 3830000.00, '2026-03-05 16:27:34', 'Череповец', b'1', 2, 0, 'Вездеход Тингер ТФ4 от завода-изготовителя. Двигатель Черри 0.7 л (57 л.с.), 5-ступенчатая МКПП+вариатор Грузоподъемность 600 кг, клиренс 500 мм, скорость до 50 км/ч на суше, удлинённый кузов на 30см. Максимальная комплектация: шины Тингер, 2 межосевые блокировки, усиленные полусои, защитный каркас, лебёдка спереди и сзади, кунг с отопителем и люком, камера заднего вида, фаркоп. Доставка по всей стране. Гарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(35, 'Тингер', 'РТ2', 3, 4, 490000.00, '2026-03-05 16:36:26', 'Череповец', b'1', 2, 0, 'Прицеп Тингер ТР2 от завода-изготовителя. Оцинкованная рама, тормоз наката, ЛЕД-оптика, рессорная подвеска, 2-скатные шины, сходни в комплекте. \nДоставка по всей стране. \nГарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(36, 'Тингер', 'Т4', 3, 4, 185000.00, '2026-03-05 16:41:57', 'Череповец', b'1', 2, 0, 'Плавающий прицеп Тингер Т4 от завода-изготовителя. Пластиковый корпус, 4 шины низкого давления, вместимость 6 человек.\nДоставка по всей стране. \nГарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***'),
+	(37, 'Тингер', 'Т8', 3, 4, 363000.00, '2026-03-05 16:44:22', 'Череповец', b'1', 2, 0, 'Плавающий прицеп Тингер Т8 от завода-изготовителя. Пластиковый корпус, 8 шин низкого давления, вмещает 10 человек.\nДоставка по всей стране. \nГарантия завода 2 года.\nТелефон для связи 89833843002, Евгений ***STATUS_NEW***');
 
 -- Дамп структуры для таблица vehicle_website.advertisement_photo
 CREATE TABLE IF NOT EXISTS `advertisement_photo` (
@@ -60,19 +70,40 @@ CREATE TABLE IF NOT EXISTS `advertisement_photo` (
   CONSTRAINT `FK_advertisement_photo_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement_photo: ~11 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement_photo: ~20 rows (приблизительно)
 INSERT INTO `advertisement_photo` (`advertisement`, `photo`) VALUES
-	(11, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097683/vu6mslttcbjg8pm5w1xz.jpg'),
-	(11, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097684/vxp4vnjdl1bjlyu9zwgt.jpg'),
-	(12, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097768/ypoofxf2vkyxghsyyzge.jpg'),
-	(12, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097769/cw0ilu2vh7yzsfbctlrf.webp'),
-	(13, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097908/jgb0ru80iudzsn8ojbnm.webp'),
-	(13, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097910/hmeonhoaeu1cpvochwfi.png'),
-	(14, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771097995/qw1pzxo0xe6u6uqibaoa.jpg'),
 	(15, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771098044/ywrbozui9tkobmts9yzg.png'),
 	(16, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771098130/mc1do0kq8gxxy5ny5m9j.png'),
-	(18, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771098876/mknzr17o07bgpponioit.png'),
-	(18, 'https://res.cloudinary.com/duystfz2v/image/upload/v1771098878/zyay9zt2fq66j0kil6qq.png');
+	(23, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772722647/u8clp26rggr6gyf32upt.jpg'),
+	(23, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772722648/sxh9oh1q92ppdt2uaaxl.jpg'),
+	(25, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772724632/l28iqtzhgwnrym46rz9a.jpg'),
+	(25, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772724632/pumxfxeqb9qpvcswiihf.webp'),
+	(26, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772724966/czk4fvprzs6myfgcx4y2.png'),
+	(27, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772725336/ymprccle9boebcw5gcfu.png'),
+	(28, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772725807/sgsgd8lcs9nmpmuk9ton.png'),
+	(29, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772726217/cjktypyfuyktvexbfc0k.png'),
+	(30, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772726522/fioiin93hiocnjucol0r.png'),
+	(31, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772727282/asl0mzom0kcuwyfijzgg.png'),
+	(32, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772727672/ovz1tuapvqnomvafyz5h.png'),
+	(33, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772727909/i82eiapls6dogzsxocxq.png'),
+	(34, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772728053/alti03qpmenny6fyxusn.png'),
+	(35, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772728582/wmce36ao451kdnpkxgjp.png'),
+	(35, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772728583/db3uevqbgfhyhdtzlnff.png'),
+	(35, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772728585/zrrgiebwj9amle5otv1z.png'),
+	(36, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772728916/ba1vgijlhj5jqokrqwkm.png'),
+	(37, 'https://res.cloudinary.com/duystfz2v/image/upload/v1772729061/romgn80lfed0wotaqawx.png');
+
+-- Дамп структуры для таблица vehicle_website.advertisement_service
+CREATE TABLE IF NOT EXISTS `advertisement_service` (
+  `advertisement` int(11) NOT NULL,
+  `description` varchar(10000) NOT NULL,
+  `price` decimal(20,2) NOT NULL,
+  `city` varchar(100) NOT NULL,
+  PRIMARY KEY (`advertisement`),
+  CONSTRAINT `FK_advertisement_service_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Дамп данных таблицы vehicle_website.advertisement_service: ~0 rows (приблизительно)
 
 -- Дамп структуры для таблица vehicle_website.advertisement_technic
 CREATE TABLE IF NOT EXISTS `advertisement_technic` (
@@ -103,40 +134,52 @@ CREATE TABLE IF NOT EXISTS `advertisement_technic` (
   CONSTRAINT `FK_advertisement_wheel` FOREIGN KEY (`chassis`) REFERENCES `chassis` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.advertisement_technic: ~7 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.advertisement_technic: ~17 rows (приблизительно)
 INSERT INTO `advertisement_technic` (`advertisement`, `tender`, `chassis`, `color`, `mileage`, `engine`, `power`, `transmission`, `fuel`, `wheelSize`, `amphibious`, `document`, `constructionType`, `capacity`) VALUES
 	(5, b'0', 1, 'Черный', 0, '', 0, 1, 1, '', b'0', 3, 1, 1700),
 	(6, b'1', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 3, NULL),
-	(11, b'0', 1, 'Зеленый', 0, 'Тойота 1нз фе', 110, 1, 1, '1300x500', b'1', 1, 1, NULL),
-	(12, b'0', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 1, 1800),
-	(13, b'1', 2, 'Желтый', 0, 'Черри 0,7', 52, 2, 1, '', b'1', 1, 1, NULL),
-	(14, b'0', 1, 'Зеленый', 0, 'Тойота 1нз фе', 110, 1, 1, '1600x650', b'1', 1, 1, NULL),
-	(18, b'1', 1, 'Красный', 0, 'Черри 0,7', 52, 2, 1, '400x300', b'1', 1, 3, NULL);
+	(23, b'1', 1, 'Оранжевый', 275, 'Cherry 1.1', 52, 2, 1, '1400x650', b'1', 1, 2, NULL),
+	(24, b'1', 1, 'Красный', 1000, 'ВАЗ Гранта', 90, 2, 1, '1400x650', b'1', 1, 2, NULL),
+	(25, b'1', 2, 'Зеленый', 0, 'Cherry 0.7', 57, 2, 1, '', b'1', 1, 1, NULL),
+	(26, b'1', 2, 'Красный', 0, 'Cherry 0.7', 57, 3, 1, '', b'1', 1, 1, NULL),
+	(27, b'1', 1, 'Красный', 0, 'Cherry 0.7', 57, 2, 1, '1400x650', b'1', 1, 2, NULL),
+	(28, b'1', 1, 'Черный', 0, 'Cherry 0.7', 57, 2, 1, '1400x650', b'1', 1, 2, NULL),
+	(29, b'1', 1, 'Зеленый', 0, 'Cherry 0.7', 57, 3, 1, '630x300', b'1', 1, 1, NULL),
+	(30, b'1', 1, 'Зеленый', 0, 'Cherry 0.7', 57, 3, 1, '630x300', b'1', 1, 1, NULL),
+	(31, b'1', 1, '', 0, 'ВАЗ Гранта', 90, 2, 1, '1400x650', b'1', 1, 2, NULL),
+	(32, b'1', 1, '', 0, 'ВАЗ Гранта', 57, 2, 1, '1400x650', b'1', 1, 2, NULL),
+	(33, b'1', 1, 'Черный', 0, 'Cherry 0.7', 57, 2, 1, '1400x650', b'1', 1, 2, NULL),
+	(34, b'1', 1, 'Черный', 0, 'Cherry 0.7', 57, 2, 1, '1400x650', b'1', 1, 1, NULL),
+	(35, b'0', 1, '', 0, '', 0, 1, 1, '', b'0', 1, 1, 1900),
+	(36, b'0', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 1, 300),
+	(37, b'0', 1, '', 0, '', 0, 1, 1, '', b'0', 3, 1, 590);
 
 -- Дамп структуры для таблица vehicle_website.advertisement_type
 CREATE TABLE IF NOT EXISTS `advertisement_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Дамп данных таблицы vehicle_website.advertisement_type: ~4 rows (приблизительно)
 INSERT INTO `advertisement_type` (`id`, `name`) VALUES
-		(1, 'Вездеход'),
-		(2, 'Мото-техника'),
-		(3, 'Прицеп'),
-		(4, 'Запчасть'),
-		(5, 'Услуга');
+	(1, 'Вездеход'),
+	(2, 'Мото-техника'),
+	(3, 'Прицеп'),
+	(4, 'Запчасть'),
+	(5, 'Услуга');
 
--- Таблица для услуг
-CREATE TABLE IF NOT EXISTS `advertisement_service` (
-	`advertisement` int(11) NOT NULL,
-	`description` varchar(10000) NOT NULL,
-	`price` decimal(20,2) NOT NULL,
-	`city` varchar(100) NOT NULL,
-	PRIMARY KEY (`advertisement`),
-	CONSTRAINT `FK_advertisement_service_advertisement` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- Дамп структуры для таблица vehicle_website.advertisement_video
+CREATE TABLE IF NOT EXISTS `advertisement_video` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `advertisement` int(11) NOT NULL,
+  `video` varchar(500) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `advertisement` (`advertisement`),
+  CONSTRAINT `advertisement_video_ibfk_1` FOREIGN KEY (`advertisement`) REFERENCES `advertisement` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Дамп данных таблицы vehicle_website.advertisement_video: ~0 rows (приблизительно)
 
 -- Дамп структуры для таблица vehicle_website.chassis
 CREATE TABLE IF NOT EXISTS `chassis` (
@@ -390,7 +433,7 @@ CREATE TABLE IF NOT EXISTS `seller_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп данных таблицы vehicle_website.seller_type: ~3 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.seller_type: ~2 rows (приблизительно)
 INSERT INTO `seller_type` (`id`, `name`) VALUES
 	(1, 'Производитель'),
 	(2, 'Диллер'),
@@ -403,7 +446,7 @@ CREATE TABLE IF NOT EXISTS `transmission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Дамп данных таблицы vehicle_website.transmission: ~3 rows (приблизительно)
+-- Дамп данных таблицы vehicle_website.transmission: ~2 rows (приблизительно)
 INSERT INTO `transmission` (`id`, `name`) VALUES
 	(1, 'АКПП'),
 	(2, 'МКПП'),
@@ -415,12 +458,13 @@ CREATE TABLE IF NOT EXISTS `user` (
   `name` varchar(255) NOT NULL,
   `phone` varchar(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Дамп данных таблицы vehicle_website.user: ~1 rows (приблизительно)
 INSERT INTO `user` (`id`, `name`, `phone`) VALUES
 	(1, 'Админ', '79829817369'),
-	(3, 'Павел', '79129260707');
+	(3, 'Павел', '79129260707'),
+	(4, 'Евгений', '79833843002');
 
 -- Дамп структуры для таблица vehicle_website.user_favorite_advertisement
 CREATE TABLE IF NOT EXISTS `user_favorite_advertisement` (
@@ -432,9 +476,7 @@ CREATE TABLE IF NOT EXISTS `user_favorite_advertisement` (
   CONSTRAINT `FK_user_favorite_advertisement_user` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп данных таблицы vehicle_website.user_favorite_advertisement: ~1 rows (приблизительно)
-INSERT INTO `user_favorite_advertisement` (`user`, `advertisement`) VALUES
-	(1, 14);
+-- Дамп данных таблицы vehicle_website.user_favorite_advertisement: ~0 rows (приблизительно)
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

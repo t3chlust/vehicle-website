@@ -562,7 +562,11 @@
                     specs.push({ l: "Конструкция", v: item.constructionType });
                 }
                 if (item.techType === 'Прицеп') {
-                    specs.push({ l: "Грузоподъемность", v: item.capacity ? item.capacity + ' кг' : '', style: 'padding-bottom:24px;' }); // note: non-breaking space before кг
+                    specs.push({ l: "Грузоподъемность", v: item.capacity ? item.capacity + ' кг' : '', style: 'padding-bottom:24px;' });
+                } else if (item.techType === 'Услуга') {
+                    // Only show city, description, and photos for service
+                    specs.push({ l: "Город", v: item.city });
+                    specs.push({ l: "Описание услуги", v: item.desc });
                 } else {
                     specs.push({ l: "Тип шасси", v: item.wheelFormula });
                     specs.push({ l: "Плавающий", v: ((item.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });

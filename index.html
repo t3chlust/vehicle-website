@@ -34,12 +34,49 @@
                             const productType = document.getElementById('inp-product-type').value;
                             const sellerSection = document.getElementById('seller-info-section');
                             const serviceFields = document.getElementById('service-fields');
+                            // Hide all sections except city, service description, and photos for 'Услуга'
                             if (productType === 'Услуга') {
                                 sellerSection.classList.add('hidden');
                                 serviceFields.classList.remove('hidden');
+                                document.getElementById('div-part-only').classList.add('hidden');
+                                document.getElementById('div-brand-model').classList.add('hidden');
+                                document.getElementById('div-tender').classList.add('hidden');
+                                document.getElementById('city-label').innerText = 'Город *';
+                                document.getElementById('inp-city').classList.remove('hidden');
+                                document.getElementById('inp-price').classList.add('hidden');
+                                document.getElementById('inp-trans').classList.add('hidden');
+                                document.getElementById('inp-engine').classList.add('hidden');
+                                document.getElementById('inp-power').classList.add('hidden');
+                                document.getElementById('inp-fuel').classList.add('hidden');
+                                document.getElementById('inp-wheel-f').classList.add('hidden');
+                                document.getElementById('inp-color').classList.add('hidden');
+                                document.getElementById('inp-mileage').classList.add('hidden');
+                                document.getElementById('inp-condition').classList.add('hidden');
+                                document.getElementById('inp-docs').classList.add('hidden');
+                                document.getElementById('inp-amphibious').classList.add('hidden');
+                                document.getElementById('inp-capacity').classList.add('hidden');
+                                document.getElementById('inp-construction').classList.add('hidden');
                             } else {
                                 sellerSection.classList.remove('hidden');
                                 serviceFields.classList.add('hidden');
+                                document.getElementById('div-part-only').classList.add('hidden');
+                                document.getElementById('div-brand-model').classList.remove('hidden');
+                                document.getElementById('div-tender').classList.remove('hidden');
+                                document.getElementById('city-label').innerText = 'Где находится техника *';
+                                document.getElementById('inp-city').classList.remove('hidden');
+                                document.getElementById('inp-price').classList.remove('hidden');
+                                document.getElementById('inp-trans').classList.remove('hidden');
+                                document.getElementById('inp-engine').classList.remove('hidden');
+                                document.getElementById('inp-power').classList.remove('hidden');
+                                document.getElementById('inp-fuel').classList.remove('hidden');
+                                document.getElementById('inp-wheel-f').classList.remove('hidden');
+                                document.getElementById('inp-color').classList.remove('hidden');
+                                document.getElementById('inp-mileage').classList.remove('hidden');
+                                document.getElementById('inp-condition').classList.remove('hidden');
+                                document.getElementById('inp-docs').classList.remove('hidden');
+                                document.getElementById('inp-amphibious').classList.remove('hidden');
+                                document.getElementById('inp-capacity').classList.remove('hidden');
+                                document.getElementById('inp-construction').classList.remove('hidden');
                             }
                         }
                             function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
@@ -5051,7 +5088,7 @@
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
+                                if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `ad-${ad.rowIndex}`;
@@ -5153,7 +5190,7 @@
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
+                                if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
 
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
@@ -6074,7 +6111,7 @@
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
+                                if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
                                 d.className = 'ad-card';
                                 d.id = `ad-${ad.rowIndex}`;
@@ -6190,7 +6227,7 @@
                                     if (ad.city) infoParts.push(ad.city);
                                     else if (ad.region) infoParts.push(ad.region);
                                     if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                    if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
+                                    if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
                                     const d = document.createElement('div');
                                     d.className = 'ad-card';
                                     d.id = `ad-${ad.rowIndex}`;
@@ -6292,7 +6329,7 @@
                                     if (ad.city) infoParts.push(ad.city);
                                     else if (ad.region) infoParts.push(ad.region);
                                     if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                    if (ad.transmission && ad.type !== 'Прицеп') infoParts.push(ad.transmission);
+                                    if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
                                     const d = document.createElement('div');
                                     d.className = 'ad-card';
                                     d.id = `ad-${ad.rowIndex}`;
