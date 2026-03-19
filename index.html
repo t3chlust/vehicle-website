@@ -1239,7 +1239,7 @@
                                 }
                             }
 
-                            .ad-grid {
+                            .listing-grid {
                                 display: grid;
                                 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
                                 gap: 20px;
@@ -1248,11 +1248,11 @@
                                 transition: opacity 0.6s;
                             }
 
-                            .ad-grid.loaded {
+                            .listing-grid.loaded {
                                 opacity: 1;
                             }
 
-                            .ad-card {
+                            .listing-card {
                                 border: 1px solid #eee;
                                 border-radius: 12px;
                                 overflow: hidden;
@@ -1264,7 +1264,7 @@
                                 flex-direction: column;
                             }
 
-                            .ad-card:hover {
+                            .listing-card:hover {
                                 transform: translateY(-4px);
                                 box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
                             }
@@ -1312,7 +1312,7 @@
                                 }
                             }
 
-                            .ad-card-img {
+                            .listing-card-img {
                                 height: 180px;
                                 width: 100%;
                                 object-fit: cover;
@@ -1320,18 +1320,18 @@
                                 display: block;
                             }
 
-                            .ad-card-media {
+                            .listing-card-media {
                                 position: relative;
                             }
 
-                            .ad-card-content {
+                            .listing-card-content {
                                 padding: 15px;
                                 flex-grow: 1;
                                 display: flex;
                                 flex-direction: column;
                             }
 
-                            .ad-card-tender-badge {
+                            .listing-card-tender-badge {
                                 position: absolute;
                                 left: 0;
                                 right: 0;
@@ -1351,7 +1351,7 @@
                                 z-index: 2;
                             }
 
-                            .ad-card-tender-badge.visible {
+                            .listing-card-tender-badge.visible {
                                 display: flex;
                                 background: #ab47bc;
                                 color: #fff;
@@ -1359,30 +1359,30 @@
 
                             /* Экстра-контроль для очень маленьких экранов */
                             @media (max-width: 320px) {
-                                .ad-card-tender-badge {
+                                .listing-card-tender-badge {
                                     font-size: 10px;
                                     padding: 6px 8px;
                                 }
                             }
 
                             @media (min-width: 321px) and (max-width: 374px) {
-                                .ad-card-tender-badge {
+                                .listing-card-tender-badge {
                                     font-size: 10px;
                                 }
                             }
 
-                            .ad-card-tender-badge.placeholder {
+                            .listing-card-tender-badge.placeholder {
                                 display: none;
                             }
 
-                            .ad-card-header {
+                            .listing-card-header {
                                 display: flex;
                                 flex-direction: column;
                                 gap: 8px;
                                 margin-bottom: 8px;
                             }
 
-                            .ad-card-title {
+                            .listing-card-title {
                                 font-weight: 600;
                                 color: #0066cc;
                                 font-size: 18px;
@@ -1395,13 +1395,13 @@
                                 order: 1;
                             }
 
-                            .ad-card-price {
+                            .listing-card-price {
                                 font-weight: 800;
                                 font-size: 20px;
                                 order: 2;
                             }
 
-                            .ad-card-price-text {
+                            .listing-card-price-text {
                                 font-size: 19px;
                             }
 
@@ -1419,32 +1419,32 @@
                                 margin-top: 4px;
                             }
 
-                            .ad-card-info {
+                            .listing-card-info {
                                 font-size: 13px;
                                 color: #666;
                                 margin-top: auto;
                             }
 
                             @media (max-width: 600px) {
-                                .ad-grid {
+                                .listing-grid {
                                     grid-template-columns: repeat(2, 1fr);
                                     gap: 10px;
                                 }
 
-                                .ad-card-img {
+                                .listing-card-img {
                                     height: 120px !important;
                                 }
 
-                                .ad-card-title {
+                                .listing-card-title {
                                     font-size: 14px !important;
                                     line-height: 18px;
                                 }
 
-                                .ad-card-price {
+                                .listing-card-price {
                                     font-size: 16px !important;
                                 }
 
-                                .ad-card-price-text {
+                                .listing-card-price-text {
                                     font-size: 15px !important;
                                 }
 
@@ -1458,11 +1458,11 @@
                                     margin: 0 !important;
                                 }
 
-                                .ad-card-info {
+                                .listing-card-info {
                                     font-size: 11px !important;
                                 }
 
-                                .ad-card-tender-badge {
+                                .listing-card-tender-badge {
                                     position: absolute;
                                     left: 0;
                                     right: 0;
@@ -1482,7 +1482,7 @@
                                     z-index: 2;
                                 }
 
-                                .ad-card-tender-badge.visible {
+                                .listing-card-tender-badge.visible {
                                     display: flex;
                                     background: #ab47bc;
                                     color: #fff;
@@ -1490,19 +1490,19 @@
 
                                 /* Экстра-контроль для очень маленьких экранов */
                                 @media (max-width: 320px) {
-                                    .ad-card-tender-badge {
+                                    .listing-card-tender-badge {
                                         font-size: 9px;
                                         padding: 5px 8px;
                                     }
                                 }
 
                                 @media (min-width: 321px) and (max-width: 374px) {
-                                    .ad-card-tender-badge {
+                                    .listing-card-tender-badge {
                                         font-size: 9px;
                                     }
                                 }
 
-                                .ad-card-tender-badge.placeholder {
+                                .listing-card-tender-badge.placeholder {
                                     display: none;
                                 }
                             }
@@ -2509,7 +2509,7 @@
                                         <div id="loading-ads" style="text-align:center; padding: 60px; color:#888;">
                                             <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
                                         </div>
-                                        <div id="vehicles-container" class="ad-grid"></div>
+                                        <div id="vehicles-container" class="listing-grid"></div>
                                     </div>
                                 </div>
                                 <div id="tab-content-parts_services" class="tab-content">
@@ -2524,7 +2524,7 @@
                                         <div id="loading-parts" style="text-align:center; padding: 60px; color:#888;">
                                             <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
                                         </div>
-                                        <div id="parts-container" class="ad-grid"></div>
+                                        <div id="parts-container" class="listing-grid"></div>
                                     </div>
                                 </div>
                                 <div id="tab-content-tender" class="tab-content">
@@ -2665,7 +2665,7 @@
                                             style="text-align:center; padding: 60px; color:#888; display:none;">
                                             <div class="spinner" style="margin:0 auto 20px;"></div>Загрузка...
                                         </div>
-                                        <div id="tender-container" class="ad-grid"></div>
+                                        <div id="tender-container" class="listing-grid"></div>
                                     </div>
                                 </div>
                                 <div id="tab-content-profile" class="tab-content">
@@ -2730,7 +2730,7 @@
                                                 style="text-align:center; padding:20px 0; color:#999; display:none;">
                                                 <p>У вас пока нет объявлений</p>
                                             </div>
-                                            <div id="profile-my-ads-grid" class="ad-grid"></div>
+                                            <div id="profile-my-ads-grid" class="listing-grid"></div>
                                             <div id="profile-my-ads-toggle-wrap"
                                                 style="display:none; margin-top:15px; text-align:center;">
                                                 <button id="profile-my-ads-toggle" class="btn btn-black"
@@ -2758,7 +2758,7 @@
                                                 style="text-align:center; padding:20px 0; color:#999; display:none;">
                                                 <p>У вас пока нет избранных объявлений</p>
                                             </div>
-                                            <div id="profile-favorites-grid" class="ad-grid"></div>
+                                            <div id="profile-favorites-grid" class="listing-grid"></div>
                                             <div id="profile-favorites-toggle-wrap"
                                                 style="display:none; margin-top:15px; text-align:center;">
                                                 <button id="profile-favorites-toggle" class="btn btn-black"
@@ -5100,7 +5100,7 @@
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
                                 const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
-                                    ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                    ? '<div class="listing-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
                                     : '';
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
@@ -5108,7 +5108,7 @@
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
                                 if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
-                                d.className = 'ad-card';
+                                d.className = 'listing-card';
                                 d.id = `ad-${ad.rowIndex}`;
                                 d.onclick = () => openAd(ad);
                                 // Проверяем, в избранном ли объявление
@@ -5116,14 +5116,14 @@
                                 const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
-                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='images/no_logo.svg'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='images/no_logo.svg'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
                             });
                             setTimeout(() => {
                                 c.classList.add('loaded');
                                 const stylesAfter = window.getComputedStyle(c);
                                 // Проверяем первую карточку
-                                const firstCard = c.querySelector('.ad-card');
+                                const firstCard = c.querySelector('.listing-card');
                                 if (firstCard) {
                                     const cardStyles = window.getComputedStyle(firstCard);
                                 }
@@ -5159,7 +5159,7 @@
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
                                 const d = document.createElement('div');
-                                d.className = 'ad-card';
+                                d.className = 'listing-card';
                                 d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
                                 // Проверяем, в избранном ли запчасть
@@ -5167,7 +5167,7 @@
                                 const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
-                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='images/no_logo.svg'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='images/no_logo.svg'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                 c.appendChild(d);
                             });
                             setTimeout(() => c.classList.add('loaded'), 50);
@@ -5203,7 +5203,7 @@
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
 
-                                const tenderBadgeHtml = '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>';
+                                const tenderBadgeHtml = '<div class="listing-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>';
 
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
@@ -5211,7 +5211,7 @@
                                 if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
 
                                 const d = document.createElement('div');
-                                d.className = 'ad-card';
+                                d.className = 'listing-card';
                                 d.id = `ad-tender-${ad.rowIndex}`; // Уникальный ID для карточки
                                 d.onclick = () => openAd(ad);
 
@@ -5220,7 +5220,7 @@
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
 
-                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='images/no_logo.svg'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='images/no_logo.svg'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                 container.appendChild(d);
                             });
 
@@ -6197,7 +6197,7 @@
                                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                 if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
                                 const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
-                                    ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                    ? '<div class="listing-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
                                     : '';
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
@@ -6205,13 +6205,13 @@
                                 if (ad.power) infoParts.push(ad.power + ' л.с.');
                                 if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
-                                d.className = 'ad-card';
+                                d.className = 'listing-card';
                                 d.id = `ad-${ad.rowIndex}`;
                                 d.onclick = () => openAd(ad);
                                 const heartClass = 'favorite-heart active';
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
-                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                 grid.appendChild(d);
                             });
                             // Рендерим избранные запчасти
@@ -6227,13 +6227,13 @@
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
                                 const d = document.createElement('div');
-                                d.className = 'ad-card';
+                                d.className = 'listing-card';
                                 d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
                                 const heartClass = 'favorite-heart active';
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
-                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                 grid.appendChild(d);
                             });
                         }
@@ -6313,7 +6313,7 @@
                                     if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                     if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
                                     const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
-                                        ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                        ? '<div class="listing-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
                                         : '';
                                     let infoParts = [];
                                     if (ad.city) infoParts.push(ad.city);
@@ -6321,14 +6321,14 @@
                                     if (ad.power) infoParts.push(ad.power + ' л.с.');
                                     if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
                                     const d = document.createElement('div');
-                                    d.className = 'ad-card';
+                                    d.className = 'listing-card';
                                     d.id = `ad-${ad.rowIndex}`;
                                     d.onclick = () => openAd(ad);
                                     const isFavorite = userFavorites.includes(ad.rowIndex);
                                     const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
                                     const heartFill = isFavorite ? '#ff4757' : 'none';
                                     const heartStroke = isFavorite ? '#ff4757' : '#ccc';
-                                    d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                    d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                     grid.appendChild(d);
                                     return;
                                 }
@@ -6344,14 +6344,14 @@
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
                                 const d = document.createElement('div');
-                                d.className = 'ad-card';
+                                d.className = 'listing-card';
                                 d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
                                 const isFavorite = userFavorites.includes(part.rowIndex);
                                 const heartClass = isFavorite ? 'favorite-heart active' : 'favorite-heart';
                                 const heartFill = isFavorite ? '#ff4757' : 'none';
                                 const heartStroke = isFavorite ? '#ff4757' : '#ccc';
-                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                 grid.appendChild(d);
                             });
                             // Добавляем класс loaded для показа карточек с анимацией
@@ -6415,7 +6415,7 @@
                                     if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">ВЛАДЕЛЕЦ</span>';
                                     if ((ad.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
                                     const tenderBadgeHtml = ((ad.tender || "").toLowerCase() === 'yes')
-                                        ? '<div class="ad-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
+                                        ? '<div class="listing-card-tender-badge visible">В РЕЕСТРЕ МИНПРОМТОРГА</div>'
                                         : '';
                                     let infoParts = [];
                                     if (ad.city) infoParts.push(ad.city);
@@ -6423,13 +6423,13 @@
                                     if (ad.power) infoParts.push(ad.power + ' л.с.');
                                     if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
                                     const d = document.createElement('div');
-                                    d.className = 'ad-card';
+                                    d.className = 'listing-card';
                                     d.id = `ad-${ad.rowIndex}`;
                                     d.onclick = () => openAd(ad);
                                     const heartClass = 'favorite-heart active';
                                     const heartFill = '#ff4757';
                                     const heartStroke = '#ff4757';
-                                    d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                    d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">${tenderBadgeHtml}</div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${ad.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${ad.title || ""}">${ad.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(ad.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                     grid.appendChild(d);
                                     return;
                                 }
@@ -6445,13 +6445,13 @@
                                 if (part.city) infoParts.push(part.city);
                                 if (sellerLabel) infoParts.push(sellerLabel);
                                 const d = document.createElement('div');
-                                d.className = 'ad-card';
+                                d.className = 'listing-card';
                                 d.id = `part-${part.rowIndex}`;
                                 d.onclick = () => openPart(part);
                                 const heartClass = 'favorite-heart active';
                                 const heartFill = '#ff4757';
                                 const heartStroke = '#ff4757';
-                                d.innerHTML = `<div class="ad-card-media"><img class="ad-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="ad-card-content"><div class="ad-card-header"><div class="ad-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="ad-card-price"><span class="ad-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="ad-card-info">${infoParts.join(' • ')}</div></div>`;
+                                d.innerHTML = `<div class="listing-card-media"><img class="listing-card-img" src="${mI}" onerror="this.src='https://placehold.co/400?text=Нет+фото'"></div><div class="${heartClass}" onclick="event.stopPropagation(); toggleFavorite(${part.rowIndex})" title="Удалить из избранного"><svg width="24" height="24" viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div><div class="listing-card-content"><div class="listing-card-header"><div class="listing-card-title" title="${part.title || ""}">${part.title || "Без названия"}</div><div class="listing-card-price"><span class="listing-card-price-text">${Number(part.price || 0).toLocaleString()} ₽</span></div><div class="badge-wrap">${badgesHtml}</div></div><div class="listing-card-info">${infoParts.join(' • ')}</div></div>`;
                                 grid.appendChild(d);
                             });
                             // Добавляем класс loaded для показа карточек с анимацией
