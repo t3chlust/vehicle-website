@@ -6,7 +6,7 @@ const mysql = require('mysql2/promise');
 const app = express();
 
 // Инициализация SMS.RU с API ключом
-const smsru = new SMSRu('A1D81123-7ABC-927E-9F79-5AD4357DFD9A');
+const smsru = new SMSRu(process.env.SMSRU_API_KEY || 'A1D81123-7ABC-927E-9F79-5AD4357DFD9A');
 
 // Хранилище кодов подтверждения (номер телефона => {код, время создания})
 const verificationCodes = new Map();
@@ -17,9 +17,9 @@ const CODE_TTL = 10 * 60 * 1000;
 // Создаем пул соединений с MariaDB
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
-  user: 'root',
-  password: 'rhyKrag004',
-  database: 'vehicle_website',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'rhyKrag004',
+  database: process.env.DB_NAME || 'vehicle_website',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

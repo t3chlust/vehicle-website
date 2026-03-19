@@ -929,6 +929,14 @@
                                 }
                             }
 
+                            @media (max-width: 480px) {
+                                #div-brand-model > div,
+                                #div-main-specs,
+                                #div-color-docs {
+                                    grid-template-columns: 1fr !important;
+                                }
+                            }
+
                             .search-container {
                                 position: relative;
                                 width: 100%;
@@ -5545,6 +5553,68 @@
                                 let desc = safeVal('inp-desc');
                                 if (cond === 'new') desc += NEW_STATUS_TAG;
                                 const priceVal = getPriceValue('inp-price');
+
+                                // === Услуга — отдельная отправка ===
+                                if (productType === 'Услуга') {
+                                    // Upload service photos
+                                    let servicePhU = '';
+                                    const servicePhotosInput = document.getElementById('inp-service-photos');
+                                    if (servicePhotosInput && servicePhotosInput.files && servicePhotosInput.files.length > 0) {
+                                        let photoArr = [];
+                                        for (let i = 0; i < servicePhotosInput.files.length; i++) {
+                                            const file = servicePhotosInput.files[i];
+                                            let fd = new FormData();
+                                            fd.append('file', file);
+                                            fd.append('upload_preset', UPLOAD_PRESET);
+                                            let r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
+                                            let j = await r.json();
+                                            if (j.secure_url) photoArr.push(j.secure_url);
+                                        }
+                                        servicePhU = photoArr.join(',');
+                                    }
+                                    const servicePl = {
+                                        action: isEditMode ? 'edit' : 'create',
+                                        rowIndex: safeVal('edit-row-index') || '',
+                                        title: 'Услуга',
+                                        brand: '',
+                                        model: '',
+                                        price: getPriceValue('inp-service-price'),
+                                        desc: safeVal('inp-service-desc'),
+                                        name: currentUserName || '',
+                                        phone: currentUser.phoneNumber,
+                                        userId: currentUser.id,
+                                        photos: servicePhU,
+                                        videos: '',
+                                        engine: '', power: '', transmission: '', fuel: '',
+                                        wheels: '', region: '',
+                                        city: safeVal('inp-service-city'),
+                                        condition: 'used',
+                                        sellerTypeId: '',
+                                        tender: 'no',
+                                        wheelFormula: '', color: '', mileage: '',
+                                        amphibious: 'no', docs: '',
+                                        techType: 'Услуга',
+                                        constructionType: '', capacity: ''
+                                    };
+                                    const response = await fetch('/api/ads', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(servicePl)
+                                    });
+                                    const json = await response.json();
+                                    if (json.status !== 'success') {
+                                        throw new Error(json.message || 'Ошибка операции');
+                                    }
+                                    document.getElementById('main-form').reset();
+                                    document.getElementById('preview-container').innerHTML = '';
+                                    document.getElementById('file-count').innerText = '';
+                                    window.currentAdDeletedMedia = [];
+                                    window.removedNewMediaIndices = [];
+                                    window.accumulatedMediaFiles = [];
+                                    showList(); loadAds();
+                                    return;
+                                }
+
                                 if (productType === 'Запчасть') {
                                     const payload = {
                                         action: isEditMode ? 'edit' : 'create',

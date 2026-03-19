@@ -554,20 +554,22 @@
                 if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">Владелец</span>';
                 if ((item.amphibious || "").toLowerCase() === 'yes') badgesHtml += '<span class="badge-float">ПЛАВАЮЩИЙ</span>';
                 
-                specs.push({ l: "Тип продавца", v: sellerLabel });
-                specs.push({ l: "Город", v: item.city });
-                specs.push({ l: "Тип техники", v: item.techType || '' });
-
-                if (item.techType === 'Вездеход') {
-                    specs.push({ l: "Конструкция", v: item.constructionType });
-                }
-                if (item.techType === 'Прицеп') {
-                    specs.push({ l: "Грузоподъемность", v: item.capacity ? item.capacity + ' кг' : '', style: 'padding-bottom:24px;' });
-                } else if (item.techType === 'Услуга') {
-                    // Only show city, description, and photos for service
+                const tt = (item.techType || '').trim();
+                if (tt === 'Услуга') {
                     specs.push({ l: "Город", v: item.city });
-                    specs.push({ l: "Описание услуги", v: item.desc });
+                } else if (tt === 'Прицеп') {
+                    specs.push({ l: "Тип продавца", v: sellerLabel });
+                    specs.push({ l: "Город", v: item.city });
+                    specs.push({ l: "Тип техники", v: tt });
+                    specs.push({ l: "Грузоподъемность", v: item.capacity ? item.capacity + ' кг' : '' });
+                    specs.push({ l: "Документы", v: item.docs || 'Без документов' });
                 } else {
+                    specs.push({ l: "Тип продавца", v: sellerLabel });
+                    specs.push({ l: "Город", v: item.city });
+                    specs.push({ l: "Тип техники", v: tt });
+                    if (tt === 'Вездеход') {
+                        specs.push({ l: "Конструкция", v: item.constructionType });
+                    }
                     specs.push({ l: "Тип шасси", v: item.wheelFormula });
                     specs.push({ l: "Плавающий", v: ((item.amphibious || "").toLowerCase() === 'yes') ? 'Да' : 'Нет' });
                     specs.push({ l: "Двигатель", v: item.engine });
@@ -576,11 +578,9 @@
                     specs.push({ l: "Топливо", v: item.fuel });
                     specs.push({ l: "Колеса", v: item.wheels });
                     specs.push({ l: "Пробег", v: item.mileage ? item.mileage + ' м.ч.' : '' });
-                }
-                 if (item.techType !== 'Прицеп') {
                     specs.push({ l: "Документы", v: item.docs || 'Без документов' });
+                    specs.push({ l: "Цвет", v: item.color });
                 }
-                specs.push({ l: "Цвет", v: item.color });
 
             } else if (type === 'part') {
                 if (item.condition === 'new') badgesHtml += '<span class="badge-new">Новый</span>';
@@ -664,8 +664,7 @@
                             <div class="seller-location">${item.city || ""}</div>
                             <a class="seller-phone" href="tel:${item.phone || ""}">${item.phone || ""}</a>
                         </div>
-                        <h4 class="section-title">Характеристики</h4>
-                        <table class="specs-table"><tbody>${specsHtml}</tbody></table>
+                        ${specsHtml ? '<h4 class="section-title">Характеристики</h4><table class="specs-table"><tbody>' + specsHtml + '</tbody></table>' : ''}
                         <h4 class="section-title">Описание</h4>
                         <div class="description">${cleanDesc}</div>
                         ${actionButtonsHtml}
