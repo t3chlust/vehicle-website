@@ -32,52 +32,113 @@
                         <script>
                         function onProductTypeChange() {
                             const productType = document.getElementById('inp-product-type').value;
+                            // Sync hidden inp-tech-type with product type selection
+                            const techTypeEl = document.getElementById('inp-tech-type');
+                            if (techTypeEl) techTypeEl.value = productType;
+
                             const sellerSection = document.getElementById('seller-info-section');
                             const serviceFields = document.getElementById('service-fields');
-                            // Hide all sections except city, service description, and photos for 'Услуга'
-                            if (productType === 'Услуга') {
+                            const partOnlyDiv = document.getElementById('div-part-only');
+                            const brandModelDiv = document.getElementById('div-brand-model');
+                            const tenderDiv = document.getElementById('div-tender');
+                            const cityLabel = document.getElementById('city-label');
+                            const mainSpecs = document.getElementById('div-main-specs');
+                            const capDiv = document.getElementById('div-capacity');
+                            const wheelsDiv = document.getElementById('div-wheels');
+                            const colorDocsDiv = document.getElementById('div-color-docs');
+                            const colorSelect = document.getElementById('inp-color');
+                            const specsTitle = document.getElementById('specs-title');
+                            const constrInp = document.getElementById('inp-construction');
+                            const conditionSection = document.getElementById('inp-condition');
+                            const conditionTitle = conditionSection ? conditionSection.previousElementSibling : null;
+                            const mileageDiv = document.getElementById('div-mileage');
+                            const priceInp = document.getElementById('inp-price');
+                            const cityInp = document.getElementById('inp-city');
+                            const descInp = document.getElementById('inp-desc');
+                            const descTitle = descInp ? descInp.previousElementSibling : null;
+
+                            // Reset all to visible first
+                            sellerSection.classList.remove('hidden');
+                            serviceFields.classList.add('hidden');
+                            partOnlyDiv.classList.add('hidden');
+                            brandModelDiv.classList.remove('hidden');
+                            tenderDiv.classList.add('hidden');
+                            mainSpecs.classList.remove('hidden');
+                            capDiv.classList.add('hidden');
+                            wheelsDiv.classList.remove('hidden');
+                            colorDocsDiv.classList.remove('hidden');
+                            constrInp.classList.add('hidden');
+                            specsTitle.classList.remove('hidden');
+                            priceInp.classList.remove('hidden');
+                            cityInp.classList.remove('hidden');
+                            if (conditionSection) conditionSection.classList.remove('hidden');
+                            if (conditionTitle) conditionTitle.classList.remove('hidden');
+                            if (mileageDiv) mileageDiv.classList.remove('hidden');
+                            if (descTitle) descTitle.classList.remove('hidden');
+                            if (descInp) descInp.classList.remove('hidden');
+                            if (colorSelect) { colorSelect.style.display = ''; colorDocsDiv.style.gridTemplateColumns = ''; }
+                            cityLabel.classList.remove('hidden');
+                            cityLabel.innerHTML = 'Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span>';
+
+                            if (productType === 'Вездеход') {
+                                // All fields visible, show construction
+                                constrInp.classList.remove('hidden');
+                                checkTenderVisibility();
+                                checkConditionVisibility();
+                            } else if (productType === 'Мото-техника') {
+                                // Same as Вездеход but no construction
+                                constrInp.classList.add('hidden');
+                                tenderDiv.classList.add('hidden');
+                                checkConditionVisibility();
+                            } else if (productType === 'Прицеп') {
+                                // Show: seller, brand-model, city, price, condition, грузоподъемность, docs, description, photos
+                                // Hide: construction, engine, power, transmission, fuel, chassis, amphibious, color, tires, mileage
+                                constrInp.classList.add('hidden');
+                                mainSpecs.classList.add('hidden');
+                                wheelsDiv.classList.add('hidden');
+                                capDiv.classList.remove('hidden');
+                                tenderDiv.classList.add('hidden');
+                                if (mileageDiv) mileageDiv.classList.add('hidden');
+                                if (colorSelect) { colorSelect.style.display = 'none'; colorDocsDiv.style.gridTemplateColumns = '1fr'; }
+                            } else if (productType === 'Запчасть') {
+                                // Show: seller info, city, price, description, photos
+                                // Hide: everything vehicle-related
+                                constrInp.classList.add('hidden');
+                                mainSpecs.classList.add('hidden');
+                                wheelsDiv.classList.add('hidden');
+                                capDiv.classList.add('hidden');
+                                brandModelDiv.classList.add('hidden');
+                                colorDocsDiv.classList.add('hidden');
+                                tenderDiv.classList.add('hidden');
+                                specsTitle.classList.add('hidden');
+                                partOnlyDiv.classList.remove('hidden');
+                                if (conditionSection) conditionSection.classList.add('hidden');
+                                if (conditionTitle) conditionTitle.classList.add('hidden');
+                                if (mileageDiv) mileageDiv.classList.add('hidden');
+                                cityLabel.innerHTML = 'Город <span style="color:#ff4757; font-weight:bold;">*</span>';
+                            } else if (productType === 'Услуга') {
+                                // Show: service fields (price, city, description, photos)
+                                // Hide: everything else
                                 sellerSection.classList.add('hidden');
                                 serviceFields.classList.remove('hidden');
-                                document.getElementById('div-part-only').classList.add('hidden');
-                                document.getElementById('div-brand-model').classList.add('hidden');
-                                document.getElementById('div-tender').classList.add('hidden');
-                                document.getElementById('city-label').innerText = 'Город *';
-                                document.getElementById('inp-city').classList.remove('hidden');
-                                document.getElementById('inp-price').classList.add('hidden');
-                                document.getElementById('inp-trans').classList.add('hidden');
-                                document.getElementById('inp-engine').classList.add('hidden');
-                                document.getElementById('inp-power').classList.add('hidden');
-                                document.getElementById('inp-fuel').classList.add('hidden');
-                                document.getElementById('inp-wheel-f').classList.add('hidden');
-                                document.getElementById('inp-color').classList.add('hidden');
-                                document.getElementById('inp-mileage').classList.add('hidden');
-                                document.getElementById('inp-condition').classList.add('hidden');
-                                document.getElementById('inp-docs').classList.add('hidden');
-                                document.getElementById('inp-amphibious').classList.add('hidden');
-                                document.getElementById('inp-capacity').classList.add('hidden');
-                                document.getElementById('inp-construction').classList.add('hidden');
-                            } else {
-                                sellerSection.classList.remove('hidden');
-                                serviceFields.classList.add('hidden');
-                                document.getElementById('div-part-only').classList.add('hidden');
-                                document.getElementById('div-brand-model').classList.remove('hidden');
-                                document.getElementById('div-tender').classList.remove('hidden');
-                                document.getElementById('city-label').innerText = 'Где находится техника *';
-                                document.getElementById('inp-city').classList.remove('hidden');
-                                document.getElementById('inp-price').classList.remove('hidden');
-                                document.getElementById('inp-trans').classList.remove('hidden');
-                                document.getElementById('inp-engine').classList.remove('hidden');
-                                document.getElementById('inp-power').classList.remove('hidden');
-                                document.getElementById('inp-fuel').classList.remove('hidden');
-                                document.getElementById('inp-wheel-f').classList.remove('hidden');
-                                document.getElementById('inp-color').classList.remove('hidden');
-                                document.getElementById('inp-mileage').classList.remove('hidden');
-                                document.getElementById('inp-condition').classList.remove('hidden');
-                                document.getElementById('inp-docs').classList.remove('hidden');
-                                document.getElementById('inp-amphibious').classList.remove('hidden');
-                                document.getElementById('inp-capacity').classList.remove('hidden');
-                                document.getElementById('inp-construction').classList.remove('hidden');
+                                brandModelDiv.classList.add('hidden');
+                                tenderDiv.classList.add('hidden');
+                                constrInp.classList.add('hidden');
+                                mainSpecs.classList.add('hidden');
+                                wheelsDiv.classList.add('hidden');
+                                capDiv.classList.add('hidden');
+                                colorDocsDiv.classList.add('hidden');
+                                specsTitle.classList.add('hidden');
+                                priceInp.classList.add('hidden');
+                                cityInp.classList.add('hidden');
+                                cityLabel.classList.add('hidden');
+                                if (conditionSection) conditionSection.classList.add('hidden');
+                                if (conditionTitle) conditionTitle.classList.add('hidden');
+                                if (mileageDiv) mileageDiv.classList.add('hidden');
                             }
+
+                            checkChassisTypeVisibility();
+                            updateSubmitButtonColor();
                         }
                             function closeModal(e) { if (e.target.id === 'modal') closeModalDirect() }
                             function closeModalDirect() {
@@ -3083,13 +3144,7 @@
                                             <option value="private">Владелец</option>
                                         </select>
                                     </div>
-                                    <div class="form-section-title">Основное</div>
-                                    <select class="form-select" id="inp-tech-type" onchange="checkTechTypeVisibility()">
-                                        <option value="Вездеход" selected>Вездеход</option>
-                                        <option value="Мото-техника">Мото-техника</option>
-                                        <option value="Прицеп">Прицеп</option>
-                                        <option value="Запчасть">Запчасть</option>
-                                    </select>
+                                    <input type="hidden" id="inp-tech-type" value="Вездеход" />
                                     <select class="form-select" id="inp-construction">
                                         <option value="">Конструкция вездехода</option>
                                         <option value="Цельнорамный">Цельнорамный</option>
@@ -4186,12 +4241,12 @@
                         function checkTenderVisibility() {
                             const select = document.getElementById('inp-seller-type');
                             const tenderDiv = document.getElementById('div-tender');
-                            const techType = document.getElementById('inp-tech-type');
-                            if (!select || !tenderDiv || !techType) return;
+                            const productType = document.getElementById('inp-product-type');
+                            if (!select || !tenderDiv || !productType) return;
                             const selected = select.options[select.selectedIndex];
                             const label = selected ? selected.textContent : '';
                             const isTenderSeller = isTenderSellerLabel(label);
-                            const isAllTerrain = techType.value === 'Вездеход';
+                            const isAllTerrain = productType.value === 'Вездеход';
                             if (isTenderSeller && isAllTerrain) {
                                 tenderDiv.classList.remove('hidden');
                             } else {
@@ -4202,8 +4257,8 @@
                         function checkConditionVisibility() {
                             const cond = document.getElementById('inp-condition').value;
                             const mileageDiv = document.getElementById('div-mileage');
-                            const type = document.getElementById('inp-tech-type').value;
-                            if (type === 'Запчасть' || type === 'Прицеп') {
+                            const type = document.getElementById('inp-product-type').value;
+                            if (type === 'Запчасть' || type === 'Прицеп' || type === 'Услуга') {
                                 mileageDiv.classList.add('hidden');
                                 document.getElementById('inp-mileage').value = '';
                                 return;
@@ -4216,67 +4271,22 @@
                             }
                         }
                         function checkTechTypeVisibility() {
-                            const type = document.getElementById('inp-tech-type').value;
-                            const constrInp = document.getElementById('inp-construction');
-                            const mainSpecs = document.getElementById('div-main-specs');
-                            const capDiv = document.getElementById('div-capacity');
-                            const wheelsDiv = document.getElementById('div-wheels');
-                            const brandModelDiv = document.getElementById('div-brand-model');
-                            const colorDocsDiv = document.getElementById('div-color-docs');
-                            const colorSelect = document.getElementById('inp-color');
-                            const partOnlyDiv = document.getElementById('div-part-only');
-                            const specsTitle = document.getElementById('specs-title');
-                            const cityLabel = document.getElementById('city-label');
-                            constrInp.classList.add('hidden');
-                            mainSpecs.classList.remove('hidden');
-                            capDiv.classList.add('hidden');
-                            wheelsDiv.classList.remove('hidden');
-                            brandModelDiv.classList.remove('hidden');
-                            colorDocsDiv.classList.remove('hidden');
-                            partOnlyDiv.classList.add('hidden');
-                            specsTitle.classList.remove('hidden');
-                            if (type === 'Вездеход') {
-                                constrInp.classList.remove('hidden');
-                            } else if (type === 'Прицеп') {
-                                mainSpecs.classList.add('hidden');
-                                wheelsDiv.classList.add('hidden');
-                                capDiv.classList.remove('hidden');
-                            } else if (type === 'Запчасть') {
-                                constrInp.classList.add('hidden');
-                                mainSpecs.classList.add('hidden');
-                                wheelsDiv.classList.add('hidden');
-                                capDiv.classList.add('hidden');
-                                brandModelDiv.classList.add('hidden');
-                                colorDocsDiv.classList.add('hidden');
-                                partOnlyDiv.classList.remove('hidden');
-                                specsTitle.classList.add('hidden');
-                            }
-                            if (cityLabel) {
-                                cityLabel.innerHTML = (type === 'Запчасть')
-                                    ? 'Где находится запчасть <span style="color:#ff4757; font-weight:bold;">*</span>'
-                                    : 'Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span>';
-                            }
-                            if (colorDocsDiv && colorSelect) {
-                                if (type === 'Прицеп' || type === 'Запчасть') {
-                                    colorSelect.value = '';
-                                    colorSelect.style.display = 'none';
-                                    colorDocsDiv.style.gridTemplateColumns = '1fr';
-                                } else {
-                                    colorSelect.style.display = '';
-                                    colorDocsDiv.style.gridTemplateColumns = '';
+                            // Delegate to onProductTypeChange — all logic is there now
+                            // Sync inp-product-type from inp-tech-type if needed (edit mode)
+                            const techType = document.getElementById('inp-tech-type').value;
+                            const productType = document.getElementById('inp-product-type');
+                            if (productType && techType) {
+                                // Check if option exists
+                                const options = Array.from(productType.options).map(o => o.value);
+                                if (options.includes(techType)) {
+                                    productType.value = techType;
                                 }
                             }
-                            if (type !== 'Запчасть') {
-                                setVal('inp-part-title', '');
-                            }
-                            checkTenderVisibility();
-                            checkConditionVisibility();
-                            checkChassisTypeVisibility();
-                            updateSubmitButtonColor();
+                            onProductTypeChange();
                         }
 
                         function updateSubmitButtonColor() {
-                            const type = document.getElementById('inp-tech-type').value;
+                            const type = document.getElementById('inp-product-type').value;
                             const tenderVal = document.getElementById('inp-tender').value;
                             const submitBtn = document.getElementById('submit-btn');
                             const tRecords = document.querySelector('.t-records');
@@ -4311,7 +4321,7 @@
                         }
 
                         function checkChassisTypeVisibility() {
-                            const type = document.getElementById('inp-tech-type').value;
+                            const type = document.getElementById('inp-product-type').value;
                             const wheelType = safeVal('inp-wheel-f');
                             const wheelsDiv = document.getElementById('div-wheels');
                             if (!wheelsDiv) return;
@@ -5412,10 +5422,22 @@
                         }
                         function validateForm() {
                             const errors = [];
-                            const techType = safeVal('inp-tech-type');
+                            const productType = safeVal('inp-product-type');
+                            // Услуга — отдельная валидация (service fields)
+                            if (productType === 'Услуга') {
+                                if (!safeVal('inp-service-city').trim()) errors.push('Укажите город');
+                                if (!safeVal('inp-service-price').trim()) errors.push('Укажите цену услуги');
+                                if (errors.length > 0) {
+                                    alert('Пожалуйста, заполните обязательные поля:\n\n' + errors.map((e, i) => `${i + 1}. ${e}`).join('\n'));
+                                    return false;
+                                }
+                                return true;
+                            }
                             // Проверяем обязательные поля для всех типов объявлений
-                            if (!safeVal('inp-seller-type')) {
-                                errors.push('Выберите тип продавца (Кто вы?)');
+                            if (productType !== 'Запчасть') {
+                                if (!safeVal('inp-seller-type')) {
+                                    errors.push('Выберите тип продавца (Кто вы?)');
+                                }
                             }
                             if (!safeVal('inp-city').trim()) {
                                 errors.push('Укажите город');
@@ -5424,16 +5446,18 @@
                             if (!priceVal || parseInt(priceVal) <= 0) {
                                 errors.push('Укажите цену');
                             }
-                            if (!safeVal('inp-condition')) {
-                                errors.push('Выберите состояние (Новый/Б/У)');
+                            if (productType !== 'Запчасть') {
+                                if (!safeVal('inp-condition')) {
+                                    errors.push('Выберите состояние (Новый/Б/У)');
+                                }
                             }
                             // Проверяем специфичные поля для запчастей
-                            if (techType === 'Запчасть') {
+                            if (productType === 'Запчасть') {
                                 if (!safeVal('inp-part-title').trim()) {
                                     errors.push('Укажите название запчасти');
                                 }
                             } else {
-                                // Проверяем специфичные поля для техники
+                                // Проверяем специфичные поля для техники (не запчасть)
                                 if (!safeVal('inp-brand').trim()) {
                                     errors.push('Укажите марку техники');
                                 }
@@ -5516,12 +5540,12 @@
                                     }
                                 }
                                 
+                                const productType = safeVal('inp-product-type');
                                 const cond = safeVal('inp-condition');
                                 let desc = safeVal('inp-desc');
                                 if (cond === 'new') desc += NEW_STATUS_TAG;
                                 const priceVal = getPriceValue('inp-price');
-                                const techType = safeVal('inp-tech-type');
-                                if (techType === 'Запчасть') {
+                                if (productType === 'Запчасть') {
                                     const payload = {
                                         action: isEditMode ? 'edit' : 'create',
                                         rowIndex: safeVal('edit-row-index') || '',
@@ -5588,7 +5612,7 @@
                                     mileage: safeVal('inp-mileage'),
                                     amphibious: safeVal('inp-amphibious'),
                                     docs: safeVal('inp-docs'),
-                                    techType: safeVal('inp-tech-type'),
+                                    techType: safeVal('inp-product-type'),
                                     constructionType: safeVal('inp-construction'),
                                     capacity: safeVal('inp-capacity')
                                 };
@@ -5929,8 +5953,8 @@
                             setVal('inp-tender', ad.tender || "no");
                             setVal('inp-amphibious', ad.amphibious || "no");
                             setVal('inp-docs', ad.docs || "");
-                            // Убедимся что inp-tech-type включен (не disabled)
-                            document.getElementById('inp-tech-type').disabled = false;
+                            // Set product type from ad data
+                            setVal('inp-product-type', ad.techType || "Вездеход");
                             setVal('inp-tech-type', ad.techType || "Вездеход");
                             setVal('inp-construction', ad.constructionType || "");
                             setVal('inp-capacity', ad.capacity || "");
@@ -5974,11 +5998,9 @@
                             } else {
                                 setSellerTypeSelectByLabel(getSellerTypeLabel(part));
                             }
-                            // Установка типа как "Запчасть" (id=4) и отключение его изменения
-                            const techTypeSelect = document.getElementById('inp-tech-type');
-                            techTypeSelect.disabled = false;
+                            // Установка типа как "Запчасть"
+                            setVal('inp-product-type', 'Запчасть');
                             setVal('inp-tech-type', 'Запчасть');
-                            techTypeSelect.disabled = true;
                             setVal('inp-part-brand', part.brand || "");
                             setVal('inp-part-title', part.partName || part.title || "");
                             // Очищаем поля техники
