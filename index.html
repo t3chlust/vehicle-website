@@ -99,6 +99,7 @@
                             const cityInp = document.getElementById('inp-city');
                             const descInp = document.getElementById('inp-desc');
                             const descTitle = descInp ? descInp.previousElementSibling : null;
+                            const descPhotosDiv = document.getElementById('div-desc-photos');
 
                             // Reset all to visible first
                             sellerSection.classList.remove('hidden');
@@ -120,6 +121,7 @@
                             if (descTitle) descTitle.classList.remove('hidden');
                             if (descInp) descInp.classList.remove('hidden');
                             if (colorSelect) { colorSelect.style.display = ''; colorDocsDiv.style.gridTemplateColumns = ''; }
+                            if (descPhotosDiv) descPhotosDiv.classList.remove('hidden');
                             cityLabel.classList.remove('hidden');
                             cityLabel.innerHTML = 'Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span>';
 
@@ -161,7 +163,7 @@
                                 cityLabel.innerHTML = 'Город <span style="color:#ff4757; font-weight:bold;">*</span>';
                             } else if (productType === 'Услуга') {
                                 // Show: service fields (price, city, description, photos)
-                                // Hide: everything else
+                                // Hide: everything else including general description/photos
                                 sellerSection.classList.add('hidden');
                                 serviceFields.classList.remove('hidden');
                                 brandModelDiv.classList.add('hidden');
@@ -175,6 +177,7 @@
                                 priceInp.classList.add('hidden');
                                 cityInp.classList.add('hidden');
                                 cityLabel.classList.add('hidden');
+                                if (descPhotosDiv) descPhotosDiv.classList.add('hidden');
                                 if (conditionSection) conditionSection.classList.add('hidden');
                                 if (conditionTitle) conditionTitle.classList.add('hidden');
                                 if (mileageDiv) mileageDiv.classList.add('hidden');
@@ -3314,6 +3317,7 @@
                                                 style="font-weight:bold; color:#aaa;">x</span><input class="tires-input"
                                                 id="tire-w" placeholder="W (мм)" type="number"></div>
                                     </div>
+                                    <div id="div-desc-photos">
                                     <div class="form-section-title">Описание</div> <textarea class="form-input"
                                         id="inp-desc" rows="4" placeholder="Доп. информация..."></textarea>
                                     <div
@@ -3326,6 +3330,7 @@
                                         </div>
                                         <div id="preview-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;"></div>
                                         <div id="file-count" style="margin-top:10px; font-weight:bold;"></div>
+                                    </div>
                                     </div>
                                     <div style="display:flex; gap:10px;"><button type="button" class="btn btn-red"
                                             onclick="showList()">Отмена</button><button type="submit"
@@ -5148,8 +5153,9 @@
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
-                                if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
+                                const tt = (ad.techType || ad.technical || '').trim();
+                                if (ad.power && tt !== 'Прицеп') infoParts.push(ad.power + ' л.с.');
+                                if (ad.transmission && tt !== 'Прицеп' && tt !== 'Услуга') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
                                 d.className = 'listing-card';
                                 d.id = `ad-${ad.rowIndex}`;
@@ -5250,8 +5256,9 @@
 
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
-                                if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
+                                const tt = (ad.techType || ad.technical || '').trim();
+                                if (ad.power && tt !== 'Прицеп') infoParts.push(ad.power + ' л.с.');
+                                if (ad.transmission && tt !== 'Прицеп' && tt !== 'Услуга') infoParts.push(ad.transmission);
 
                                 const d = document.createElement('div');
                                 d.className = 'listing-card';
@@ -6245,8 +6252,9 @@
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
-                                if (ad.power) infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && ad.type !== 'Прицеп' && ad.type !== 'Услуга') infoParts.push(ad.transmission);
+                                const tt = (ad.techType || ad.technical || '').trim();
+                                if (ad.power && tt !== 'Прицеп') infoParts.push(ad.power + ' л.с.');
+                                if (ad.transmission && tt !== 'Прицеп' && tt !== 'Услуга') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
                                 d.className = 'listing-card';
                                 d.id = `ad-${ad.rowIndex}`;
