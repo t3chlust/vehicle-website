@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>Производитель - купитьвездеход.рф</title>
     <meta name="description" content="Производитель вездеходов — информация, модели, контакты на купитьвездеход.рф" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    <meta name="format-detection" content="telephone=no" />
     <meta property="og:type" content="profile" />
     <meta property="og:title" content="Производитель - купитьвездеход.рф" id="og-title" />
     <meta property="og:description" content="" id="og-description" />
@@ -486,6 +488,19 @@
                     "address": manufacturer.city ? { "@type": "PostalAddress", "addressLocality": manufacturer.city } : undefined
                 });
                 document.head.appendChild(mLd);
+
+                // JSON-LD: BreadcrumbList
+                const bcLd = document.createElement('script'); bcLd.type = 'application/ld+json';
+                bcLd.textContent = JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://kupitvezdehod.ru/" },
+                        { "@type": "ListItem", "position": 2, "name": "Производители", "item": "https://kupitvezdehod.ru/" },
+                        { "@type": "ListItem", "position": 3, "name": manufacturer.name }
+                    ]
+                });
+                document.head.appendChild(bcLd);
 
                 renderManufacturerPage(manufacturer, allAds, allParts);
             } catch (e) {

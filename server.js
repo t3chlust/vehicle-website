@@ -117,6 +117,172 @@ async function ensureUserByPhone(connection, phoneDigits, name) {
 }
 
 app.use(express.json());
+
+// Определение поисковых ботов
+const BOT_UA = /bot|google|yandex|baidu|bing|msn|duckduckbot|teoma|slurp|crawler|spider|robot|crawling|facebook|telegram|whatsapp|viber|vkshare|facebookexternalhit/i;
+function isBot(req) { return BOT_UA.test(req.get('User-Agent') || ''); }
+
+function escHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ========================
+// Пререндер для ботов (ad.html) — отдаём готовый HTML с мета-тегами и JSON-LD
+// ========================
+app.get('/ad.html', async (req, res, next) => {
+  if (!isBot(req)) return next(); // обычным пользователям — SPA
+  const adId = parseInt(req.query.id);
+  if (!adId) return next();
+
+  try {
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query(`
+      SELECT a.id, a.brand, a.name, a.price, a.city, a.description, a.\`condition\`,
+             vt.name AS vehicleTypeName, u.name AS userName,
+             st.name AS sellerTypeName
+      FROM advertisement a
+      LEFT JOIN advertisement_type vt ON a.type = vt.id
+      LEFT JOIN user u ON a.userId = u.id
+      LEFT JOIN seller_type st ON a.sellerType = st.id
+      WHERE a.id = ? LIMIT 1`, [adId]);
+    const [photos] = await connection.query('SELECT photo FROM advertisement_photo WHERE advertisement = ? LIMIT 5', [adId]);
+    connection.release();
+
+    if (!rows.length) return next();
+    const ad = rows[0];
+    const title = [ad.brand, ad.name].filter(Boolean).join(' ').trim() || 'Объявление';
+    const desc = [title, ad.price ? Number(ad.price).toLocaleString() + ' ₽' : '', ad.city].filter(Boolean).join(' · ');
+    const photo = photos[0] ? photos[0].photo : 'https://kupitvezdehod.ru/images/logo.png';
+    const url = `https://kupitvezdehod.ru/ad.html?id=${ad.id}&type=ad`;
+    const isNew = ad.condition && (Buffer.isBuffer(ad.condition) ? ad.condition[0] === 1 : ad.condition === 1);
+    const category = ad.vehicleTypeName || 'Техника';
+
+    const jsonLdProduct = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": title,
+      "url": url,
+      "image": photos.map(p => p.photo),
+      "description": (ad.description || desc).substring(0, 300),
+      "brand": ad.brand ? { "@type": "Brand", "name": ad.brand } : undefined,
+      "category": category,
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "RUB",
+        "price": ad.price || 0,
+        "availability": "https://schema.org/InStock",
+        "itemCondition": isNew ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
+        "seller": { "@type": "Person", "name": ad.userName || "Продавец" }
+      }
+    });
+
+    const jsonLdBreadcrumb = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://kupitvezdehod.ru/" },
+        { "@type": "ListItem", "position": 2, "name": category, "item": "https://kupitvezdehod.ru/" },
+        { "@type": "ListItem", "position": 3, "name": title }
+      ]
+    });
+
+    res.set('Cache-Control', 'no-store');
+    res.send(`<!DOCTYPE html><html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escHtml(title)} — купитьвездеход.рф</title>
+<meta name="description" content="${escHtml(desc)}">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link rel="canonical" href="${escHtml(url)}">
+<meta property="og:type" content="product">
+<meta property="og:title" content="${escHtml(title)} — купитьвездеход.рф">
+<meta property="og:description" content="${escHtml(desc)}">
+<meta property="og:image" content="${escHtml(photo)}">
+<meta property="og:url" content="${escHtml(url)}">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="купитьвездеход.рф">
+<script type="application/ld+json">${jsonLdProduct}</script>
+<script type="application/ld+json">${jsonLdBreadcrumb}</script>
+</head><body>
+<h1>${escHtml(title)}</h1>
+<p>${escHtml(desc)}</p>
+${photos.map(p => `<img src="${escHtml(p.photo)}" alt="${escHtml(title)}">`).join('')}
+<p>${escHtml(ad.description || '')}</p>
+<a href="https://kupitvezdehod.ru/">← Все объявления</a>
+<script>window.location.href='/ad.html?id=${ad.id}&type=ad';</script>
+</body></html>`);
+  } catch (e) {
+    next();
+  }
+});
+
+// ========================
+// Пререндер для ботов (manufacturer.html)
+// ========================
+app.get('/manufacturer.html', async (req, res, next) => {
+  if (!isBot(req)) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    return res.sendFile(path.join(__dirname, 'manufacturer.html'));
+  }
+  const mId = parseInt(req.query.id);
+  if (!mId) return res.sendFile(path.join(__dirname, 'manufacturer.html'));
+
+  try {
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT * FROM manufacturer WHERE id = ? LIMIT 1', [mId]);
+    connection.release();
+
+    if (!rows.length) return res.sendFile(path.join(__dirname, 'manufacturer.html'));
+    const m = rows[0];
+    const mTitle = `${m.name} — производитель вездеходов | купитьвездеход.рф`;
+    const mDesc = [m.name, m.city].filter(Boolean).join(', ') + ' — модели, характеристики, объявления';
+    const mUrl = `https://kupitvezdehod.ru/manufacturer.html?id=${m.id}`;
+
+    const jsonLdOrg = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": m.name,
+      "url": m.website || mUrl,
+      "logo": m.logo || '',
+      "address": m.city ? { "@type": "PostalAddress", "addressLocality": m.city } : undefined
+    });
+
+    const jsonLdBc = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://kupitvezdehod.ru/" },
+        { "@type": "ListItem", "position": 2, "name": "Производители", "item": "https://kupitvezdehod.ru/" },
+        { "@type": "ListItem", "position": 3, "name": m.name }
+      ]
+    });
+
+    res.set('Cache-Control', 'no-store');
+    res.send(`<!DOCTYPE html><html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escHtml(mTitle)}</title>
+<meta name="description" content="${escHtml(mDesc)}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="${escHtml(mUrl)}">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="${escHtml(mTitle)}">
+<meta property="og:description" content="${escHtml(mDesc)}">
+<meta property="og:image" content="${escHtml(m.logo || '')}">
+<meta property="og:url" content="${escHtml(mUrl)}">
+<meta property="og:locale" content="ru_RU">
+<script type="application/ld+json">${jsonLdOrg}</script>
+<script type="application/ld+json">${jsonLdBc}</script>
+</head><body>
+<h1>${escHtml(m.name)}</h1>
+<p>${escHtml(mDesc)}</p>
+${m.logo ? `<img src="${escHtml(m.logo)}" alt="${escHtml(m.name)}">` : ''}
+<a href="https://kupitvezdehod.ru/">← Все объявления</a>
+<script>window.location.href='/manufacturer.html?id=${m.id}';</script>
+</body></html>`);
+  } catch (e) {
+    res.sendFile(path.join(__dirname, 'manufacturer.html'));
+  }
+});
+
 app.use(express.static(__dirname));
 
 app.use('/api', (req, res, next) => {
@@ -132,13 +298,6 @@ app.get('/', (req, res) => {
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
   res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/manufacturer.html', (req, res) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.set('Pragma', 'no-cache');
-  res.set('Expires', '0');
-  res.sendFile(path.join(__dirname, 'manufacturer.html'));
 });
 
 app.get('/privacy', (req, res) => {

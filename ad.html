@@ -7,6 +7,8 @@
     <title>Объявление - купитьвездеход.рф</title>
     <meta name="description" content="Объявление о продаже техники на купитьвездеход.рф" />
     <link rel="canonical" href="" id="canonical-link" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    <meta name="format-detection" content="telephone=no" />
 
     <!-- OG теги обновляются динамически из JS -->
     <meta property="og:type" content="product" />
@@ -705,29 +707,47 @@
             const descMeta = document.querySelector('meta[name="description"]');
             if (descMeta) descMeta.setAttribute('content', seoDesc);
 
-            // JSON-LD для объявления
+            // JSON-LD: Product
             const jsonLd = {
                 "@context": "https://schema.org",
                 "@type": "Product",
                 "name": item.title || item.partName || 'Объявление',
                 "url": seoUrl,
-                "image": seoPhoto,
+                "image": (item.photos || '').split(',').filter(Boolean).map(p => ({ "@type": "ImageObject", "url": p })),
                 "description": (item.desc || seoDesc).substring(0, 300)
             };
             if (item.brand) jsonLd.brand = { "@type": "Brand", "name": item.brand };
-            if (item.city) {
-                jsonLd.offers = {
-                    "@type": "Offer",
-                    "priceCurrency": "RUB",
-                    "price": item.price || 0,
-                    "availability": "https://schema.org/InStock",
-                    "itemCondition": item.condition === 'new' ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
-                    "areaServed": { "@type": "Place", "name": item.city }
-                };
-            }
+            if (item.techType) jsonLd.category = item.techType;
+            jsonLd.offers = {
+                "@type": "Offer",
+                "priceCurrency": "RUB",
+                "price": item.price || 0,
+                "availability": "https://schema.org/InStock",
+                "itemCondition": item.condition === 'new' ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
+                "seller": {
+                    "@type": item.sellerType === 'Дилер' ? "Organization" : "Person",
+                    "name": item.name || "Продавец"
+                }
+            };
+            if (item.city) jsonLd.offers.areaServed = { "@type": "Place", "name": item.city };
             let ldScript = document.getElementById('jsonld-ad');
             if (!ldScript) { ldScript = document.createElement('script'); ldScript.type = 'application/ld+json'; ldScript.id = 'jsonld-ad'; document.head.appendChild(ldScript); }
             ldScript.textContent = JSON.stringify(jsonLd);
+
+            // JSON-LD: BreadcrumbList
+            const categoryName = type === 'part' ? 'Запчасти' : (item.techType || 'Техника');
+            const breadcrumb = {
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://kupitvezdehod.ru/" },
+                    { "@type": "ListItem", "position": 2, "name": categoryName, "item": "https://kupitvezdehod.ru/" },
+                    { "@type": "ListItem", "position": 3, "name": item.title || item.partName || 'Объявление' }
+                ]
+            };
+            let bcScript = document.getElementById('jsonld-breadcrumb');
+            if (!bcScript) { bcScript = document.createElement('script'); bcScript.type = 'application/ld+json'; bcScript.id = 'jsonld-breadcrumb'; document.head.appendChild(bcScript); }
+            bcScript.textContent = JSON.stringify(breadcrumb);
 
             // Добавляем event listener для кнопки поделиться
             const shareButton = document.querySelector('[data-share-btn="true"]');
