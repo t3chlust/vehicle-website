@@ -2,8 +2,32 @@ const express = require('express');
 const path = require('path');
 const { SMSRu } = require('node-sms-ru');
 const mysql = require('mysql2/promise');
+const compression = require('compression');
+const helmet = require('helmet');
 
 const app = express();
+
+// === Безопасность: HTTP-заголовки ===
+app.use(helmet({
+  contentSecurityPolicy: false, // отключаем CSP — SPA с inline-скриптами
+  crossOriginEmbedderPolicy: false
+}));
+
+// === Производительность: gzip-сжатие ===
+app.use(compression());
+
+// === Безопасность: CORS — только свой домен ===
+app.use((req, res, next) => {
+  const origin = req.get('Origin');
+  const allowed = ['https://kupitvezdehod.ru', 'http://kupitvezdehod.ru', 'http://localhost:3001'];
+  if (origin && allowed.includes(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
 // Инициализация SMS.RU с API ключом
 const smsru = new SMSRu(process.env.SMSRU_API_KEY || 'A1D81123-7ABC-927E-9F79-5AD4357DFD9A');
@@ -116,7 +140,7 @@ async function ensureUserByPhone(connection, phoneDigits, name) {
   };
 }
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 // Определение поисковых ботов
 const BOT_UA = /bot|google|yandex|baidu|bing|msn|duckduckbot|teoma|slurp|crawler|spider|robot|crawling|facebook|telegram|whatsapp|viber|vkshare|facebookexternalhit/i;
@@ -312,6 +336,32 @@ function generateCode() {
   return String(Math.floor(1000 + Math.random() * 9000));
 }
 
+// === Rate limiter для SMS (макс 3 запроса на номер за 10 мин, макс 10 с одного IP за 10 мин) ===
+const smsRateLimit = new Map(); // key → { count, firstRequest }
+const SMS_RATE_WINDOW = 10 * 60 * 1000;
+const SMS_RATE_MAX_PHONE = 3;
+const SMS_RATE_MAX_IP = 10;
+
+function checkSmsRate(key, max) {
+  const now = Date.now();
+  const entry = smsRateLimit.get(key);
+  if (!entry || now - entry.firstRequest > SMS_RATE_WINDOW) {
+    smsRateLimit.set(key, { count: 1, firstRequest: now });
+    return true;
+  }
+  if (entry.count >= max) return false;
+  entry.count++;
+  return true;
+}
+
+// Очистка старых записей каждые 10 минут
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of smsRateLimit) {
+    if (now - val.firstRequest > SMS_RATE_WINDOW) smsRateLimit.delete(key);
+  }
+}, SMS_RATE_WINDOW);
+
 // POST /send-sms - отправка кода подтверждения
 app.post('/send-sms', async (req, res) => {
   try {
@@ -319,6 +369,15 @@ app.post('/send-sms', async (req, res) => {
 
     if (!phone) {
       return res.status(400).json({ success: false, error: 'Номер телефона не предоставлен' });
+    }
+
+    // Rate limiting
+    const clientIp = req.ip || req.connection.remoteAddress;
+    if (!checkSmsRate('ip:' + clientIp, SMS_RATE_MAX_IP)) {
+      return res.status(429).json({ success: false, error: 'Слишком много запросов. Попробуйте через 10 минут.' });
+    }
+    if (!checkSmsRate('phone:' + phone, SMS_RATE_MAX_PHONE)) {
+      return res.status(429).json({ success: false, error: 'Слишком много запросов на этот номер. Попробуйте через 10 минут.' });
     }
 
     // Специальная обработка для админского номера
