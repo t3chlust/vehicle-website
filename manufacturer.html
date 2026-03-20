@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>Производитель - купитьвездеход.рф</title>
+    <meta name="description" content="Производитель вездеходов — информация, модели, контакты на купитьвездеход.рф" />
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content="Производитель - купитьвездеход.рф" id="og-title" />
+    <meta property="og:description" content="" id="og-description" />
+    <meta property="og:image" content="" id="og-image" />
+    <meta property="og:url" content="" id="og-url" />
+    <meta property="og:locale" content="ru_RU" />
     <link rel="shortcut icon" href="images/logo.svg" type="image/x-icon" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -459,7 +466,27 @@
                         '<div class="empty-message">Производитель не найден</div>';
                     return;
                 }
-                document.title = `${manufacturer.name} - купитьвездеход.рф`;
+                document.title = `${manufacturer.name} — производитель вездеходов | купитьвездеход.рф`;
+                const mDesc = `${manufacturer.name}${manufacturer.city ? ', ' + manufacturer.city : ''} — модели, характеристики, объявления о продаже на купитьвездеход.рф`;
+                const setM = (id, a, v) => { const e = document.getElementById(id); if (e) e.setAttribute(a, v); };
+                setM('og-title', 'content', document.title);
+                setM('og-description', 'content', mDesc);
+                setM('og-image', 'content', manufacturer.logo || 'https://kupitvezdehod.ru/images/logo.png');
+                setM('og-url', 'content', window.location.href);
+                const dm = document.querySelector('meta[name="description"]'); if (dm) dm.setAttribute('content', mDesc);
+
+                // JSON-LD Organization
+                const mLd = document.createElement('script'); mLd.type = 'application/ld+json';
+                mLd.textContent = JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Organization",
+                    "name": manufacturer.name,
+                    "url": manufacturer.website || window.location.href,
+                    "logo": manufacturer.logo || '',
+                    "address": manufacturer.city ? { "@type": "PostalAddress", "addressLocality": manufacturer.city } : undefined
+                });
+                document.head.appendChild(mLd);
+
                 renderManufacturerPage(manufacturer, allAds, allParts);
             } catch (e) {
                 console.error('Ошибка загрузки производителей:', e);

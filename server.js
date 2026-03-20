@@ -1284,6 +1284,46 @@ app.get('/api/filters', async (req, res) => {
 });
 
 // ========================
+// SEO: динамический sitemap.xml
+// ========================
+
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [ads] = await connection.query('SELECT id, date FROM advertisement ORDER BY date DESC');
+    const [manufacturers] = await connection.query('SELECT id FROM manufacturer ORDER BY id');
+    connection.release();
+
+    const base = 'https://kupitvezdehod.ru';
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+    // Главная
+    xml += `  <url><loc>${base}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>\n`;
+    // Политика
+    xml += `  <url><loc>${base}/privacy</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>\n`;
+
+    // Объявления
+    for (const ad of ads) {
+      const lastmod = ad.date ? new Date(ad.date).toISOString().split('T')[0] : '';
+      xml += `  <url><loc>${base}/ad.html?id=${ad.id}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}<changefreq>weekly</changefreq><priority>0.8</priority></url>\n`;
+    }
+
+    // Производители
+    for (const m of manufacturers) {
+      xml += `  <url><loc>${base}/manufacturer.html?id=${m.id}</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>\n`;
+    }
+
+    xml += '</urlset>';
+
+    res.set('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (error) {
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
+// ========================
 // Запуск сервера
 // ========================
 

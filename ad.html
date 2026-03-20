@@ -1,10 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>Объявление - купитьвездеход.рф</title>
+    <meta name="description" content="Объявление о продаже техники на купитьвездеход.рф" />
+    <link rel="canonical" href="" id="canonical-link" />
+
+    <!-- OG теги обновляются динамически из JS -->
+    <meta property="og:type" content="product" />
+    <meta property="og:title" content="Объявление - купитьвездеход.рф" id="og-title" />
+    <meta property="og:description" content="" id="og-description" />
+    <meta property="og:image" content="" id="og-image" />
+    <meta property="og:url" content="" id="og-url" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="купитьвездеход.рф" />
+
     <link rel="shortcut icon" href="images/logo.svg" type="image/x-icon" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -671,8 +683,52 @@
                     </div>
                 </div>
             `;
-            document.title = `${item.title || item.partName} - купитьвездеход.рф`;
-            
+            // === SEO: динамические мета-теги и JSON-LD ===
+            const seoTitle = (item.title || item.partName || 'Объявление') + ' — купитьвездеход.рф';
+            const seoDesc = [
+                item.title || item.partName,
+                item.price ? Number(item.price).toLocaleString() + ' ₽' : '',
+                item.city
+            ].filter(Boolean).join(' · ');
+            const seoPhoto = (item.photos || '').split(',')[0] || 'https://kupitvezdehod.ru/images/logo.png';
+            const seoUrl = 'https://kupitvezdehod.ru/ad.html?id=' + item.rowIndex + '&type=' + (type === 'ad' ? 'ad' : 'part');
+
+            document.title = seoTitle;
+
+            const setMeta = (id, attr, val) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, val); };
+            setMeta('og-title', 'content', seoTitle);
+            setMeta('og-description', 'content', seoDesc);
+            setMeta('og-image', 'content', seoPhoto);
+            setMeta('og-url', 'content', seoUrl);
+            setMeta('canonical-link', 'href', seoUrl);
+
+            const descMeta = document.querySelector('meta[name="description"]');
+            if (descMeta) descMeta.setAttribute('content', seoDesc);
+
+            // JSON-LD для объявления
+            const jsonLd = {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": item.title || item.partName || 'Объявление',
+                "url": seoUrl,
+                "image": seoPhoto,
+                "description": (item.desc || seoDesc).substring(0, 300)
+            };
+            if (item.brand) jsonLd.brand = { "@type": "Brand", "name": item.brand };
+            if (item.city) {
+                jsonLd.offers = {
+                    "@type": "Offer",
+                    "priceCurrency": "RUB",
+                    "price": item.price || 0,
+                    "availability": "https://schema.org/InStock",
+                    "itemCondition": item.condition === 'new' ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
+                    "areaServed": { "@type": "Place", "name": item.city }
+                };
+            }
+            let ldScript = document.getElementById('jsonld-ad');
+            if (!ldScript) { ldScript = document.createElement('script'); ldScript.type = 'application/ld+json'; ldScript.id = 'jsonld-ad'; document.head.appendChild(ldScript); }
+            ldScript.textContent = JSON.stringify(jsonLd);
+
             // Добавляем event listener для кнопки поделиться
             const shareButton = document.querySelector('[data-share-btn="true"]');
             if (shareButton) {

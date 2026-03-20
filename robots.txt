@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /send-sms
+Disallow: /verify-code
+
+Sitemap: https://kupitvezdehod.ru/sitemap.xml
+Host: https://kupitvezdehod.ru
