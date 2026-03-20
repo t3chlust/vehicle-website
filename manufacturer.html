@@ -14,7 +14,8 @@
     <meta property="og:image" content="" id="og-image" />
     <meta property="og:url" content="" id="og-url" />
     <meta property="og:locale" content="ru_RU" />
-    <link rel="shortcut icon" href="images/logo.svg" type="image/x-icon" />
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml" />
+    <link rel="shortcut icon" href="images/logo.png" type="image/png" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         body, html {
@@ -317,7 +318,7 @@
             card.className = 'ad-card';
             card.onclick = () => { window.location.href = `/ad.html?id=${ad.rowIndex}&type=ad`; };
             card.innerHTML = `
-                <img class="ad-card-img" src="${mainImage}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">
+                <img class="ad-card-img" loading="lazy" src="${mainImage}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">
                 <div class="ad-card-content">
                     <div class="ad-card-title" title="${adTitle}">${adTitle}</div>
                     <div class="ad-card-price">${Number(ad.price || 0).toLocaleString()} ₽</div>
@@ -343,7 +344,7 @@
             card.className = 'ad-card';
             card.onclick = () => { window.location.href = `/ad.html?id=${part.rowIndex}&type=part`; };
             card.innerHTML = `
-                <img class="ad-card-img" src="${mainImage}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">
+                <img class="ad-card-img" loading="lazy" src="${mainImage}" onerror="this.src='https://placehold.co/400?text=Нет+фото'">
                 <div class="ad-card-content">
                     <div class="ad-card-title" title="${partTitle}">${partTitle}</div>
                     <div class="ad-card-price">${Number(part.price || 0).toLocaleString()} ₽</div>
@@ -379,7 +380,7 @@
             addSocial(manufacturer.telegram, ICONS.TG);
             let headerHtml = `
                 <div class="manufacturer-header">
-                    <img src="${manufacturer.logo || ''}" alt="${manufacturer.name}" class="manufacturer-logo-large" onerror="this.src='https://placehold.co/150x150?text=нет+лого'">
+                    <img src="${manufacturer.logo || ''}" alt="${manufacturer.name}" loading="lazy" class="manufacturer-logo-large" onerror="this.src='https://placehold.co/150x150?text=нет+лого'">
                     <div class="manufacturer-info">
                         <h1 class="manufacturer-name-large">${manufacturer.name || 'Производитель'}</h1>
                         <div class="manufacturer-city-large">${manufacturer.city || '-'}</div>
