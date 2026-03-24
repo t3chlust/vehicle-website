@@ -3226,8 +3226,8 @@
                                         <option value="Бортоповоротный">Бортоповоротный</option>
                                     </select>
                                     <div id="service-fields" class="hidden">
-                                        <div class="form-section-title">Бренд</div>
-                                        <input class="form-input" id="inp-service-brand" placeholder="Бренд (необязательно)" />
+                                        <div class="form-section-title">Название услуги <span style="color:#ff4757; font-weight:bold;">*</span></div>
+                                        <input class="form-input" id="inp-service-title" placeholder="Название услуги *" />
                                         <div class="form-section-title">Описание услуги <span style="color:#ff4757; font-weight:bold;">*</span></div>
                                         <textarea class="form-input" id="inp-service-desc" placeholder="Описание услуги *"></textarea>
                                         <div class="form-section-title">Цена услуги <span style="color:#ff4757; font-weight:bold;">*</span></div>
@@ -5507,6 +5507,7 @@
                             const productType = safeVal('inp-product-type');
                             // Услуга — отдельная валидация (service fields)
                             if (productType === 'Услуга') {
+                                if (!safeVal('inp-service-title').trim()) errors.push('Укажите название услуги');
                                 if (!safeVal('inp-service-city').trim()) errors.push('Укажите город');
                                 if (!safeVal('inp-service-price').trim()) errors.push('Укажите цену услуги');
                                 if (errors.length > 0) {
@@ -5646,12 +5647,12 @@
                                         }
                                         servicePhU = photoArr.join(',');
                                     }
-                                    const serviceBrand = safeVal('inp-service-brand').trim();
+                                    const serviceTitle = safeVal('inp-service-title').trim();
                                     const servicePl = {
                                         action: isEditMode ? 'edit' : 'create',
                                         rowIndex: safeVal('edit-row-index') || '',
-                                        title: serviceBrand ? serviceBrand + ' — Услуга' : 'Услуга',
-                                        brand: serviceBrand,
+                                        title: serviceTitle || 'Услуга',
+                                        brand: serviceTitle,
                                         model: '',
                                         price: getPriceValue('inp-service-price'),
                                         desc: safeVal('inp-service-desc'),
