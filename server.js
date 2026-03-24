@@ -801,8 +801,8 @@ app.post('/api/ads', async (req, res) => {
             (brand, name, type, userId, price, date, city, \`condition\`, sellerType, verified, description)
            VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)`,
           [
-            brand || null, 
-            model || '', 
+            brand || '',
+            model || '',
             vehicleTypeId, 
             resolvedUserId, 
             price || 0, 
@@ -867,8 +867,8 @@ app.post('/api/ads', async (req, res) => {
             \`condition\` = ?, sellerType = ?, description = ?
            WHERE id = ?`,
           [
-            brand || null, 
-            model || '', 
+            brand || '',
+            model || '',
             vehicleTypeId, 
             resolvedUserId, 
             price || 0, 

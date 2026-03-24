@@ -156,8 +156,9 @@
                                 if (mileageDiv) mileageDiv.classList.add('hidden');
                                 if (colorSelect) { colorSelect.style.display = 'none'; colorDocsDiv.style.gridTemplateColumns = '1fr'; }
                             } else if (productType === 'Запчасть') {
-                                // Show: seller info, city, price, description, photos
-                                // Hide: everything vehicle-related
+                                // Show: city, price, description, photos
+                                // Hide: seller info and everything vehicle-related
+                                sellerSection.classList.add('hidden');
                                 constrInp.classList.add('hidden');
                                 mainSpecs.classList.add('hidden');
                                 wheelsDiv.classList.add('hidden');
@@ -3225,6 +3226,8 @@
                                         <option value="Бортоповоротный">Бортоповоротный</option>
                                     </select>
                                     <div id="service-fields" class="hidden">
+                                        <div class="form-section-title">Бренд</div>
+                                        <input class="form-input" id="inp-service-brand" placeholder="Бренд (необязательно)" />
                                         <div class="form-section-title">Описание услуги <span style="color:#ff4757; font-weight:bold;">*</span></div>
                                         <textarea class="form-input" id="inp-service-desc" placeholder="Описание услуги *"></textarea>
                                         <div class="form-section-title">Цена услуги <span style="color:#ff4757; font-weight:bold;">*</span></div>
@@ -4400,7 +4403,7 @@
                             const wheelType = safeVal('inp-wheel-f');
                             const wheelsDiv = document.getElementById('div-wheels');
                             if (!wheelsDiv) return;
-                            if (type === 'Запчасть' || type === 'Прицеп') {
+                            if (type === 'Запчасть' || type === 'Прицеп' || type === 'Услуга') {
                                 return;
                             }
                             if (wheelType === 'Гусеничный') {
@@ -5643,11 +5646,12 @@
                                         }
                                         servicePhU = photoArr.join(',');
                                     }
+                                    const serviceBrand = safeVal('inp-service-brand').trim();
                                     const servicePl = {
                                         action: isEditMode ? 'edit' : 'create',
                                         rowIndex: safeVal('edit-row-index') || '',
-                                        title: 'Услуга',
-                                        brand: '',
+                                        title: serviceBrand ? serviceBrand + ' — Услуга' : 'Услуга',
+                                        brand: serviceBrand,
                                         model: '',
                                         price: getPriceValue('inp-service-price'),
                                         desc: safeVal('inp-service-desc'),
