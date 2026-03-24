@@ -5885,6 +5885,9 @@
                             document.getElementById('submit-btn').innerText = "Опубликовать";
                             document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
                             document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
+                            // Also hide admin tab which is outside tabs-container
+                            const adminTab = document.getElementById('tab-content-admin');
+                            if (adminTab) adminTab.style.display = 'none';
                             document.getElementById('view-form').classList.remove('hidden');
                             document.getElementById('main-form').reset();
                             document.getElementById('preview-container').innerHTML = '';

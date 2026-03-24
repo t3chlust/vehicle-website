@@ -634,11 +634,13 @@ async function fetchPartsPayload() {
       SELECT
         a.id, a.name AS partName, a.brand, a.date, a.price, a.userId, a.verified,
         a.\`condition\`, a.sellerType, st.name AS sellerTypeName, a.city,
+        a.type, vt.name AS vehicleTypeName, a.description,
         u.name AS userName, u.phone AS userPhone
       FROM advertisement a
       LEFT JOIN seller_type st ON a.sellerType = st.id
       LEFT JOIN user u ON a.userId = u.id
-      WHERE a.type = 4
+      LEFT JOIN advertisement_type vt ON a.type = vt.id
+      WHERE a.type IN (4, 5)
       ORDER BY a.date DESC
     `);
 
@@ -653,10 +655,12 @@ async function fetchPartsPayload() {
         [part.id]
       );
 
+      const typeName = part.vehicleTypeName || '';
+      const isService = typeName === 'Услуга';
       return {
         rowIndex: part.id,
         userId: part.userId,
-        title: part.partName || 'Запчасть',
+        title: isService ? (part.brand ? part.brand + ' — Услуга' : 'Услуга') : (part.partName || 'Запчасть'),
         partName: part.partName || '',
         brand: part.brand || '',
         date: part.date,
@@ -670,7 +674,9 @@ async function fetchPartsPayload() {
         phone: formatPhoneForDisplay(part.userPhone),
         photos: photos.map((p) => p.photo).join(','),
         videos: videos.map((v) => v.video).join(','),
-        verified: part.verified
+        verified: part.verified,
+        techType: typeName,
+        desc: part.description || ''
       };
     }));
 
