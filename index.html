@@ -102,6 +102,10 @@
                             const descTitle = descInp ? descInp.previousElementSibling : null;
                             const descPhotosDiv = document.getElementById('div-desc-photos');
 
+                            // Helper: toggle required attribute based on visibility
+                            function setReq(el, on) { if (!el) return; if (on) el.setAttribute('required','required'); else el.removeAttribute('required'); }
+                            const sellerType = document.getElementById('inp-seller-type');
+
                             // Reset all to visible first
                             sellerSection.classList.remove('hidden');
                             serviceFields.classList.add('hidden');
@@ -125,6 +129,11 @@
                             if (descPhotosDiv) descPhotosDiv.classList.remove('hidden');
                             cityLabel.classList.remove('hidden');
                             cityLabel.innerHTML = 'Где находится техника <span style="color:#ff4757; font-weight:bold;">*</span>';
+                            // Reset required attributes to defaults
+                            setReq(sellerType, true);
+                            setReq(priceInp, true);
+                            setReq(cityInp, true);
+                            setReq(conditionSection, true);
 
                             if (productType === 'Вездеход') {
                                 // All fields visible, show construction
@@ -162,6 +171,9 @@
                                 if (conditionTitle) conditionTitle.classList.add('hidden');
                                 if (mileageDiv) mileageDiv.classList.add('hidden');
                                 cityLabel.innerHTML = 'Город <span style="color:#ff4757; font-weight:bold;">*</span>';
+                                // Remove required from hidden fields
+                                setReq(conditionSection, false);
+                                setReq(sellerType, false);
                             } else if (productType === 'Услуга') {
                                 // Show: service fields (price, city, description, photos)
                                 // Hide: everything else including general description/photos
@@ -182,6 +194,11 @@
                                 if (conditionSection) conditionSection.classList.add('hidden');
                                 if (conditionTitle) conditionTitle.classList.add('hidden');
                                 if (mileageDiv) mileageDiv.classList.add('hidden');
+                                // Remove required from hidden fields so form can submit
+                                setReq(sellerType, false);
+                                setReq(priceInp, false);
+                                setReq(cityInp, false);
+                                setReq(conditionSection, false);
                             }
 
                             checkChassisTypeVisibility();
@@ -5156,8 +5173,9 @@
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 const tt = (ad.techType || ad.technical || '').trim();
-                                if (ad.power && tt !== 'Прицеп') infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && tt !== 'Прицеп' && tt !== 'Услуга') infoParts.push(ad.transmission);
+                                const isTrailer = tt === 'Прицеп' || (ad.capacity && Number(ad.capacity) > 0);
+                                if (ad.power && !isTrailer) infoParts.push(ad.power + ' л.с.');
+                                if (ad.transmission && !isTrailer && tt !== 'Услуга') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
                                 d.className = 'listing-card';
                                 d.id = `ad-${ad.rowIndex}`;
@@ -5259,8 +5277,9 @@
                                 let infoParts = [];
                                 if (ad.city) infoParts.push(ad.city);
                                 const tt = (ad.techType || ad.technical || '').trim();
-                                if (ad.power && tt !== 'Прицеп') infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && tt !== 'Прицеп' && tt !== 'Услуга') infoParts.push(ad.transmission);
+                                const isTrailer = tt === 'Прицеп' || (ad.capacity && Number(ad.capacity) > 0);
+                                if (ad.power && !isTrailer) infoParts.push(ad.power + ' л.с.');
+                                if (ad.transmission && !isTrailer && tt !== 'Услуга') infoParts.push(ad.transmission);
 
                                 const d = document.createElement('div');
                                 d.className = 'listing-card';
@@ -6255,8 +6274,9 @@
                                 if (ad.city) infoParts.push(ad.city);
                                 else if (ad.region) infoParts.push(ad.region);
                                 const tt = (ad.techType || ad.technical || '').trim();
-                                if (ad.power && tt !== 'Прицеп') infoParts.push(ad.power + ' л.с.');
-                                if (ad.transmission && tt !== 'Прицеп' && tt !== 'Услуга') infoParts.push(ad.transmission);
+                                const isTrailer = tt === 'Прицеп' || (ad.capacity && Number(ad.capacity) > 0);
+                                if (ad.power && !isTrailer) infoParts.push(ad.power + ' л.с.');
+                                if (ad.transmission && !isTrailer && tt !== 'Услуга') infoParts.push(ad.transmission);
                                 const d = document.createElement('div');
                                 d.className = 'listing-card';
                                 d.id = `ad-${ad.rowIndex}`;
