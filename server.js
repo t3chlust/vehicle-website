@@ -660,7 +660,7 @@ async function fetchPartsPayload() {
       return {
         rowIndex: part.id,
         userId: part.userId,
-        title: isService ? (part.brand ? part.brand + ' — Услуга' : 'Услуга') : (part.partName || 'Запчасть'),
+        title: isService ? (part.brand || 'Услуга') : (part.partName || 'Запчасть'),
         partName: part.partName || '',
         brand: part.brand || '',
         date: part.date,

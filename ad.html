@@ -598,15 +598,21 @@
                 }
 
             } else if (type === 'part') {
-                if (item.condition === 'new') badgesHtml += '<span class="badge-new">Новый</span>';
-                if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">Владелец</span>';
-
-                specs.push({ l: 'Тип', v: 'Запчасть' });
-                specs.push({ l: 'Название', v: item.partName || item.title });
-                specs.push({ l: 'Бренд', v: item.brand || '' });
-                specs.push({ l: 'Состояние', v: item.condition === 'new' ? 'Новая' : 'Б/У' });
-                specs.push({ l: 'Тип продавца', v: sellerLabel });
-                specs.push({ l: 'Город', v: item.city });
+                const partTechType = (item.techType || '').trim();
+                if (partTechType === 'Услуга') {
+                    // Услуга — только город
+                    specs.push({ l: 'Город', v: item.city });
+                } else {
+                    // Запчасть
+                    if (item.condition === 'new') badgesHtml += '<span class="badge-new">Новый</span>';
+                    if (isPrivateSellerLabel(sellerLabel)) badgesHtml += '<span class="badge-private">Владелец</span>';
+                    specs.push({ l: 'Тип', v: 'Запчасть' });
+                    specs.push({ l: 'Название', v: item.partName || item.title });
+                    specs.push({ l: 'Бренд', v: item.brand || '' });
+                    specs.push({ l: 'Состояние', v: item.condition === 'new' ? 'Новая' : 'Б/У' });
+                    specs.push({ l: 'Тип продавца', v: sellerLabel });
+                    specs.push({ l: 'Город', v: item.city });
+                }
             }
 
             currentPhotos = item.photos ? item.photos.split(',').filter(p => p.startsWith('http')) : [];
