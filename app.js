@@ -1356,9 +1356,14 @@ function initAdsSearch() {
             if (arr.length >= 5) break;
         }
         if (arr.length === 0) {
-            listDiv.style.display = 'none';
+            if (typed.length >= 2) {
+                listDiv.innerHTML = '<div class="manufacturer" style="color:#999;pointer-events:none">Ничего не найдено</div>';
+                listDiv.style.display = 'block';
+            } else {
+                listDiv.style.display = 'none';
+            }
         } else {
-            
+
             // СНАЧАЛА добавляем опцию БРЕНДА если есть совпадение
             if (brandMatch) {
                 const brandEl = document.createElement('div');
@@ -1498,9 +1503,14 @@ function initTenderSearch() {
             if (arr.length >= 5) break;
         }
         if (arr.length === 0) {
-            listDiv.style.display = 'none';
+            if (typed.length >= 2) {
+                listDiv.innerHTML = '<div class="manufacturer" style="color:#999;pointer-events:none">Ничего не найдено</div>';
+                listDiv.style.display = 'block';
+            } else {
+                listDiv.style.display = 'none';
+            }
         } else {
-            
+
             // СНАЧАЛА добавляем опцию БРЕНДА если есть совпадение
             if (brandMatch) {
                 const brandEl = document.createElement('div');
@@ -1680,7 +1690,12 @@ function initPartsSearch() {
             if (arr.length >= 5) break;
         }
         if (arr.length === 0) {
-            listDiv.style.display = 'none';
+            if (typed.length >= 2) {
+                listDiv.innerHTML = '<div class="manufacturer" style="color:#999;pointer-events:none">Ничего не найдено</div>';
+                listDiv.style.display = 'block';
+            } else {
+                listDiv.style.display = 'none';
+            }
         } else {
             arr.forEach(item => {
                 const el = document.createElement('div');
