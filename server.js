@@ -669,7 +669,7 @@ async function fetchPartsPayload() {
       return {
         rowIndex: part.id,
         userId: part.userId,
-        title: isService ? (part.description || part.brand || 'Услуга') : (part.partName || 'Запчасть'),
+        title: isService ? (part.brand || 'Услуга') : (part.partName || 'Запчасть'),
         partName: part.partName || '',
         brand: part.brand || '',
         date: part.date,
@@ -1287,13 +1287,13 @@ app.post('/api/parts/delete', async (req, res) => {
         `SELECT a.userId, u.phone
          FROM advertisement a
          LEFT JOIN user u ON a.userId = u.id
-         WHERE a.id = ? AND a.type = 4`,
+         WHERE a.id = ? AND a.type IN (4, 5)`,
         [rowIndex]
       );
 
       if (parts.length === 0) {
         connection.release();
-        return res.status(404).json({ status: 'error', message: 'Запчасть не найдена' });
+        return res.status(404).json({ status: 'error', message: 'Запчасть/услуга не найдена' });
       }
 
       const storedUserId = parts[0].userId ? Number(parts[0].userId) : null;
