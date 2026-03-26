@@ -1223,6 +1223,7 @@ function findAdAndScroll(value, itemId, brandFilter) {
         if (card) {
             card.style.transition = 'background 1.2s';
             card.style.background = getHighlightColor(0.35);
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             setTimeout(() => { card.style.background = ''; }, 1600);
             if (input) input.value = '';
         } else {

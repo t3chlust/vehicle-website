@@ -73,7 +73,7 @@
             <div class="t123">
                 <div class="t-container_100 ">
                     <div class="t-width t-width_100 "> <!-- nominify begin -->
-                        <script src="early.js?v=5">
+                        <script src="early.js?v=6">
                         </script> <datalist id="price-list">
                             <option value="500 000">
                             <option value="1 000 000">
@@ -81,7 +81,7 @@
                             <option value="5 000 000">
                             <option value="10 000 000">
                         </datalist>
-                        <link rel="stylesheet" href="styles.css?v=5">
+                        <link rel="stylesheet" href="styles.css?v=6">
                         <div class="tm-wrapper fade-in" id="main-wrapper">
                             <div id="main-header"
                                 style="border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:12px; gap: 8px;">
@@ -829,30 +829,34 @@
                                                                 listDiv.innerHTML = '';
                                                                 const all = [...found].sort();
                                                                 const cities = [...foundByCity].sort();
-                                                                let arr;
 
-                                                                // Если нашли города, показываем их первыми
-                                                                if (cities.length > 0) {
-                                                                    arr = cities;
-                                                                } else {
-                                                                    arr = all.slice(0, 5); // показываем максимум 5 подсказок
-                                                                }
+                                                                // Объединяем: сначала города, потом бренды, максимум 5
+                                                                const combined = [];
+                                                                cities.forEach(c => {
+                                                                    if (combined.length < 5) combined.push({ name: c, type: 'city' });
+                                                                });
+                                                                all.forEach(b => {
+                                                                    if (combined.length < 5) combined.push({ name: b, type: 'brand' });
+                                                                });
 
-                                                                if (arr.length === 0) {
+                                                                if (combined.length === 0) {
                                                                     listDiv.style.display = 'none';
                                                                 } else {
-                                                                    arr.forEach(name => {
+                                                                    combined.forEach(entry => {
                                                                         const item = document.createElement('div');
                                                                         item.className = 'manufacturer';
-                                                                        item.setAttribute('data-target', name);
-                                                                        item.textContent = name;
+                                                                        item.setAttribute('data-target', entry.name);
+                                                                        if (entry.type === 'city') {
+                                                                            item.textContent = '📍 ' + entry.name;
+                                                                            item.style.color = '#1E88E5';
+                                                                        } else {
+                                                                            item.textContent = entry.name;
+                                                                        }
                                                                         item.addEventListener('click', function (e) {
                                                                             e.preventDefault();
-                                                                            // Подставляем название
-                                                                            input.value = name;
+                                                                            input.value = entry.name;
                                                                             listDiv.style.display = 'none';
-                                                                            // Если это город, скроллим к производителям из этого города
-                                                                            findAndScroll(name);
+                                                                            findAndScroll(entry.name);
                                                                         });
                                                                         listDiv.appendChild(item);
                                                                     });
@@ -1152,7 +1156,7 @@
                         <div class="spinner"></div>
                         <p style="margin-top:15px;" id="loader-text">Загрузка...</p>
                     </div>
-                    <script src="app.js?v=5">
+                    <script src="app.js?v=6">
                     </script> <!-- nominify end -->
                 </div>
             </div>
