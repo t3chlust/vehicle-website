@@ -307,7 +307,16 @@ ${m.logo ? `<img src="${escHtml(m.logo)}" alt="${escHtml(m.name)}">` : ''}
   }
 });
 
-app.use(express.static(__dirname));
+// Cache static assets (CSS, JS, images) for 7 days; HTML always fresh
+app.use(express.static(__dirname, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.css') || filePath.endsWith('.js') || filePath.endsWith('.png') || filePath.endsWith('.svg') || filePath.endsWith('.ico')) {
+      res.setHeader('Cache-Control', 'public, max-age=604800'); // 7 days
+    } else if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
+}));
 
 app.use('/api', (req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
