@@ -29,6 +29,8 @@ const descPhotosDiv = document.getElementById('div-desc-photos');
 // Helper: toggle required attribute based on visibility
 function setReq(el, on) { if (!el) return; if (on) el.setAttribute('required','required'); else el.removeAttribute('required'); }
 const sellerType = document.getElementById('inp-seller-type');
+const servicePrice = document.getElementById('inp-service-price');
+const serviceCity = document.getElementById('inp-service-city');
 
 // Reset all to visible first
 sellerSection.classList.remove('hidden');
@@ -58,6 +60,9 @@ setReq(sellerType, true);
 setReq(priceInp, true);
 setReq(cityInp, true);
 setReq(conditionSection, true);
+// Service fields off by default
+setReq(servicePrice, false);
+setReq(serviceCity, false);
 
 if (productType === 'Вездеход') {
     // All fields visible, show construction
@@ -124,6 +129,9 @@ if (productType === 'Вездеход') {
     setReq(priceInp, false);
     setReq(cityInp, false);
     setReq(conditionSection, false);
+    // Service fields required for Услуга
+    setReq(servicePrice, true);
+    setReq(serviceCity, true);
 }
 
 checkChassisTypeVisibility();
