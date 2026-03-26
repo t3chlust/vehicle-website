@@ -510,6 +510,32 @@ function accumulateMediaFiles() {
     // Show preview with accumulated files
     showFilePreview();
 }
+function previewServicePhotos() {
+    const input = document.getElementById('inp-service-photos');
+    const container = document.getElementById('service-preview-container');
+    const countEl = document.getElementById('service-file-count');
+    if (!container || !input) return;
+    container.innerHTML = '';
+    const files = input.files;
+    if (files.length > 0) {
+        countEl.innerText = 'Файлов: ' + files.length;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.cssText = 'width:100%;height:100px;object-fit:cover;border-radius:6px;';
+                    container.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    } else {
+        countEl.innerText = '';
+    }
+}
 function showFilePreview() {
     const container = document.getElementById('preview-container');
     const countEl = document.getElementById('file-count');
