@@ -16,6 +16,8 @@ const wheelsDiv = document.getElementById('div-wheels');
 const colorDocsDiv = document.getElementById('div-color-docs');
 const colorSelect = document.getElementById('inp-color');
 const specsTitle = document.getElementById('card-specs');
+const vehicleCard = document.getElementById('card-vehicle-info');
+const descCard = document.getElementById('card-desc-photos');
 const constrInp = document.getElementById('inp-construction');
 const conditionSection = document.getElementById('inp-condition');
 const conditionTitle = conditionSection ? conditionSection.previousElementSibling : null;
@@ -33,6 +35,8 @@ const servicePrice = document.getElementById('inp-service-price');
 const serviceCity = document.getElementById('inp-service-city');
 
 // Reset all to visible first
+if (vehicleCard) vehicleCard.classList.remove('hidden');
+if (descCard) descCard.classList.remove('hidden');
 sellerSection.classList.remove('hidden');
 serviceFields.classList.add('hidden');
 partOnlyDiv.classList.add('hidden');
@@ -121,6 +125,8 @@ if (productType === 'Вездеход') {
     cityInp.classList.add('hidden');
     cityLabel.classList.add('hidden');
     if (descPhotosDiv) descPhotosDiv.classList.add('hidden');
+    if (vehicleCard) vehicleCard.classList.add('hidden');
+    if (descCard) descCard.classList.add('hidden');
     if (conditionSection) conditionSection.classList.add('hidden');
     if (conditionTitle) conditionTitle.classList.add('hidden');
     if (mileageDiv) mileageDiv.classList.add('hidden');
