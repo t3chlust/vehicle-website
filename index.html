@@ -73,7 +73,7 @@
             <div class="t123">
                 <div class="t-container_100 ">
                     <div class="t-width t-width_100 "> <!-- nominify begin -->
-                        <script src="early.js?v=11">
+                        <script src="early.js?v=12">
                         </script> <datalist id="price-list">
                             <option value="500 000">
                             <option value="1 000 000">
@@ -81,7 +81,7 @@
                             <option value="5 000 000">
                             <option value="10 000 000">
                         </datalist>
-                        <link rel="stylesheet" href="styles.css?v=10">
+                        <link rel="stylesheet" href="styles.css?v=12">
                         <div class="tm-wrapper fade-in" id="main-wrapper">
                             <div id="main-header"
                                 style="border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:12px; gap: 8px;">
@@ -948,6 +948,13 @@
                                         <input class="form-input" id="inp-part-brand" placeholder="Бренд" />
                                         <input class="form-input" id="inp-part-title"
                                             placeholder="Название запчасти *" />
+                                        <div class="form-section-title">Город <span style="color:#ff4757; font-weight:bold;">*</span></div>
+                                        <input class="form-input" id="inp-part-city" placeholder="Город *" />
+                                        <div class="form-section-title">Цена <span style="color:#ff4757; font-weight:bold;">*</span></div>
+                                        <div class="price-wrapper">
+                                            <input type="text" class="form-input" id="inp-part-price" placeholder="Введите цену" list="price-list" oninput="formatPriceInput(this)" />
+                                            <span class="price-suffix">&#8381;</span>
+                                        </div>
                                     </div>
                                     <div class="form-card" id="card-vehicle-info">
                                         <div class="form-card-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#26a69a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>Техника и цена</div>
@@ -1180,7 +1187,7 @@
                         <div class="spinner"></div>
                         <p style="margin-top:15px;" id="loader-text">Загрузка...</p>
                     </div>
-                    <script src="app.js?v=10">
+                    <script src="app.js?v=12">
                     </script> <!-- nominify end -->
                 </div>
             </div>

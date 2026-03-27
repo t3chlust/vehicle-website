@@ -101,6 +101,7 @@ if (productType === 'Вездеход') {
     tenderDiv.classList.add('hidden');
     specsTitle.classList.add('hidden');
     partOnlyDiv.classList.remove('hidden');
+    if (vehicleCard) vehicleCard.classList.add('hidden');
     if (conditionSection) conditionSection.classList.add('hidden');
     if (conditionTitle) conditionTitle.classList.add('hidden');
     if (mileageDiv) mileageDiv.classList.add('hidden');

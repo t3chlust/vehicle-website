@@ -2119,10 +2119,12 @@ function validateForm() {
     if (productType !== 'Запчасть') {
         check('inp-seller-type', 'Выберите тип продавца');
     }
-    check('inp-city', 'Укажите город');
-    const priceVal = getPriceValue('inp-price');
+    const cityCheckId = productType === 'Запчасть' ? 'inp-part-city' : 'inp-city';
+    const priceCheckId = productType === 'Запчасть' ? 'inp-part-price' : 'inp-price';
+    check(cityCheckId, 'Укажите город');
+    const priceVal = getPriceValue(priceCheckId);
     if (!priceVal || parseInt(priceVal) <= 0) {
-        const el = markFieldError('inp-price', 'Укажите цену');
+        const el = markFieldError(priceCheckId, 'Укажите цену');
         if (!firstErr) firstErr = el;
     }
     if (productType !== 'Запчасть') {
@@ -2279,10 +2281,10 @@ document.getElementById('main-form').addEventListener('submit', async (e) => {
                 rowIndex: safeVal('edit-row-index') || '',
                 brand: safeVal('inp-part-brand'),
                 partName: safeVal('inp-part-title'),
-                price: priceVal,
+                price: getPriceValue('inp-part-price'),
                 condition: safeVal('inp-condition'),
                 sellerTypeId: safeVal('inp-seller-type'),
-                city: safeVal('inp-city'),
+                city: safeVal('inp-part-city'),
                 phone: currentUser.phoneNumber,
                 name: currentUserName || '',
                 userId: currentUser.id,
@@ -2719,9 +2721,9 @@ function openEditModePart(part) {
     const btnCreate = document.getElementById('btn-create-ad');
     if (btnCreate) btnCreate.classList.add('hidden');
     setVal('edit-row-index', part.rowIndex);
-    setVal('inp-price', Number(part.price || 0).toLocaleString('ru-RU').replace(/,/g, ' '));
+    setVal('inp-part-price', Number(part.price || 0).toLocaleString('ru-RU').replace(/,/g, ' '));
     setVal('inp-desc', (part.desc || "").replace(NEW_STATUS_TAG, "").trim());
-    setVal('inp-city', part.city);
+    setVal('inp-part-city', part.city);
     setVal('inp-condition', part.condition === 'new' ? 'new' : 'used');
     checkConditionVisibility();
     if (part.sellerTypeId) {
