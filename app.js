@@ -744,8 +744,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(enforceCleanFiltersState, 600);
     setTimeout(enforceCleanFiltersState, 1500);
 });
-window.addEventListener('pageshow', () => {
+window.addEventListener('pageshow', (e) => {
     setTimeout(enforceCleanFiltersState, 0);
+    // Если страница восстановлена из BFCache (кнопка "назад") — перезагрузить данные
+    if (e.persisted) {
+        loadAds();
+        loadParts();
+    }
 });
 function clearAllFilters() {
     resetAdsFiltersOnStartup(); // Эта функция у вас уже есть, она сбрасывает поля
@@ -2695,7 +2700,15 @@ function openEditMode(ad) {
     checkChassisTypeVisibility();
     showExistingMedia(ad);
     document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
-    document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
+    // Показываем tab-content-profile чтобы view-form (внутри него) был виден
+    const profileTabContent = document.getElementById('tab-content-profile');
+    if (profileTabContent) {
+        document.getElementById('tabs-container').style.display = 'block';
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        profileTabContent.classList.add('active');
+    } else {
+        document.getElementById('tabs-container').style.display = 'none';
+    }
     // Set background color for ads section
     const tRecords = document.querySelector('.t-records');
     const submitBtn = document.getElementById('submit-btn');
@@ -2742,7 +2755,14 @@ function openEditModePart(part) {
     checkTechTypeVisibility();
     showExistingMedia(part);
     document.getElementById('tabs-nav').style.display = 'none'; // Hide tabs nav
-    document.getElementById('tabs-container').style.display = 'none'; // Hide tabs content
+    const profileTabContent2 = document.getElementById('tab-content-profile');
+    if (profileTabContent2) {
+        document.getElementById('tabs-container').style.display = 'block';
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        profileTabContent2.classList.add('active');
+    } else {
+        document.getElementById('tabs-container').style.display = 'none';
+    }
     // Set background color for parts section
     const tRecords = document.querySelector('.t-records');
     if (tRecords) {
