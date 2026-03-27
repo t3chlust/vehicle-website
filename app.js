@@ -2340,7 +2340,7 @@ document.getElementById('main-form').addEventListener('submit', async (e) => {
             wheelFormula: safeVal('inp-wheel-f'),
             color: safeVal('inp-color'),
             mileage: safeVal('inp-mileage'),
-            amphibious: document.getElementById('inp-amphibious').checked ? "yes" : "no",
+            amphibious: safeVal('inp-amphibious') || 'no',
             docs: safeVal('inp-docs'),
             techType: safeVal('inp-product-type'),
             constructionType: safeVal('inp-construction'),
@@ -2684,7 +2684,7 @@ function openEditMode(ad) {
     }
     checkTenderVisibility();
     setVal('inp-tender', ad.tender || "no");
-    document.getElementById('inp-amphibious').checked = (ad.amphibious === "yes");
+    setVal('inp-amphibious', ad.amphibious === "yes" ? "yes" : "no");
     setVal('inp-docs', ad.docs || "");
     // Set product type from ad data
     setVal('inp-product-type', ad.techType || "Вездеход");
