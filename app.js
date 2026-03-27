@@ -2082,57 +2082,59 @@ function updateAuthUI(user) {
         userFavorites = []; // Очищаем избранное при выходе
     }
 }
+function clearFormErrors() {
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    document.querySelectorAll('.field-error-msg').forEach(el => { el.classList.remove('visible'); el.remove(); });
+}
+function markFieldError(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    el.classList.add('input-error');
+    const err = document.createElement('div');
+    err.className = 'field-error-msg visible';
+    err.textContent = msg;
+    el.parentNode.insertBefore(err, el.nextSibling);
+    // Убираем ошибку при изменении
+    const handler = () => { el.classList.remove('input-error'); if (err.parentNode) err.remove(); el.removeEventListener('input', handler); el.removeEventListener('change', handler); };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+    return el;
+}
 function validateForm() {
-    const errors = [];
+    clearFormErrors();
+    let firstErr = null;
     const productType = safeVal('inp-product-type');
-    // Услуга — отдельная валидация (service fields)
-    if (productType === 'Услуга') {
-        if (!safeVal('inp-service-title').trim()) errors.push('Укажите название услуги');
-        if (!safeVal('inp-service-city').trim()) errors.push('Укажите город');
-        if (!safeVal('inp-service-price').trim()) errors.push('Укажите цену услуги');
-        if (errors.length > 0) {
-            alert('Пожалуйста, заполните обязательные поля:\n\n' + errors.map((e, i) => `${i + 1}. ${e}`).join('\n'));
-            return false;
-        }
+    function check(id, msg) {
+        const v = safeVal(id);
+        if (!v || !v.trim()) { const el = markFieldError(id, msg); if (!firstErr) firstErr = el; return false; }
         return true;
     }
-    // Проверяем обязательные поля для всех типов объявлений
+    if (productType === 'Услуга') {
+        check('inp-service-title', 'Укажите название услуги');
+        check('inp-service-city', 'Укажите город');
+        check('inp-service-price', 'Укажите цену услуги');
+        if (firstErr) { firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
+        return true;
+    }
     if (productType !== 'Запчасть') {
-        if (!safeVal('inp-seller-type')) {
-            errors.push('Выберите тип продавца (Кто вы?)');
-        }
+        check('inp-seller-type', 'Выберите тип продавца');
     }
-    if (!safeVal('inp-city').trim()) {
-        errors.push('Укажите город');
-    }
+    check('inp-city', 'Укажите город');
     const priceVal = getPriceValue('inp-price');
     if (!priceVal || parseInt(priceVal) <= 0) {
-        errors.push('Укажите цену');
+        const el = markFieldError('inp-price', 'Укажите цену');
+        if (!firstErr) firstErr = el;
     }
     if (productType !== 'Запчасть') {
-        if (!safeVal('inp-condition')) {
-            errors.push('Выберите состояние (Новый/Б/У)');
-        }
+        check('inp-condition', 'Выберите состояние');
     }
-    // Проверяем специфичные поля для запчастей
     if (productType === 'Запчасть') {
-        if (!safeVal('inp-part-title').trim()) {
-            errors.push('Укажите название запчасти');
-        }
+        check('inp-part-title', 'Укажите название запчасти');
     } else {
-        // Проверяем специфичные поля для техники (не запчасть)
-        if (!safeVal('inp-brand').trim()) {
-            errors.push('Укажите марку техники');
-        }
-        if (!safeVal('inp-model').trim()) {
-            errors.push('Укажите модель техники');
-        }
+        check('inp-brand', 'Укажите марку');
+        check('inp-model', 'Укажите модель');
     }
-    if (errors.length > 0) {
-        const errorMessage = 'Пожалуйста, заполните обязательные поля:\n\n' + errors.map((e, i) => `${i + 1}. ${e}`).join('\n');
-        alert(errorMessage);
-        return false;
-    }
+    if (firstErr) { firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
     return true;
 }
 document.getElementById('main-form').addEventListener('submit', async (e) => {
@@ -2336,7 +2338,7 @@ document.getElementById('main-form').addEventListener('submit', async (e) => {
             wheelFormula: safeVal('inp-wheel-f'),
             color: safeVal('inp-color'),
             mileage: safeVal('inp-mileage'),
-            amphibious: safeVal('inp-amphibious'),
+            amphibious: document.getElementById('inp-amphibious').checked ? "yes" : "no",
             docs: safeVal('inp-docs'),
             techType: safeVal('inp-product-type'),
             constructionType: safeVal('inp-construction'),
@@ -2680,7 +2682,7 @@ function openEditMode(ad) {
     }
     checkTenderVisibility();
     setVal('inp-tender', ad.tender || "no");
-    setVal('inp-amphibious', ad.amphibious || "no");
+    document.getElementById('inp-amphibious').checked = (ad.amphibious === "yes");
     setVal('inp-docs', ad.docs || "");
     // Set product type from ad data
     setVal('inp-product-type', ad.techType || "Вездеход");
