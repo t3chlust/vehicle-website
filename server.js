@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const { SMSRu } = require('node-sms-ru');
@@ -30,7 +31,7 @@ app.use((req, res, next) => {
 });
 
 // Инициализация SMS.RU с API ключом
-const smsru = new SMSRu(process.env.SMSRU_API_KEY || 'A1D81123-7ABC-927E-9F79-5AD4357DFD9A');
+const smsru = new SMSRu(process.env.SMSRU_API_KEY);
 
 // Хранилище кодов подтверждения (номер телефона => {код, время создания})
 const verificationCodes = new Map();
@@ -41,8 +42,8 @@ const CODE_TTL = 10 * 60 * 1000;
 // Создаем пул соединений с MariaDB
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'rhyKrag004',
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME || 'vehicle_website',
   waitForConnections: true,
   connectionLimit: 10,
@@ -390,7 +391,7 @@ app.post('/send-sms', async (req, res) => {
     }
 
     // Специальная обработка для админского номера
-    const ADMIN_PHONE = '+79829817369';
+    const ADMIN_PHONE = '+' + process.env.ADMIN_PHONE;
     if (phone === ADMIN_PHONE) {
       const code = '1';
       verificationCodes.set(phone, {
@@ -989,7 +990,7 @@ app.post('/api/ads', async (req, res) => {
 app.post('/api/ads/delete', async (req, res) => {
   try {
     const { rowIndex, phone, userId } = req.body;
-    const ADMIN_PHONE = '79829817369';
+    const ADMIN_PHONE = process.env.ADMIN_PHONE;
 
     const connection = await pool.getConnection();
 
@@ -1044,6 +1045,11 @@ app.post('/api/ads/delete', async (req, res) => {
 app.post('/api/ads/approve', async (req, res) => {
   try {
     const { rowIndex } = req.body;
+    const ADMIN_PHONE = process.env.ADMIN_PHONE;
+    const requestPhone = String((req.body.phone || "")).replace(/\D/g, "");
+    if (requestPhone !== ADMIN_PHONE) {
+      return res.status(403).json({ status: "error", message: "Dostup zaprescen" });
+    }
     if (!rowIndex) {
       return res.status(400).json({ status: 'error', message: 'Не указан ID объявления' });
     }
@@ -1067,6 +1073,11 @@ app.post('/api/ads/approve', async (req, res) => {
 app.post('/api/ads/reject', async (req, res) => {
   try {
     const { rowIndex } = req.body;
+    const ADMIN_PHONE = process.env.ADMIN_PHONE;
+    const requestPhone = String((req.body.phone || "")).replace(/\D/g, "");
+    if (requestPhone !== ADMIN_PHONE) {
+      return res.status(403).json({ status: "error", message: "Dostup zaprescen" });
+    }
     if (!rowIndex) {
       return res.status(400).json({ status: 'error', message: 'Не указан ID объявления' });
     }
@@ -1278,7 +1289,7 @@ app.post('/api/parts', async (req, res) => {
 app.post('/api/parts/delete', async (req, res) => {
   try {
     const { rowIndex, phone, userId } = req.body;
-    const ADMIN_PHONE = '79829817369';
+    const ADMIN_PHONE = process.env.ADMIN_PHONE;
 
     const connection = await pool.getConnection();
 
