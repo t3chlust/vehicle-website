@@ -109,6 +109,8 @@ if (productType === 'Вездеход') {
     // Remove required from hidden fields
     setReq(conditionSection, false);
     setReq(sellerType, false);
+    setReq(priceInp, false);
+    setReq(cityInp, false);
 } else if (productType === 'Услуга') {
     // Show: service fields (price, city, description, photos)
     // Hide: everything else including general description/photos
