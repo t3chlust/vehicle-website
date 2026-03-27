@@ -1960,6 +1960,7 @@
 
     /* Upload zone improved */
     .upload-zone {
+        display: block;
         border: 2px dashed #c5cae9;
         padding: 28px 20px;
         text-align: center;
