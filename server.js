@@ -1180,7 +1180,7 @@ app.post('/api/parts', async (req, res) => {
             (brand, name, type, userId, price, date, city, \`condition\`, sellerType, verified)
            VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?)`,
           [
-            brand || null,
+            brand || partName || 'Запчасть',
             partName || 'Запчасть',
             partTypeId,
             resolvedUserId,
@@ -1224,7 +1224,7 @@ app.post('/api/parts', async (req, res) => {
             brand = ?, name = ?, price = ?, userId = ?, \`condition\` = ?, sellerType = ?, city = ?
            WHERE id = ?`,
           [
-            brand || null,
+            brand || partName || 'Запчасть',
             partName || 'Запчасть',
             price || 0,
             resolvedUserId,
